@@ -4,18 +4,30 @@ WHITE  := $(shell tput -Txterm setaf 7)
 CYAN   := $(shell tput -Txterm setaf 6)
 RESET  := $(shell tput -Txterm sgr0)
 
+CC=go
+NM="venera"
+
 all: help
 
 
 ## Run
 run: ## Build project in volatile mode
-	@echo "Run"
+	$(CC) run $(NM)
 
 
 ## Build
 build: ## Build project and organize files
-	@echo "xxx"
+	[ -d bin/ ] || `echo "Creating bin/" && mkdir bin/`
+	$(CC) build -o bin/$(NM) $(NM)
 
+build-op: ## Build with optimization flags
+	[ -d bin/ ] || `echo "creating bin/" && mkdir bin/`
+	$(CC) build -o bin/$(NM) -ldflags="-s -w" $(NM)
+
+build-run: ## Build and run project
+	[ -d bin/ ] || `echo "creating bin/" && mkdir bin/`
+	$(CC) build -o bin/$(NM) $(NM)
+	./bin/$(NM)
 
 ## Test
 test: ## Run tests of the project
@@ -23,7 +35,8 @@ test: ## Run tests of the project
 
 ## Clear
 clear: ## Clear compilation garbage
-	@echo "clear"
+	@echo "Cleaning bin/"
+	@rm bin/*
 
 ## Help
 help: ## Show this help
