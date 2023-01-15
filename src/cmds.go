@@ -18,6 +18,10 @@ func (p *Profile) Execute(cmd string) {
 		} else {
 			PrintErr("No module setted. Type `help`.")
 		}
+	
+
+	} else if cmds[0] == "search" || cmds[0] == "s" {
+		SCListScripts(cmds)
 
 
 	} else if cmds[0] == "info" {
@@ -28,7 +32,7 @@ func (p *Profile) Execute(cmd string) {
 		}
 
 
-	} else if cmds[0] == "back" {
+	} else if cmds[0] == "back" || cmds[0] == "b" {
 		if p.SSet {
 			p.State.Close()
 			p.Prompt = "[*]>> "

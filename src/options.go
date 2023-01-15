@@ -22,9 +22,25 @@ func CmdHelp() {
 	print("\n")
 	t.Print()
 	print("\n")
+	println("BASIC NAVEGATION:")
 	println("    Press `TAB` to rotate suggestions.")
 	println("    Press `arrow key` to pass suggentions or history.")
-	println("    Press `CTRL-D` to exit.")
+	println("    Press `CTRL-d` to exit.")
+	println("    Press `CTRL-l` to clear promp.")
+
+	print("\n")
+	println("SEARCHING:")
+	println("    `serach` list scripts/modules.")
+	println("    `serach match <key>` list witch maches patter.")
+	println("    `serach match:path <key>` list path matching.")
+	println("    `serach match:description <key>` list description matching.")
+	println("    `s m <key>`")
+	println("    `s m:p <key>`")
+	println("    `s m:d <key>`")
+
+	print("\n")
+	println("SET VARIABLE:")
+	println("    `set RHOST <value>` .")
 	print("\n")
 }
 

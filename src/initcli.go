@@ -33,18 +33,28 @@ func (p *Profile)completer(d prompt.Document) []prompt.Suggest {
 	case "use":
 			aux := *ScriptSuggentions
 			return aux
-	}
+	
+	case "s":
+			return []prompt.Suggest{
+				{Text: "match", 	Description: "Match string"},
+			}
 	
 	
-	
+	case "serach":
+			return []prompt.Suggest{
+				{Text: "match", 	Description: "Match string"},
+			}
+}
+
 	// General options
 	// If script setted, show script options
 	if p.SSet {
 		return []prompt.Suggest{
 			{Text: "help", 	Description: "Show help menu"},
+			{Text: "search", 	Description: "Search script/module"},
 			// Inside script/module options
-			{Text:"back", 		Description:"Exit module/script"},
-			{Text:"set",		Description:"Set value for a ver"},
+			{Text: "back", 		Description:"Exit module/script"},
+			{Text: "set",		Description:"Set value for a ver"},
 			{Text: "options", 	Description: "Show variables of script/module"},
 			{Text: "info", 		Description: "Info/metadata about script/module"},
 			{Text: "run", 		Description: "Run a script/module"},
@@ -54,6 +64,7 @@ func (p *Profile)completer(d prompt.Document) []prompt.Suggest {
 		return []prompt.Suggest{
 			{Text: "help", 	Description: "Show help menu"},
 			{Text: "use", 	Description: "Load a script/module"},
+			{Text: "search", 	Description: "Search script/module"},
 		}
 	}
 
@@ -74,4 +85,4 @@ func (p *Profile)completer(d prompt.Document) []prompt.Suggest {
 			{Text: "lua", 		Description: "Run Lua code in running mod"},
 		}, d.GetWordBeforeCursor(),true)
 */
-}
+	}
