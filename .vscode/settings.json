@@ -3,6 +3,7 @@
         "PrintSuccs",
         "PrintErr",
         "Meta",
-        "LoadVars"
+        "LoadVars",
+        "tcp"
     ]
 }

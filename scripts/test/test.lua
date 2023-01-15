@@ -1,5 +1,3 @@
-local tcp = require("tcp")
-
 -- Metadata
 Metadata = {
     AUTHOR = {"Author1 <author1@mail.com>",
@@ -7,7 +5,7 @@ Metadata = {
                 "Author3 <author3@mail.com>"
             },
     VERSION = "0.1",
-    CATS = {"vuln","XSS","scanner"},
+    CATS = {"example","XSS","scanner"},
     INFO = [[Lorem ipsum dolor sit amet, consectetur adipiscing elit,
 sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
 Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
@@ -29,10 +27,5 @@ function Init()
 end
 
 function Main()
-    local conn, err = tcp.open("google.com:80")
-    err = conn:write("GET /\n\n")
-    
-    if err then error(err) end
-    local result, err = conn:read(64*1024)
-    print(result)
+    PrintSuccs("OK")
 end
