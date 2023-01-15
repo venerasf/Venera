@@ -1,5 +1,6 @@
 local tcp = require("tcp")
 
+-- Metadata
 Metadata = {
     AUTHOR = {"Author1 <author1@mail.com>"},
     VERSION = "0.1",
@@ -19,9 +20,5 @@ function Init()
 end
 
 function Main()
-    local conn, err = tcp.open(Vars.RHOST.VALUE+":"+Vars.RPORT.VALUE)
-    err = conn:write("GET /\n\n")
-    if err then error(err) end
-    local result, err = conn:read(64*1024)
-    print(result)
+    PrintSuccs("OK")
 end

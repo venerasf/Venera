@@ -1,13 +1,17 @@
 package src
 
 import (
+	"strings"
 	"github.com/c-bata/go-prompt"
 )
 
 func (p *Profile)InitCLI() {
+	SCLoadScripts()
+	Banner()
+	SCGetPath()
 	prom := prompt.New(
 		p.Execute,
-		completer,
+		p.completer,
 		prompt.OptionPrefix("[*]>> "),
 		prompt.OptionLivePrefix(changeLivePrefix),
 		prompt.OptionCompletionOnDown(),
@@ -23,15 +27,51 @@ func changeLivePrefix() (string,bool) {
 }
 
 // Suggentions
-func completer(d prompt.Document) []prompt.Suggest {
+func (p *Profile)completer(d prompt.Document) []prompt.Suggest {
+	inputs := strings.Split(d.TextBeforeCursor(), " ")
+	switch inputs[0] {
+	case "use":
+			aux := *ScriptSuggentions
+			return aux
+	}
+	
+	
+	
+	// General options
+	// If script setted, show script options
+	if p.SSet {
+		return []prompt.Suggest{
+			{Text: "help", 	Description: "Show help menu"},
+			// Inside script/module options
+			{Text:"back", 		Description:"Exit module/script"},
+			{Text:"set",		Description:"Set value for a ver"},
+			{Text: "options", 	Description: "Show variables of script/module"},
+			{Text: "info", 		Description: "Info/metadata about script/module"},
+			{Text: "run", 		Description: "Run a script/module"},
+			{Text: "lua", 		Description: "Run Lua code in running mod"},
+		}
+	} else {
+		return []prompt.Suggest{
+			{Text: "help", 	Description: "Show help menu"},
+			{Text: "use", 	Description: "Load a script/module"},
+		}
+	}
+
+/*	
 	return prompt.FilterContains(
 		[]prompt.Suggest{
-			{Text: "help", Description: "Show help menu"},
-			{Text: "bash", Description: "Spawn shell"},
+			// General options
+			{Text: "help", 	Description: "Show help menu"},
+			{Text: "use", 	Description: "Load a script/module"},
+			{Text: "bash", 	Description: "Spawn shell"},
 
-			{Text: "use", Description: "Load a script/module"},
-			{Text: "options", Description: "Show variables of script/module"},
-			{Text: "info", Description: "Info/metadata about script/module"},
-			{Text: "run", Description: "Run a script/module"},
+			// Inside script/module options
+			{Text:"back", 		Description:"Exit module/script"},
+			{Text:"set",		Description:"Set value for a ver"},
+			{Text: "options", 	Description: "Show variables of script/module"},
+			{Text: "info", 		Description: "Info/metadata about script/module"},
+			{Text: "run", 		Description: "Run a script/module"},
+			{Text: "lua", 		Description: "Run Lua code in running mod"},
 		}, d.GetWordBeforeCursor(),true)
+*/
 }

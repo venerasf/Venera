@@ -3,13 +3,17 @@ package wlua
 import (
 	//"venera/src"
 	//"os"
-	
 	ltcp "venera/src/wlua/tcp"
 	"github.com/yuin/gopher-lua"
 )
 
 // This global var receives metadata from the running script
 var Metad Metadata
+
+// Execute arbitrary strings
+func LuaExecString(l *lua.LState,s string) {
+	l.DoString(s)
+}
 
 func loadLibs(l *lua.LState) {
 	l.PreloadModule("tcp",ltcp.Loader)
