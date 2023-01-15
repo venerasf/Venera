@@ -3,11 +3,17 @@ package wlua
 import (
 	//"venera/src"
 	//"os"
+	
+	ltcp "venera/src/wlua/tcp"
 	"github.com/yuin/gopher-lua"
 )
 
 // This global var receives metadata from the running script
 var Metad Metadata
+
+func loadLibs(l *lua.LState) {
+	l.PreloadModule("tcp",ltcp.Loader)
+}
 
 func sets(l *lua.LState) {
 	l.SetGlobal("RandomString", l.NewFunction(RandomString))
@@ -18,6 +24,7 @@ func sets(l *lua.LState) {
 
 	l.SetGlobal("Meta", l.NewFunction(Meta))
 	l.SetGlobal("LoadVars",l.NewFunction(LoadVars))
+	loadLibs(l)
 }
 
 // Start Lua sandbox run once at a time
@@ -31,6 +38,7 @@ func LuaInitUniq(p LuaProfile) (*lua.LState, bool) {
 	sets(l) // Set main funcs
 	err := l.DoFile(p.Script)
 	if err != nil {
+		println(err.Error())
 		return nil,false
 	}
 	l.DoString("Init()")

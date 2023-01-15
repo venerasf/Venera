@@ -1,3 +1,5 @@
+local tcp = require("tcp")
+
 -- Metadata
 Metadata = {
     AUTHOR = {"Author1 <author1@mail.com>",
@@ -27,5 +29,10 @@ function Init()
 end
 
 function Main()
-    print(Vars.RHOST.VALUE)
+    local conn, err = tcp.open("google.com:80")
+    err = conn:write("GET /\n\n")
+    
+    if err then error(err) end
+    local result, err = conn:read(64*1024)
+    print(result)
 end
