@@ -21,7 +21,7 @@ func (p *Profile) Execute(cmd string) {
 	
 
 	} else if cmds[0] == "search" || cmds[0] == "s" {
-		SCListScripts(cmds)
+		p.SCListScripts(cmds)
 
 
 	} else if cmds[0] == "info" {
@@ -31,15 +31,19 @@ func (p *Profile) Execute(cmd string) {
 			PrintErr("No module setted. Type `help`.")
 		}
 
+	} else if cmds[0] == "reload" {
+		ReloadScript(p)
+
+
+	} else if cmds[0] == "import" && len(cmds) == 3{
+		p.SCImportScript(cmds[1],cmds[2])
+	} else if cmds[0] == "export" && len(cmds) == 3{
+		p.SCExportScript(cmds[1],cmds[2])
+
 
 	} else if cmds[0] == "back" || cmds[0] == "b" {
 		if p.SSet {
-			p.State.Close()
-			p.Prompt = "[*]>> "
-			LivePrefixState.LivePrefix = p.Prompt
-			LivePrefixState.IsEnable = true
-			p.Script = ""
-			p.SSet = false
+			FreeScript(p)
 		} else {
 			PrintErr("No module setted. Type `help`.")
 		}
@@ -111,4 +115,46 @@ func runScript(p *Profile) {
 	} else {
 		println("No Script")
 	}
+}
+
+
+// Erase everything of a script from the memory
+func FreeScript(p *Profile) {
+	p.State.Close()
+	p.SSet = false
+	p.Script = ""
+	wlua.LuaFreeScript()
+	p.Prompt = "[*]>> "
+	LivePrefixState.LivePrefix = p.Prompt
+	LivePrefixState.IsEnable = true
+}
+
+// This function will reload a script
+func ReloadScript(p *Profile) {
+	aux := p.Script
+
+	PrintSuccs("Freeing memory.")
+	// Free script
+	p.State.Close()
+	p.SSet = false
+	p.Script = ""
+	wlua.LuaFreeScript()
+	p.Prompt = "[*]>> "
+	LivePrefixState.LivePrefix = p.Prompt
+	LivePrefixState.IsEnable = true
+
+	// load script
+	PrintSuccs("Loading "+aux)
+	p.Script = aux // Set script as passed over cmd
+	profile := *p // Take off pointer
+	pl := wlua.LuaProfile(profile) // Convert Profile to LuaProfile
+	p.State,p.SSet = wlua.LuaInitUniq(pl) // Init script
+	if !p.SSet {
+		PrintErr("Error loading script/module.")
+		return
+	}
+
+	p.Prompt = "("+aux+")>> " // Change prompt
+	LivePrefixState.LivePrefix = p.Prompt
+	LivePrefixState.IsEnable = true
 }

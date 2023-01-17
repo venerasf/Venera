@@ -6,9 +6,9 @@ import (
 )
 
 func (p *Profile)InitCLI() {
-	SCLoadScripts()
+	p.SCLoadScripts()
 	Banner()
-	SCGetPath()
+	p.SCGetPath()
 	prom := prompt.New(
 		p.Execute,
 		p.completer,
@@ -44,6 +44,11 @@ func (p *Profile)completer(d prompt.Document) []prompt.Suggest {
 			return []prompt.Suggest{
 				{Text: "match", 	Description: "Match string"},
 			}
+
+
+	case "export":
+			aux := *ScriptSuggentions
+			return aux
 }
 
 	// General options
@@ -65,6 +70,8 @@ func (p *Profile)completer(d prompt.Document) []prompt.Suggest {
 			{Text: "help", 	Description: "Show help menu"},
 			{Text: "use", 	Description: "Load a script/module"},
 			{Text: "search", 	Description: "Search script/module"},
+			{Text: "import", 	Description: "Import a script"},
+			{Text: "export", 	Description: "Export a script"},
 		}
 	}
 

@@ -45,4 +45,7 @@ func PrintErr(L *lua.LState) int {
 	fmt.Printf("[\u001B[1;31m!\u001B[0;0m]- %s\n",L.ToString(1))
 	return 1
 }
-
+func PrintInfo(L *lua.LState) int {
+	fmt.Printf("[\u001B[1;34mi\u001B[0;0m]- %s\n",L.ToString(1))
+	return 1
+}

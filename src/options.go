@@ -19,6 +19,8 @@ func CmdHelp() {
 	t.AddLine("run","Run a script/module")
 	t.AddLine("set","Set value for a ver")
 	t.AddLine("lua","Run Lua code in running mod")
+	t.AddLine("import","Import a (to edited) script")
+	t.AddLine("export","Export a script (to edit)")
 	print("\n")
 	t.Print()
 	print("\n")
@@ -34,13 +36,14 @@ func CmdHelp() {
 	println("    `serach match <key>` list witch maches patter.")
 	println("    `serach match:path <key>` list path matching.")
 	println("    `serach match:description <key>` list description matching.")
-	println("    `s m <key>`")
-	println("    `s m:p <key>`")
-	println("    `s m:d <key>`")
+	println("    `s m <key>` filter in collapsed format.")
+	println("        `s m:p <key>` filter by path.")
+	println("        `s m:d <key>` filter by description.")
 
 	print("\n")
 	println("SET VARIABLE:")
-	println("    `set RHOST <value>` .")
+	println("    `set RHOST <value>` Configure var for an in use test.")
+	println("    `set global RHOST <value>` Configure var to a chain of tests.")
 	print("\n")
 }
 

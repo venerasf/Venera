@@ -6,6 +6,7 @@ type LuaProfile struct {
 	Prompt 	string
 	Script 	string // script path
 	SSet 	bool // Script setted
+	BPath 	string // Base path
 
 	State 	*lua.LState
 }

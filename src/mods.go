@@ -18,8 +18,8 @@ import (
 
 var ScriptSuggentions *[]prompt.Suggest
 
-func SCGetPath() []string {
-	root := "scripts/"
+func (p Profile)SCGetPath() []string {
+	root := p.BPath
 	filePath := []string{} // List of file paths
 
 	err := filepath.Walk(root,func(path string, info os.FileInfo, err error) error {
@@ -36,10 +36,10 @@ func SCGetPath() []string {
 	return filePath
 }
 
-func SCLoadScripts() {
+func (p Profile)SCLoadScripts() {
 	re := regexp.MustCompile(`Metadata(\s)*=(\s)*\{((.|\n)*)INFO(\s)*=(\s)*\[\[((.|\n)*?)\]\]((.|\n)*)\}`)
 	//rea := *re
-	paths := SCGetPath()
+	paths := p.SCGetPath()
 	
 	aux := []prompt.Suggest{}
 	for _,file := range(paths) {
@@ -49,8 +49,8 @@ func SCLoadScripts() {
 }
 
 // Use for seaarch functions
-func SCListScripts(key []string) {
-	pathList := SCGetPath()
+func (p Profile)SCListScripts(key []string) {
+	pathList := p.SCGetPath()
 	t := tabby.New()
 	
 	if len(key) == 1 {

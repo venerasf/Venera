@@ -8,9 +8,6 @@ import (
 	lua "github.com/yuin/gopher-lua"
 )
 
-// Global variable vars
-var LoadVar = new(map[string]VarDef)
-
 // Load vars
 func LoadVars(L *lua.LState) int {
 	if err := gluamapper.Map(L.GetGlobal("Vars").(*lua.LTable), &LoadVar); err != nil {

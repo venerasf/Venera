@@ -3,12 +3,17 @@ package wlua
 import (
 	//"venera/src"
 	//"os"
-	ltcp "venera/src/wlua/tcp"
+	libs "github.com/vadv/gopher-lua-libs"
 	"github.com/yuin/gopher-lua"
 )
 
 // This global var receives metadata from the running script
 var Metad Metadata
+// Global variable vars
+var LoadVar = new(map[string]VarDef)
+
+
+
 
 // Execute arbitrary strings
 func LuaExecString(l *lua.LState,s string) {
@@ -16,7 +21,8 @@ func LuaExecString(l *lua.LState,s string) {
 }
 
 func loadLibs(l *lua.LState) {
-	l.PreloadModule("tcp",ltcp.Loader)
+	libs.Preload(l)
+	//l.PreloadModule("lio",lio.Loader)
 }
 
 func sets(l *lua.LState) {
@@ -25,6 +31,7 @@ func sets(l *lua.LState) {
 	// PrettyPrints
 	l.SetGlobal("PrintSuccs", l.NewFunction(PrintSuccs))
 	l.SetGlobal("PrintErr", l.NewFunction(PrintErr))
+	l.SetGlobal("PrintInfo", l.NewFunction(PrintInfo))
 
 	l.SetGlobal("Meta", l.NewFunction(Meta))
 	l.SetGlobal("LoadVars",l.NewFunction(LoadVars))
@@ -58,4 +65,12 @@ func LuaRunUniq(l *lua.LState) {
 // Start lua chai for working with multiple scripts
 func LuaInitChain(p LuaProfile) {
 	//l := lua.NewState()
+}
+
+
+
+// LuaFreeScript deletes everything of a script from the memory
+func LuaFreeScript() {
+	LoadVar = new(map[string]VarDef)
+	Metad = Metadata{}
 }

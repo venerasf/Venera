@@ -3,8 +3,8 @@ local tcp = require("tcp")
 Metadata = {
     AUTHOR = {"Author1 <author1@mail.com>"},
     VERSION = "0.1",
-    CATS = {"example","XSS","scanner"},
-    INFO = [[Other Test]]
+    CATS = {"example","tcp","scanner"},
+    INFO = [[TCP conn with go-lua]]
 }
 
 -- Arguments/Variables needed to execute script
@@ -19,7 +19,8 @@ function Init()
 end
 
 function Main()
-    local conn, err = tcp.open(Vars.RHOST.VALUE+":"+Vars.RPORT.VALUE)
+    local host = Vars.RHOST.VALUE..":"..Vars.RPORT.VALUE
+    local conn, err = tcp.open(host)
     err = conn:write("GET /\n\n")
     if err then error(err) end
     local result, err = conn:read(64*1024)
