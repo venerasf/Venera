@@ -23,7 +23,9 @@ func VarsList() {
 	for i,j := range(*LoadVar) {
 		t.AddLine(i,j.VALUE,j.NEEDED,j.DESCRIPT)
 	}
+	print("\n")
 	t.Print()
+	print("\n")
 }
 
 func SetVarValue(L *lua.LState, key string, value string) {

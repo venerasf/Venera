@@ -3,6 +3,8 @@ package src
 import (
 	"strings"
 	"venera/src/wlua"
+
+	"github.com/cheynewallace/tabby"
 	//"github.com/c-bata/go-prompt"
 )
 
@@ -33,6 +35,9 @@ func (p *Profile) Execute(cmd string) {
 
 	} else if cmds[0] == "reload" {
 		ReloadScript(p)
+	
+	} else if cmds[0] == "global" || cmds[0] == "globals" || cmds[0] == "g" {
+		p.ListGlobals()
 
 
 	} else if cmds[0] == "import" && len(cmds) == 3{
@@ -56,6 +61,11 @@ func (p *Profile) Execute(cmd string) {
 			PrintErr("No module setted. Type `help`.")
 		}
 
+
+	}  else if cmds[0] == "set" && len(cmds) == 4 {
+		if cmds[1] == "global" || cmds[1] == "g" || cmds[1] == "globals" {
+			p.SetGlobals(cmds[2],cmds[3])
+		}
 
 	}  else if cmds[0] == "set" && len(cmds) == 3 {
 		if p.SSet {
@@ -157,4 +167,22 @@ func ReloadScript(p *Profile) {
 	p.Prompt = "("+aux+")>> " // Change prompt
 	LivePrefixState.LivePrefix = p.Prompt
 	LivePrefixState.IsEnable = true
+}
+
+
+// ################################ Global variables ################################
+/// Set globals
+func (p *Profile)SetGlobals(key string, value string) {
+	p.Globals[key] = value
+}
+
+func (p Profile)ListGlobals() {
+	t := tabby.New()
+	t.AddHeader("VARIABLE","VALUE")
+	for key,value := range(p.Globals) {
+		t.AddLine(key,value)
+	}
+	print("\n")
+	t.Print()
+	print("\n")
 }

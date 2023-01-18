@@ -4,6 +4,9 @@
         "PrintErr",
         "Meta",
         "LoadVars",
-        "tcp"
+        "tcp",
+        "PrintSuccsln",
+        "call",
+        "Call"
     ]
 }
