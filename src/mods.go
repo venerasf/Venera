@@ -10,13 +10,31 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"venera/src/wlua"
 
 	"github.com/c-bata/go-prompt"
 	"github.com/cheynewallace/tabby"
 	//"strings"
 )
 
-var ScriptSuggentions *[]prompt.Suggest
+var ScriptSuggentions *[]prompt.Suggest // script list with descriptions
+var SCTAG []ScriptTAG // script list with tags
+
+
+// Load all paths, get metadata INFO and tags
+func (p Profile)SCLoadScripts() {
+	re := regexp.MustCompile(`Metadata(\s)*=(\s)*\{((.|\n)*)INFO(\s)*=(\s)*\[\[((.|\n)*?)\]\]((.|\n)*)\}`)
+	//rea := *re
+	paths := p.SCGetPath()
+	
+	aux := []prompt.Suggest{}
+	for _,file := range(paths) {
+		SCTAG = append(SCTAG,ScriptTAG{file,wlua.ScriptGetTags(file)})
+		aux = append(aux, prompt.Suggest{Text: file,Description: SCExtractINFO(file,re)})
+	}
+	ScriptSuggentions = &aux
+}
+
 
 func (p Profile)SCGetPath() []string {
 	root := p.BPath
@@ -34,18 +52,6 @@ func (p Profile)SCGetPath() []string {
 		PrintErr(err.Error())
 	}
 	return filePath
-}
-
-func (p Profile)SCLoadScripts() {
-	re := regexp.MustCompile(`Metadata(\s)*=(\s)*\{((.|\n)*)INFO(\s)*=(\s)*\[\[((.|\n)*?)\]\]((.|\n)*)\}`)
-	//rea := *re
-	paths := p.SCGetPath()
-	
-	aux := []prompt.Suggest{}
-	for _,file := range(paths) {
-		aux = append(aux, prompt.Suggest{Text: file,Description: SCExtractINFO(file,re)})
-	}
-	ScriptSuggentions = &aux
 }
 
 // Use for seaarch functions
@@ -115,7 +121,28 @@ func (p Profile)SCListScripts(key []string) {
 			t.Print()
 			print("\n")
 
-			
+
+	} else if key[1] == "tag" || key[1] == "t" {
+		t.AddHeader("COUNT","PATH","TAG")
+		aux := SCTAG
+		for x,tag := range(aux) {
+			for i := range(tag.Tag) {
+				if strings.Contains(tag.Tag[i],key[2]) {
+					tags := strings.Join(tag.Tag,",")
+					if len(tags) < 20 {
+						t.AddLine(x+1,tag.Path,tags)
+					} else {
+						t.AddLine(x+1,tag.Path,tags[:20]+"...")
+					}
+					break
+				}
+			}
+		}
+		print("\n")
+		t.Print()
+		print("\n")
+
+
 	} else {
 		// TODO: Put a limit
 		t.AddHeader("COUNT","PATH","DESCRIPTION")
@@ -128,7 +155,6 @@ func (p Profile)SCListScripts(key []string) {
 		print("\n")
 	}
 }
-
 
 //// Extract INFO from script
 func SCExtractINFO(path string, re *regexp.Regexp) string {
@@ -146,3 +172,4 @@ func SCExtractINFO(path string, re *regexp.Regexp) string {
 		return match[7]
 	}
 }
+

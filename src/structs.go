@@ -18,3 +18,8 @@ var LivePrefixState struct {
 	LivePrefix string
 	IsEnable   bool
 }
+
+type ScriptTAG struct {
+	Path 	string
+	Tag 	[]string
+}

@@ -32,9 +32,9 @@ func Sets(l *lua.LState) {
 	l.SetGlobal("PrintSuccs", l.NewFunction(PrintSuccs))
 	l.SetGlobal("PrintErr", l.NewFunction(PrintErr))
 	l.SetGlobal("PrintInfo", l.NewFunction(PrintInfo))
-	l.SetGlobal("PrintSuccs", l.NewFunction(PrintSuccsln))
-	l.SetGlobal("PrintErr", l.NewFunction(PrintErrln))
-	l.SetGlobal("PrintInfo", l.NewFunction(PrintInfoln))
+	l.SetGlobal("PrintSuccsln", l.NewFunction(PrintSuccsln))
+	l.SetGlobal("PrintErrln", l.NewFunction(PrintErrln))
+	l.SetGlobal("PrintInfoln", l.NewFunction(PrintInfoln))
 
 	l.SetGlobal("Meta", l.NewFunction(Meta))
 	l.SetGlobal("LoadVars",l.NewFunction(LoadVars))
@@ -70,7 +70,17 @@ func LuaRunUniq(l *lua.LState) {
 
 // Start lua chai for working with multiple scripts
 func LuaInitChain(p LuaProfile) {
-	//l := lua.NewState()
+	l := lua.NewState()
+	defer l.Close()
+	Sets(l)
+	err := l.DoFile(p.Script)
+	if err != nil {
+		println(err.Error())
+		return
+	}
+	l.DoString("Init()")
+	SetFromGlobals(l,p)
+	l.DoString("Main()")
 }
 
 

@@ -33,6 +33,11 @@ func (p *Profile) Execute(cmd string) {
 			PrintErr("No module setted. Type `help`.")
 		}
 
+
+	} else if cmds[0] == "elf" {
+		PrintSuccs("Elf")
+
+		
 	} else if cmds[0] == "reload" {
 		ReloadScript(p)
 	

@@ -23,6 +23,6 @@ end
 function Main()
     local request = http.request(Vars.METHOD.VALUE, Vars.URL.VALUE)
     local result, err = client:do_request(request)
-    PrintSuccs(result.code)
-    PrintSuccs(result.body)
+    PrintSuccsln(result.code)
+    PrintSuccsln(result.body)
 end

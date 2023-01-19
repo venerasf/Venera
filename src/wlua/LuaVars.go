@@ -28,6 +28,8 @@ func VarsList() {
 	print("\n")
 }
 
+
+// Set variales in manual use
 func SetVarValue(L *lua.LState, key string, value string) {
 	ex := false
 	for i,_ := range(*LoadVar) {
@@ -41,5 +43,19 @@ func SetVarValue(L *lua.LState, key string, value string) {
 		println("[\u001B[1;32mOK\u001B[0;0m]",key,"<-",value)
 	} else {
 		println("[\u001B[1;31m!\u001B[0;0m] No variable",key,"<-",value)
+	}
+}
+
+// Set variables from globals 
+func SetFromGlobals(L *lua.LState,p LuaProfile) {
+	vars := new(map[string]VarDef)
+
+	if err := gluamapper.Map(L.GetGlobal("Vars").(*lua.LTable), &vars); err != nil {
+		panic(err)
+	}
+
+	for i := range(p.Globals) {
+		println("Vars."+i+".VALUE=\""+p.Globals[i]+"\"")
+		L.DoString("Vars."+i+".VALUE=\""+p.Globals[i]+"\"")
 	}
 }

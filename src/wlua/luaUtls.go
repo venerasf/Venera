@@ -53,14 +53,14 @@ func PrintInfo(L *lua.LState) int {
 
 // Pretty print with line ending
 func PrintSuccsln(L *lua.LState) int {
-	fmt.Printf("[\u001B[1;32mOK\u001B[0;0m]- %s",L.ToString(1))
+	fmt.Printf("[\u001B[1;32mOK\u001B[0;0m]- %s\n",L.ToString(1))
 	return 1
 }
 func PrintErrln(L *lua.LState) int {
-	fmt.Printf("[\u001B[1;31m!\u001B[0;0m]- %s",L.ToString(1))
+	fmt.Printf("[\u001B[1;31m!\u001B[0;0m]- %s\n",L.ToString(1))
 	return 1
 }
 func PrintInfoln(L *lua.LState) int {
-	fmt.Printf("[\u001B[1;34mi\u001B[0;0m]- %s",L.ToString(1))
+	fmt.Printf("[\u001B[1;34mi\u001B[0;0m]- %s\n",L.ToString(1))
 	return 1
 }

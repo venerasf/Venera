@@ -41,3 +41,21 @@ func MetaListCats() {
 func MetaShowInfo() {
 	println(Metad.INFO)
 }
+
+
+// return categories of a script
+func ScriptGetTags(path string) []string {
+	newMeta := Metadata{}
+	//println(path)
+	aux := lua.NewState()
+	defer aux.Close()
+
+	err := aux.DoFile(path)
+	if err != nil {
+		return []string{"nil"}
+	}
+	if err = gluamapper.Map(aux.GetGlobal("Metadata").(*lua.LTable), &newMeta); err != nil {
+		return []string{"nil"}
+	}
+	return newMeta.CATS
+}

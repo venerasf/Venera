@@ -20,14 +20,14 @@ end
 
 function Main()
     local s = base64.RawStdEncoding:encode_to_string("foo\01bar")
-    PrintSuccs(s)
+    PrintSuccsln(s)
     
     s = base64.StdEncoding:encode_to_string("foo\01bar")
-    PrintSuccs(s)
+    PrintSuccsln(s)
     
     s = base64.RawURLEncoding:encode_to_string("this is a <tag> and should be encoded")
-    PrintSuccs(s)
+    PrintSuccsln(s)
     
     s = base64.URLEncoding:encode_to_string("this is a <tag> and should be encoded")
-    PrintSuccs(s)
+    PrintSuccsln(s)
 end
