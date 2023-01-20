@@ -37,12 +37,14 @@ func (p *Profile)completer(d prompt.Document) []prompt.Suggest {
 	case "s":
 			return []prompt.Suggest{
 				{Text: "match", 	Description: "Match string"},
+				{Text: "tag", 	Description: "Search tags"},
 			}
 	
 	
 	case "serach":
 			return []prompt.Suggest{
 				{Text: "match", 	Description: "Match string"},
+				{Text: "tag", 	Description: "Search tags"},
 			}
 
 

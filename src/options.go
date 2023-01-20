@@ -55,8 +55,8 @@ func Banner() {
 	} else {
 		stb = "NotStable"
 	}
-	fmt.Printf("### Venera %.2f-%s ###\n",Version,stb)
-	/*print(`
+	//fmt.Printf("### Venera %.2f-%s ###\nType `help`\n\n",Version,stb)
+	fmt.Printf(`
 	__    _ ____________________________________
 	\ \  | |   ___   _  _    ___   _  _   __ _  |
 	 \ \ | |  / _ \ | \| |  / _ \ | |//  / _' | |
@@ -64,5 +64,7 @@ func Banner() {
 	   \___|  \___| |_| _|  \___| |_|    \__,_| |
 	   -----------------------------------------+
 	   Recon Mission: github.com/farinap5/venera
-	`)*/
+                type 'help'      %.2f-%s
+
+`,Version,stb)
 }

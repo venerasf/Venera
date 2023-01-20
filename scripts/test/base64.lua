@@ -4,8 +4,8 @@ local base64 = require("base64")
 Metadata = {
     AUTHOR = {"Author1 <author1@mail.com>"},
     VERSION = "0.1",
-    CATS = {"example","encoding"},
-    INFO = [[Base64 encoding with base64 for lua-go]]
+    CATS = {"example","encoding","util"},
+    INFO = [[Lorem ipsum dolor sit amet,]]
 }
 
 -- Arguments/Variables needed to execute script

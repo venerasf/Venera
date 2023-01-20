@@ -49,13 +49,13 @@ func ScriptGetTags(path string) []string {
 	//println(path)
 	aux := lua.NewState()
 	defer aux.Close()
-
+	Sets(aux)
 	err := aux.DoFile(path)
 	if err != nil {
-		return []string{"nil"}
+		return []string{"nil(f)"}
 	}
 	if err = gluamapper.Map(aux.GetGlobal("Metadata").(*lua.LTable), &newMeta); err != nil {
-		return []string{"nil"}
+		return []string{"nil(m)"}
 	}
 	return newMeta.CATS
 }
