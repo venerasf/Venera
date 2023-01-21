@@ -10,7 +10,7 @@ import (
 
 // Load vars
 func LoadVars(L *lua.LState) int {
-	if err := gluamapper.Map(L.GetGlobal("Vars").(*lua.LTable), &LoadVar); err != nil {
+	if err := gluamapper.Map(L.GetGlobal("VARS").(*lua.LTable), &LoadVar); err != nil {
 		panic(err)
 	}
 	//print
@@ -38,7 +38,7 @@ func SetVarValue(L *lua.LState, key string, value string) {
 		}
 	}
 	if ex {
-		L.DoString("Vars."+key+".VALUE=\""+value+"\"")
+		L.DoString("VARS."+key+".VALUE=\""+value+"\"")
 		LoadVars(L)
 		println("[\u001B[1;32mOK\u001B[0;0m]",key,"<-",value)
 	} else {
@@ -50,12 +50,14 @@ func SetVarValue(L *lua.LState, key string, value string) {
 func SetFromGlobals(L *lua.LState,p LuaProfile) {
 	vars := new(map[string]VarDef)
 
-	if err := gluamapper.Map(L.GetGlobal("Vars").(*lua.LTable), &vars); err != nil {
+	if err := gluamapper.Map(L.GetGlobal("VARS").(*lua.LTable), &vars); err != nil {
 		panic(err)
 	}
 
 	for i := range(p.Globals) {
-		println("Vars."+i+".VALUE=\""+p.Globals[i]+"\"")
-		L.DoString("Vars."+i+".VALUE=\""+p.Globals[i]+"\"")
+		println("VARS."+i+".VALUE=\""+p.Globals[i]+"\"")
+		L.DoString("VARS."+i+".VALUE=\""+p.Globals[i]+"\"")
 	}
 }
+
+

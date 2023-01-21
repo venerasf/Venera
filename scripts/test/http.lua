@@ -2,26 +2,26 @@ local http = require("http")
 local client = http.client()
 
 -- Metadata
-Metadata = {
+METADATA = {
     AUTHOR = {"Author1 <author1@mail.com>"},
     VERSION = "0.1",
-    CATS = {"example","encoding"},
+    TAGS = {"example","http"},
     INFO = [[HTTP requests with lua-go]]
 }
 
 -- Arguments/Variables needed to execute script
-Vars = {
+VARS = {
     URL = {VALUE="http://example.com", NEEDED="yes", DESCRIPT="URL"},
     METHOD = {VALUE="GET", NEEDED="yes", DESCRIPT="METHOD"}
 }
 
 function Init()
-    Meta(Metadata) -- Load metadata 
-    LoadVars(Vars) -- Load variables
+    Meta(METADATA) -- Load metadata 
+    LoadVars(VARS) -- Load variables
 end
 
 function Main()
-    local request = http.request(Vars.METHOD.VALUE, Vars.URL.VALUE)
+    local request = http.request(VARS.METHOD.VALUE, VARS.URL.VALUE)
     local result, err = client:do_request(request)
     PrintSuccsln(result.code)
     PrintSuccsln(result.body)

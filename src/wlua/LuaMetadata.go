@@ -11,7 +11,7 @@ import (
 
 // Load metadata
 func Meta(L *lua.LState) int {
-	if err := gluamapper.Map(L.GetGlobal("Metadata").(*lua.LTable), &Metad); err != nil {
+	if err := gluamapper.Map(L.GetGlobal("METADATA").(*lua.LTable), &Metad); err != nil {
 		panic(err)
 	}
 	return 1
@@ -20,7 +20,7 @@ func Meta(L *lua.LState) int {
 func MetaShow() {
 	println("## AUTHOR/S ##")
 	MetaListAuthors()
-	println("\n## CATEGORIES ##")
+	println("\n## TAGS ##")
 	MetaListCats()
 	println("\n## INFO ##")
 	MetaShowInfo()
@@ -33,8 +33,8 @@ func MetaListAuthors() {
 }
 
 func MetaListCats() {
-	for i := range(Metad.CATS) {
-		fmt.Printf("%d) %s\n",i+1,Metad.CATS[i])
+	for i := range(Metad.TAGS) {
+		fmt.Printf("%d) %s\n",i+1,Metad.TAGS[i])
 	}
 }
 
@@ -42,10 +42,9 @@ func MetaShowInfo() {
 	println(Metad.INFO)
 }
 
-
 // return categories of a script
 func ScriptGetTags(path string) []string {
-	newMeta := Metadata{}
+	newMeta := METADATA{}
 	//println(path)
 	aux := lua.NewState()
 	defer aux.Close()
@@ -54,8 +53,11 @@ func ScriptGetTags(path string) []string {
 	if err != nil {
 		return []string{"nil(f)"}
 	}
-	if err = gluamapper.Map(aux.GetGlobal("Metadata").(*lua.LTable), &newMeta); err != nil {
+	//println(path)
+	x := aux.GetGlobal("METADATA").(*lua.LTable)
+	if err = gluamapper.Map(x, &newMeta); err != nil {
 		return []string{"nil(m)"}
 	}
-	return newMeta.CATS
+	return newMeta.TAGS
 }
+

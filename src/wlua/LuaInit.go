@@ -10,7 +10,7 @@ import (
 
 // TODO: Create a sctruct and mas to methods or as var, i don't like globals
 // This global var receives metadata from the running script
-var Metad Metadata
+var Metad METADATA
 // Global variable vars
 var LoadVar = new(map[string]VarDef)
 var LuaProf LuaProfile
@@ -68,12 +68,22 @@ func LuaRunUniq(l *lua.LState) {
 }
 
 
+
+func LuaRunChaining(p LuaProfile) {
+	for _,i := range(p.Scriptslist) {
+		p.Script = i
+		LuaInitChain(p)
+	}
+}
+
+
 // Start lua chai for working with multiple scripts
 func LuaInitChain(p LuaProfile) {
 	l := lua.NewState()
 	defer l.Close()
 	Sets(l)
 	err := l.DoFile(p.Script)
+	println(p.Script)
 	if err != nil {
 		println(err.Error())
 		return
@@ -88,6 +98,6 @@ func LuaInitChain(p LuaProfile) {
 // LuaFreeScript deletes everything of a script from the memory
 func LuaFreeScript() {
 	LoadVar = new(map[string]VarDef)
-	Metad = Metadata{}
+	Metad = METADATA{}
 	LuaProf = LuaProfile{}
 }

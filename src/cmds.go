@@ -99,8 +99,21 @@ func (p *Profile) Execute(cmd string) {
 		}
 		
 
+	} else if cmds[0] == "use" && (cmds[1] == "tags" ||cmds[1] == "tag" || cmds[1] == "t" ) && len(cmds) >= 3 {
+		if !p.SSet {
+			useScriptTAG(p,cmds)
+		} else {
+			PrintErr("No module setted. Type `help`.")
+		}
+
+
 	} else if cmd == "run" || cmd == "exploit" {
-		runScript(p)
+		if !p.Chain {
+			runScript(p)
+		} else {
+			runChain(p)
+		}
+		
 
 
 	} else {
@@ -135,7 +148,12 @@ func runScript(p *Profile) {
 
 // Erase everything of a script from the memory
 func FreeScript(p *Profile) {
-	p.State.Close()
+	if p.Chain {
+		p.State.Close()
+		p.Chain = false
+		//print("cleaning\n")
+	}
+	
 	p.SSet = false
 	p.Script = ""
 	wlua.LuaFreeScript()
@@ -190,4 +208,42 @@ func (p Profile)ListGlobals() {
 	print("\n")
 	t.Print()
 	print("\n")
+}
+
+
+func useScriptTAG(p *Profile, cmds []string) {
+	var scriptslist []string
+
+	aux := SCTAG
+	for _,sti := range(aux) {
+		for i := range(sti.Tag) {
+			for _,j := range(cmds[2:]) {
+				if sti.Tag[i]==j {
+					scriptslist	= append(scriptslist, sti.Path)
+					break
+				}
+			}
+		}
+	}
+	if len(scriptslist) == 0 {
+		PrintErr("Error loading tags, no script found.")
+		return
+	}
+
+	p.Scriptslist = scriptslist
+	p.Prompt = "("+JoinTgs(cmds[2:])+")>> " // Change prompt
+	LivePrefixState.LivePrefix = p.Prompt
+	LivePrefixState.IsEnable = true
+	p.SSet = true
+}
+
+func runChain(p *Profile) {
+	profile := *p // Take off pointer
+	pl := wlua.LuaProfile(profile)
+	wlua.LuaRunChaining(pl)
+	p.Chain = true
+
+	/*for _,i := range (p.Scriptslist) {
+		println(i)
+	} */
 }

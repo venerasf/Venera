@@ -1,25 +1,25 @@
 local base64 = require("base64")
 
 -- Metadata
-Metadata = {
+METADATA = {
     AUTHOR = {"Author1 <author1@mail.com>"},
     VERSION = "0.1",
-    CATS = {"example","encoding","util"},
+    TAGS = {"example","encoding","util"},
     INFO = [[Lorem ipsum dolor sit amet,]]
 }
 
 -- Arguments/Variables needed to execute script
-Vars = {
+VARS = {
     DATA = {VALUE="Any world", NEEDED="yes", DESCRIPT="Data to encode"}
 }
 
 function Init()
-    Meta(Metadata) -- Load metadata 
-    LoadVars(Vars) -- Load variables
+    Meta(METADATA) -- Load metadata 
+    LoadVars(VARS) -- Load variables
 end
 
 function Main()
-    local s = base64.RawStdEncoding:encode_to_string("foo\01bar")
+    local s = base64.RawStdEncoding:encode_to_string(VARS.DATA.VALUE)
     PrintSuccsln(s)
     
     s = base64.StdEncoding:encode_to_string("foo\01bar")

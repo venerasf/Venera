@@ -3,20 +3,22 @@ package wlua
 import lua "github.com/yuin/gopher-lua"
 
 type LuaProfile struct {
-	Prompt 	string
-	Script 	string // script path
-	SSet 	bool   // Script setted
-	BPath 	string // Base path
+	Prompt 		string
+	Script 		string // script path
+	Scriptslist []string // list of scripts for chaining
+	SSet 		bool   // Script setted
+	BPath 		string // Base path
 
 	Globals map[string]string // Script Global variables
 	State 	*lua.LState
+	Chain 	bool
 }
 
 // Script metadata
-type Metadata struct {
+type METADATA struct {
 	AUTHOR 	[]string
 	VERSION string
-	CATS 	[]string
+	TAGS 	[]string
 	INFO	string
 }
 
