@@ -59,6 +59,7 @@ func LuaInitUniq(p LuaProfile) (*lua.LState, bool) {
 		return nil,false
 	}
 	l.DoString("Init()")
+	SetFromVarsScriptGlobals(l,p)
 	return l,true
 }
 

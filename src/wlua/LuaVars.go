@@ -55,9 +55,20 @@ func SetFromGlobals(L *lua.LState,p LuaProfile) {
 	}
 
 	for i := range(p.Globals) {
-		println("VARS."+i+".VALUE=\""+p.Globals[i]+"\"")
+		//println("VARS."+i+".VALUE=\""+p.Globals[i]+"\"")
 		L.DoString("VARS."+i+".VALUE=\""+p.Globals[i]+"\"")
 	}
 }
 
 
+// Set vars from globals to `use script/luascript.lua`
+func SetFromVarsScriptGlobals(L *lua.LState, p LuaProfile) {
+	for i := range(*LoadVar) {
+		for j,y := range(p.Globals) {
+			if j==i {
+				SetVarValue(L,i,y)
+				break
+			}
+		}
+	}
+}

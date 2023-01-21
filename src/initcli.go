@@ -15,7 +15,7 @@ func (p *Profile)InitCLI() {
 		prompt.OptionPrefix("[*]>> "),
 		prompt.OptionLivePrefix(changeLivePrefix),
 		prompt.OptionCompletionOnDown(),
-		prompt.OptionMaxSuggestion(2),
+		prompt.OptionMaxSuggestion(3),
 	)
 	prom.Run()
 }
@@ -28,6 +28,7 @@ func changeLivePrefix() (string,bool) {
 
 // Suggentions
 func (p *Profile)completer(d prompt.Document) []prompt.Suggest {
+	//inputs := strings.Split(d.CurrentLine(), " ")
 	inputs := strings.Split(d.TextBeforeCursor(), " ")
 	switch inputs[0] {
 	case "use":
@@ -51,6 +52,11 @@ func (p *Profile)completer(d prompt.Document) []prompt.Suggest {
 	case "export":
 			aux := *ScriptSuggentions
 			return aux
+	
+	case "set":
+		return []prompt.Suggest{
+			{Text: "global", 	Description: "Set a global variable"},
+		}
 }
 
 	// General options

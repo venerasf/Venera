@@ -25,7 +25,7 @@ var SCTAG []ScriptTAGInfo // script list with tags
 
 // Load all paths, get metadata INFO and tags
 func (p Profile)SCLoadScripts() {
-	re := regexp.MustCompile(`Metadata(\s)*=(\s)*\{((.|\n)*)INFO(\s)*=(\s)*\[\[((.|\n)*?)\]\]((.|\n)*)\}`)
+	re := regexp.MustCompile(`METADATA(\s)*=(\s)*\{((.|\n)*)INFO(\s)*=(\s)*\[\[((.|\n)*?)\]\]((.|\n)*)\}`)
 	//rea := *re
 	paths := p.SCGetPath()
 	
