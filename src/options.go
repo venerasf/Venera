@@ -36,9 +36,11 @@ func CmdHelp() {
 	println("    `serach match <key>` list witch maches patter.")
 	println("    `serach match:path <key>` list path matching.")
 	println("    `serach match:description <key>` list description matching.")
+	println("    `serach tag <tag1 tag2...>` list tags matching.")
 	println("    `s m <key>` filter in collapsed format.")
 	println("        `s m:p <key>` filter by path.")
 	println("        `s m:d <key>` filter by description.")
+	println("        `s t <tag1 tag2...>` filter by tags.")
 
 	print("\n")
 	println("SET VARIABLE:")
