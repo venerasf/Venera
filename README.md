@@ -103,8 +103,7 @@ end
 ```
 
 ### Function `Main()`
-A função `Main()` é o ponto de entrada da execução das abilidades do script.
-
+The function `Main()` is the entrypoint of your custom tests. It is called when user types `run`.
 ```
 function Main()
     local request = http.request(VARS.METHOD.VALUE, VARS.URL.VALUE)
