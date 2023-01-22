@@ -26,11 +26,11 @@ BASIC NAVEGATION:
     Press `CTRL-l` to clear promp.
 
 SEARCHING:
-    `serach` list scripts/modules.
-    `serach match <key>` list witch maches patter.
-    `serach match:path <key>` list path matching.
-    `serach match:description <key>` list description matching.
-    `serach tag <tag1 tag2...>` list tags matching.
+    `search` list scripts/modules.
+    `search match <key>` list witch maches patter.
+    `search match:path <key>` list path matching.
+    `search match:description <key>` list description matching.
+    `search tag <tag1 tag2...>` list tags matching.
     `s m <key>` filter in collapsed format.
         `s m:p <key>` filter by path.
         `s m:d <key>` filter by description.
