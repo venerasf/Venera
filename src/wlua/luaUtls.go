@@ -3,10 +3,13 @@
 package wlua
 
 import (
+	"bufio"
 	"fmt"
+	"io/ioutil"
 	"math/rand"
+	"os"
 	"strings"
-
+	//"github.com/c-bata/go-prompt"
 	lua "github.com/yuin/gopher-lua"
 )
 
@@ -49,7 +52,10 @@ func PrintInfo(L *lua.LState) int {
 	fmt.Printf("[\u001B[1;34mi\u001B[0;0m]- %s",L.ToString(1))
 	return 1
 }
-
+func Print(L *lua.LState) int {
+	fmt.Printf("%s",L.ToString(1))
+	return 1
+}
 
 // Pretty print with line ending
 func PrintSuccsln(L *lua.LState) int {
@@ -64,3 +70,47 @@ func PrintInfoln(L *lua.LState) int {
 	fmt.Printf("[\u001B[1;34mi\u001B[0;0m]- %s\n",L.ToString(1))
 	return 1
 }
+func Println(L *lua.LState) int {
+	fmt.Printf("%s\n",L.ToString(1))
+	return 1
+}
+
+//##################################################
+// Openfile and get content
+func Open(L *lua.LState) int {
+	p := L.ToString(1)
+	cont, err := ioutil.ReadFile(p)
+	if err != nil {
+		L.Push(lua.LString(err.Error()))
+		return 1
+	}
+	L.Push(lua.LString(string(cont)))
+	return 1
+}
+
+// Input
+func Input(L *lua.LState) int {
+	p := L.ToString(1)
+	if p == "" {
+		p = ">> "
+	}
+	fmt.Print(p)
+	reader := bufio.NewReader(os.Stdin)
+	c,err := reader.ReadString('\n')
+	if err != nil {
+		L.Push(lua.LString(err.Error()))
+		return 1
+	}
+	L.Push(lua.LString(c))
+	return 1
+}
+
+/*func Input(L *lua.LState) int {
+	p := L.ToString(1)
+	if p == "" {
+		p = ">> "
+	}
+	x := prompt.Input(p,nil)
+	L.Push(lua.LString(x))
+	return 1
+}*/

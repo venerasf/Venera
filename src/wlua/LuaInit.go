@@ -35,6 +35,13 @@ func Sets(l *lua.LState) {
 	l.SetGlobal("PrintSuccsln", l.NewFunction(PrintSuccsln))
 	l.SetGlobal("PrintErrln", l.NewFunction(PrintErrln))
 	l.SetGlobal("PrintInfoln", l.NewFunction(PrintInfoln))
+	l.SetGlobal("Print", l.NewFunction(Print))
+	l.SetGlobal("Println", l.NewFunction(Println))
+
+	//Input/prompt
+	l.SetGlobal("Input",l.NewFunction(Input))
+	//Open file
+	l.SetGlobal("Open",l.NewFunction(Open))
 
 	l.SetGlobal("Meta", l.NewFunction(Meta))
 	l.SetGlobal("LoadVars",l.NewFunction(LoadVars))

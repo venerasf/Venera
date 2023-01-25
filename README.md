@@ -112,3 +112,35 @@ function Main()
     PrintSuccsln(result.body)
 end
 ```
+
+## Built-in Functions
+
+You can call those function within the script without requirements.
+
+`PrintSuccs( str )` Print success message.
+
+`PrintErr( str )` Print error message.
+
+`PrintInfo( str )` Print info message.
+
+`PrintSuccsln( str )`  Print success message with line ending.
+
+`PrintErrln( str )` Print error message with line ending.
+
+`PrintInfoln( str )` Print info message with line ending.
+
+`Print( str )` Print string.
+
+`Println( str )` Print string with line ending.
+
+`RandomString( length=int , "a-zA-Z0-9" ) -> str` Generates random string.
+
+`Input( str ) ->  str`
+
+`Open( str ) -> str`
+
+`Meta( str )`
+
+`LoadVars( str )`
+
+`Call( path=str )` Call another script/module.  
