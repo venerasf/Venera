@@ -9,6 +9,8 @@
         "call",
         "Call",
         "Input",
-        "Open"
+        "Open",
+        "PrintErrln",
+        "RandomString"
     ]
 }

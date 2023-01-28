@@ -101,9 +101,9 @@ func GetVarsToChainTAGS(p LuaProfile) {
 }
 
 // Populate map that keep all variables from allf scripts grouped
-func PopulateLoadVarsFromGlobals(p LuaProfile) {
+/*func PopulateLoadVarsFromGlobals(p LuaProfile) {
 	//xVars := *LoadVar
 	for i,v := range(p.Globals) {
 		LoadVar[i].VALUE = v
 	}
-}
+}*/

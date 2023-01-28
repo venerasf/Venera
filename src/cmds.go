@@ -114,7 +114,7 @@ func (p *Profile) Execute(cmd string) {
 	} else if cmd == "run" || cmd == "exploit" {
 		if !p.Chain {
 			runScript(p)
-			print("aaa")
+			//print("aaa")
 		} else {
 			runChain(p)
 		}
@@ -240,7 +240,7 @@ func useScriptTAG(p *Profile, cmds []string) {
 	profile := *p // Take off pointer
 	pl := wlua.LuaProfile(profile)
 	wlua.GetVarsToChainTAGS(pl)
-	wlua.PopulateLoadVarsFromGlobals(pl)
+	//wlua.PopulateLoadVarsFromGlobals(pl)
 
 	p.Prompt = "("+JoinTgs(cmds[2:])+")>> " // Change prompt
 	LivePrefixState.LivePrefix = p.Prompt
