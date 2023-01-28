@@ -16,6 +16,7 @@ func CmdHelp() {
 	t.AddLine("back","Exit module/script")
 	t.AddLine("options","Show variables of script/module")
 	t.AddLine("info","Info/metadata about script/module")
+	t.AddLine("globals","Show global variables")
 	t.AddLine("run","Run a script/module")
 	t.AddLine("set","Set value for a ver")
 	t.AddLine("lua","Run Lua code in running mod")
@@ -43,9 +44,15 @@ func CmdHelp() {
 	println("        `s t <tag1 tag2...>` filter by tags.")
 
 	print("\n")
+	println("USE SCRIPT/MODULE:")
+	println("    `use path/to/script.lua` Configure a script.")
+	println("    `use tags http sql` Set scripts matching with tags.")
+
+	print("\n")
 	println("SET VARIABLE:")
 	println("    `set RHOST <value>` Configure var for an in use test.")
 	println("    `set global RHOST <value>` Configure var to a chain of tests.")
+	print("\n")
 	print("\n")
 }
 

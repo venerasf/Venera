@@ -12,7 +12,7 @@ import (
 // This global var receives metadata from the running script
 var Metad METADATA
 // Global variable vars
-var LoadVar = new(map[string]VarDef)
+var LoadVar = make(map[string]VarDef)
 var LuaProf LuaProfile
 
 // Execute arbitrary strings
@@ -105,7 +105,7 @@ func LuaInitChain(p LuaProfile) {
 
 // LuaFreeScript deletes everything of a script from the memory
 func LuaFreeScript() {
-	LoadVar = new(map[string]VarDef)
+	LoadVar = make(map[string]VarDef)
 	Metad = METADATA{}
 	LuaProf = LuaProfile{}
 }

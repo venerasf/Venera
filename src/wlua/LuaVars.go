@@ -3,6 +3,8 @@
 package wlua
 
 import (
+	//"fmt"
+
 	"github.com/cheynewallace/tabby"
 	"github.com/yuin/gluamapper"
 	lua "github.com/yuin/gopher-lua"
@@ -20,7 +22,7 @@ func LoadVars(L *lua.LState) int {
 func VarsList() {
 	t := tabby.New()
 	t.AddHeader("VARIABLE","DEFAULT","NEEDED","DESCRIPTION")
-	for i,j := range(*LoadVar) {
+	for i,j := range(LoadVar) {
 		t.AddLine(i,j.VALUE,j.NEEDED,j.DESCRIPT)
 	}
 	print("\n")
@@ -32,7 +34,7 @@ func VarsList() {
 // Set variales in manual use
 func SetVarValue(L *lua.LState, key string, value string) {
 	ex := false
-	for i,_ := range(*LoadVar) {
+	for i,_ := range(LoadVar) {
 		if i == key {
 			ex = true
 		}
@@ -61,14 +63,47 @@ func SetFromGlobals(L *lua.LState,p LuaProfile) {
 }
 
 
-// Set vars from globals to `use script/luascript.lua`
+// Set vars from globals when running `use script/luascript.lua`
 func SetFromVarsScriptGlobals(L *lua.LState, p LuaProfile) {
-	for i := range(*LoadVar) {
+	for i := range(LoadVar) {
 		for j,y := range(p.Globals) {
 			if j==i {
 				SetVarValue(L,i,y)
 				break
 			}
 		}
+	}
+}
+
+
+// Get vars from scripts
+func GetVarsToChainTAGS(p LuaProfile) {
+	//fmt.Println(p.Scriptslist)
+	for _,f := range(p.Scriptslist) {
+		L := lua.NewState()
+		Sets(L)
+		L.DoFile(f)
+
+		auxVar := make(map[string]VarDef)
+		if err := gluamapper.Map(L.GetGlobal("VARS").(*lua.LTable), &auxVar); err != nil {
+			panic(err)
+		}
+
+		for i,s := range(auxVar) {
+			if LoadVar[i].VALUE == "" {
+				//fmt.Println(i,LoadVar[i].VALUE)
+				LoadVar[i] = s
+			}
+		}
+
+		L.Close()
+	}
+}
+
+// Populate map that keep all variables from allf scripts grouped
+func PopulateLoadVarsFromGlobals(p LuaProfile) {
+	//xVars := *LoadVar
+	for i,v := range(p.Globals) {
+		LoadVar[i].VALUE = v
 	}
 }

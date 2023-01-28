@@ -15,7 +15,7 @@ func (p *Profile) Execute(cmd string) {
 	if cmd == "help" {
 		CmdHelp()
 	} else if cmds[0] == "options" {
-		if p.SSet {
+		if p.SSet || p.Chain {
 			wlua.VarsList()
 		} else {
 			PrintErr("No module setted. Type `help`.")
@@ -52,7 +52,7 @@ func (p *Profile) Execute(cmd string) {
 
 
 	} else if cmds[0] == "back" || cmds[0] == "b" {
-		if p.SSet {
+		if p.SSet || p.Chain {
 			FreeScript(p)
 		} else {
 			PrintErr("No module setted. Type `help`.")
@@ -76,7 +76,11 @@ func (p *Profile) Execute(cmd string) {
 		if p.SSet {
 			wlua.SetVarValue(p.State,cmds[1],cmds[2])
 		} else {
-			PrintErr("No module setted. Type `help`.")
+			if p.Chain {
+				PrintErr("Use global variable.")
+			} else {
+				PrintErr("No module setted. Type `help`.")
+			}
 		}
 
 
@@ -99,7 +103,7 @@ func (p *Profile) Execute(cmd string) {
 		}
 		
 
-	} else if cmds[0] == "use" && (cmds[1] == "tags" ||cmds[1] == "tag" || cmds[1] == "t" ) && len(cmds) >= 3 {
+	} else if cmds[0] == "use" && (cmds[1] == "tags" || cmds[1] == "tag" || cmds[1] == "t" ) && len(cmds) >= 3 {
 		if !p.SSet {
 			useScriptTAG(p,cmds)
 		} else {
@@ -110,6 +114,7 @@ func (p *Profile) Execute(cmd string) {
 	} else if cmd == "run" || cmd == "exploit" {
 		if !p.Chain {
 			runScript(p)
+			print("aaa")
 		} else {
 			runChain(p)
 		}
@@ -155,6 +160,7 @@ func FreeScript(p *Profile) {
 	}
 	
 	p.SSet = false
+	p.Chain = false
 	p.Script = ""
 	wlua.LuaFreeScript()
 	p.Prompt = "[*]>> "
@@ -231,17 +237,22 @@ func useScriptTAG(p *Profile, cmds []string) {
 	}
 
 	p.Scriptslist = scriptslist
+	profile := *p // Take off pointer
+	pl := wlua.LuaProfile(profile)
+	wlua.GetVarsToChainTAGS(pl)
+	wlua.PopulateLoadVarsFromGlobals(pl)
+
 	p.Prompt = "("+JoinTgs(cmds[2:])+")>> " // Change prompt
 	LivePrefixState.LivePrefix = p.Prompt
 	LivePrefixState.IsEnable = true
-	p.SSet = true
+	p.Chain = true
 }
 
 func runChain(p *Profile) {
 	profile := *p // Take off pointer
 	pl := wlua.LuaProfile(profile)
 	wlua.LuaRunChaining(pl)
-	p.Chain = true
+	//p.Chain = true
 
 	/*for _,i := range (p.Scriptslist) {
 		println(i)

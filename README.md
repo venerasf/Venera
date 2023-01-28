@@ -1,4 +1,4 @@
-<img align="center" src="img/venera4.png" width="100px">
+<img align="center" src="img/venera4.png" width="150px">
 <h1 align="center">Venera Framework</h1>
 
 Venera is a tool for automating customized tests and attacks agaist many kinds of protocol. It relies on a scripting engine based on the Lua scripting language that makes it possible to create modules for all types of checks and exploits. The framework is a manager and interpreter of lua scripts that provides functions and libraries for the creation of powerful tools used during unitary tests, vulnerability scanning and exploitation fase. The user can create its own modules or use community made scripts, tool is switchable for all kinds of need situation.
@@ -8,11 +8,15 @@ Venera is a tool for automating customized tests and attacks agaist many kinds o
 
 ### Help Menu
 ```
-COMMAND  DESCRIPTION                                                                                                                   -------  -----------                                                                                                                   help     Show help menu                                                              bash     Spawn shell           
+COMMAND DESCRIPTION
+------- -----------
+help     Show help menu
+bash     Spawn shell           
 use      Load a script/module
 back     Exit module/script
 options  Show variables of script/module
 info     Info/metadata about script/module
+globals  Show global variables
 run      Run a script/module
 set      Set value for a ver
 lua      Run Lua code in running mod
@@ -35,6 +39,10 @@ SEARCHING:
         `s m:p <key>` filter by path.
         `s m:d <key>` filter by description.
         `s t <tag1 tag2...>` filter by tags.
+
+USE SCRIPT/MODULE:
+    `use path/to/script.lua` Configure a script.
+    `use tags http sql` Set scripts matching with tags.
 
 SET VARIABLE:
     `set RHOST <value>` Configure var for an in use test.
@@ -135,12 +143,8 @@ You can call those function within the script without requirements.
 
 `RandomString( length=int , "a-zA-Z0-9" ) -> str` Generates random string.
 
-`Input( str ) ->  str`
+`Input( str ) ->  str` Prompt for an user input.
 
-`Open( str ) -> str`
+`Open( str ) -> str` Read a local file.
 
-`Meta( str )`
-
-`LoadVars( str )`
-
-`Call( path=str )` Call another script/module.  
+`Call( path=str )` Call another script/module. The `ARGS` from caller scripts are inherited by scripts being called. 
