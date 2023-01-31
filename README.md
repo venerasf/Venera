@@ -1,7 +1,7 @@
 <img align="center" src="img/venera4.png" width="150px">
 <h1 align="center">Venera Framework</h1>
 
-Venera is a tool for automating customized tests and attacks agaist many kinds of protocol. It relies on a scripting engine based on the Lua scripting language that makes it possible to create modules for all types of checks and exploits. The framework is a manager and interpreter of lua scripts that provides functions and libraries for the creation of powerful tools used during unitary tests, vulnerability scanning and exploitation fase. The user can create its own modules or use community made scripts, tool is switchable for all kinds of need situation.
+Venera is a tool for automating customized tests and attacks agaist many kinds of protocol. It relies on a scripting engine based on the Lua scripting language that makes it possible to create modules for all types of checks and exploits. The framework is a manager and interpreter of lua scripts that provides functions and libraries for the creation of powerful tools integrated with services used during unitary tests, vulnerability scanning and exploitation fase. The user can create its own modules or use community made scripts, the tool is switchable for all kinds of need situation.
 
 ![](img/banner.png)
 ---
@@ -52,7 +52,13 @@ SET VARIABLE:
 
 ## How does a module work? 
 
-The module has some essential tables as `METADATA` and `VARS` being loaded from `Init()` and then the `Main()` function with the entrypoint of custom functions execution.
+The module is a lua script created with one or many goals, the module will execute a routine of your choice as you would code it as you want.
+
+The modules done allow testers to target a specific, known vulnerability, or to perform generic verifications against the remote/local target.
+
+**See some examples in:** https://github.com/farinap5/Venera/tree/main/scripts/test.
+
+The module has some essential tables as `METADATA` and `VARS` being loaded from `Init()`, and then the `Main()` function with the entrypoint of custom functions.
 
 ### Table `METADATA`
 
