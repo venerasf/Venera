@@ -86,12 +86,16 @@ func LuaRunChaining(p LuaProfile) {
 
 
 // Start lua chai for working with multiple scripts
+// when we use tags to index.
 func LuaInitChain(p LuaProfile) {
 	l := lua.NewState()
-	defer l.Close()
+	defer l.Close() // Applying close() here
 	Sets(l)
 	err := l.DoFile(p.Script)
-	println(p.Script)
+
+	if p.Globals["VERBOSE"] == "true" {
+		println("-> "+p.Script)
+	}
 	if err != nil {
 		println(err.Error())
 		return

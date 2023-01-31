@@ -154,7 +154,7 @@ func runScript(p *Profile) {
 // Erase everything of a script from the memory
 func FreeScript(p *Profile) {
 	if p.Chain {
-		p.State.Close()
+		//p.State.Close()
 		p.Chain = false
 		//print("cleaning\n")
 	}

@@ -11,6 +11,7 @@ func Start(v float32, stb bool) {
 	x.BPath = "scripts/"
 	x.Globals = make(map[string]string)
 	x.Globals["chain"] = "on"
+	x.Globals["VERBOSE"] = "true"
 
 	x.InitCLI()
 }
