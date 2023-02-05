@@ -1,3 +1,5 @@
+-- Script for Venera Framework
+-- https://github.com/farinap5/Venera
 local http = require("http")
 local client = http.client()
 

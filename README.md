@@ -8,8 +8,8 @@ Venera is a tool for automating customized tests and attacks agaist many kinds o
 
 ### Help Menu
 ```
-COMMAND DESCRIPTION
-------- -----------
+COMMAND  DESCRIPTION
+-------  -----------
 help     Show help menu
 bash     Spawn shell           
 use      Load a script/module
@@ -48,6 +48,9 @@ SET VARIABLE:
     `set RHOST <value>` Configure var for an in use test.
     `set global RHOST <value>` Configure var to a chain of tests.
 ```
+
+![](img/sstiexp.png)
+
 ---
 
 ## How does a module work? 
