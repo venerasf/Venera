@@ -67,19 +67,25 @@ func (p *Profile) Execute(cmd string) {
 		}
 
 
-	}  else if cmds[0] == "set" && len(cmds) == 4 {
+	// Set global variable
+	/*}  else if cmds[0] == "set" && len(cmds) >= 4 {
 		if cmds[1] == "global" || cmds[1] == "g" || cmds[1] == "globals" {
-			p.SetGlobals(cmds[2],cmds[3])
-		}
-
-	}  else if cmds[0] == "set" && len(cmds) == 3 {
-		if p.SSet {
-			wlua.SetVarValue(p.State,cmds[1],cmds[2])
+			p.SetGlobals(cmds[2], strings.Join(cmds[3:]," "))
+		}*/
+    // Set normal variable
+	}  else if cmds[0] == "set" && len(cmds) >= 3 {
+		if (cmds[1] == "global" || cmds[1] == "g" || cmds[1] == "globals") && len(cmds) >= 4 {
+			p.SetGlobals(cmds[2], strings.Join(cmds[3:]," "))
 		} else {
-			if p.Chain {
-				PrintErr("Use global variable.")
+			if p.SSet {
+				//print("aaaaa")
+				wlua.SetVarValue(p.State,cmds[1], strings.Join(cmds[2:]," "))
 			} else {
-				PrintErr("No module setted. Type `help`.")
+				if p.Chain {
+					PrintErr("Use global variable.")
+				} else {
+					PrintErr("No module setted. Type `help`.")
+				}
 			}
 		}
 
@@ -94,7 +100,7 @@ func (p *Profile) Execute(cmd string) {
 		LivePrefixState.IsEnable = true
 		return
 
-
+	// Use a script
 	} else if cmds[0] == "use" && len(cmds) == 2 {
 		if !p.SSet {
 			useScript(p,cmds)
@@ -103,6 +109,7 @@ func (p *Profile) Execute(cmd string) {
 		}
 		
 
+	// Use a set of scripts based on tags
 	} else if cmds[0] == "use" && (cmds[1] == "tags" || cmds[1] == "tag" || cmds[1] == "t" ) && len(cmds) >= 3 {
 		if !p.SSet {
 			useScriptTAG(p,cmds)
@@ -111,7 +118,7 @@ func (p *Profile) Execute(cmd string) {
 		}
 
 
-	} else if cmd == "run" || cmd == "exploit" {
+	} else if cmd == "run" || cmd == "exploit" || cmd == "r" {
 		if !p.Chain {
 			runScript(p)
 			//print("aaa")
@@ -219,9 +226,26 @@ func (p Profile)ListGlobals() {
 
 func useScriptTAG(p *Profile, cmds []string) {
 	var scriptslist []string
-
+	
+	var scriptScanner []ScriptTAGInfo
 	aux := SCTAG
-	for _,sti := range(aux) {
+
+	/*
+		When using scripts based on tags the script cant be hard to configure
+		or has a complex stucture like ask prompts from the user, se scripts to
+		be used with tags are specified with the tag "scanner".
+
+		First its important to get all those scripts that have "scanner" tag,
+		and after that we match the tags
+	*/
+	for _, sti := range(aux) {
+		for i := range(sti.Tag) {
+			if sti.Tag[i] == "scanner" {
+				scriptScanner = append(scriptScanner, sti)
+			}
+		}
+	}
+	for _,sti := range(scriptScanner) {
 		for i := range(sti.Tag) {
 			for _,j := range(cmds[2:]) {
 				if sti.Tag[i]==j {

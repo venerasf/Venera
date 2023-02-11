@@ -63,14 +63,14 @@ func (p *Profile)completer(d prompt.Document) []prompt.Suggest {
 	// If script setted, show script options
 	if p.SSet {
 		return []prompt.Suggest{
-			{Text: "help", 	Description: "Show help menu"},
+			{Text: "set",		Description:"Set value for a var"},
+			{Text: "run", 		Description: "Run a script/module"},
+			{Text: "help", 		Description: "Show help menu"},
 			{Text: "search", 	Description: "Search script/module"},
 			// Inside script/module options
 			{Text: "back", 		Description:"Exit module/script"},
-			{Text: "set",		Description:"Set value for a ver"},
 			{Text: "options", 	Description: "Show variables of script/module"},
 			{Text: "info", 		Description: "Info/metadata about script/module"},
-			{Text: "run", 		Description: "Run a script/module"},
 			{Text: "lua", 		Description: "Run Lua code in running mod"},
 		}
 	} else {

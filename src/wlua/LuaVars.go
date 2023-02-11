@@ -4,6 +4,7 @@ package wlua
 
 import (
 	//"fmt"
+	//"strings"
 
 	"github.com/cheynewallace/tabby"
 	"github.com/yuin/gluamapper"
@@ -39,6 +40,7 @@ func SetVarValue(L *lua.LState, key string, value string) {
 			ex = true
 		}
 	}
+	//print(fmt.Sprintf(`VARS.%s.VALUE="%s"`,key,value))
 	if ex {
 		L.DoString("VARS."+key+".VALUE=\""+value+"\"")
 		LoadVars(L)

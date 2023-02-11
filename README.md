@@ -18,7 +18,7 @@ options  Show variables of script/module
 info     Info/metadata about script/module
 globals  Show global variables
 run      Run a script/module
-set      Set value for a ver
+set      Set value for a variable
 lua      Run Lua code in running mod
 import   Import a (to edited) script
 export   Export a script (to edit)
@@ -27,7 +27,7 @@ BASIC NAVEGATION:
     Press `TAB` to rotate suggestions.
     Press `arrow key` to pass suggentions or history.
     Press `CTRL-d` to exit.
-    Press `CTRL-l` to clear promp.
+    Press `CTRL-l` to clear prompt.
 
 SEARCHING:
     `search` list scripts/modules.
@@ -71,7 +71,7 @@ The module has some essential tables as `METADATA` and `VARS` being loaded from 
 - `TAGS` Some tags that define the script and its purpose. Scripts can be searched and executed based on their tags.
 - `INFO`The description of the script can, fault that abuses, type of test, proposed mitigations, it's up to the creator.
 
-```
+```lua
 METADATA = {
     AUTHOR = {"Author1 <author1@mail.com>"},
     VERSION = "0.1",
@@ -83,7 +83,7 @@ METADATA = {
 
 `VARS` table loads the script's variables, which it uses as parameters for its actions.
 
-```
+```lua
 VARS = {
     URL = {VALUE="http://example.com", NEEDED="yes", DESCRIPT="URL"},
     METHOD = {VALUE="GET", NEEDED="yes", DESCRIPT="METHOD"}
@@ -112,7 +112,7 @@ User also can edit those variables with the `set` command:
 
 When you run `use <script.lua>` the `Init()` function is automatically executed, so the metadata and variables are loaded. You can put other things in the function to load on the first iteration.
 
-```
+```lua
 function Init()
     Meta(METADATA) -- Load metadata 
     LoadVars(VARS) -- Load variables
@@ -121,7 +121,7 @@ end
 
 ### Function `Main()`
 The function `Main()` is the entrypoint of your custom tests. It is called when user types `run`.
-```
+```lua
 function Main()
     local request = http.request(VARS.METHOD.VALUE, VARS.URL.VALUE)
     local result, err = client:do_request(request)
@@ -132,7 +132,7 @@ end
 
 ## Built-in Functions
 
-You can call those function within the script without requirements.
+You can call those function within the script without requirements. Those functions are written in golang and can be called from the lua script.
 
 `PrintSuccs( str )` Print success message.
 
