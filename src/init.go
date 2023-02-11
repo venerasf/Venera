@@ -10,6 +10,7 @@ func Start(v float32, stb bool) {
 	x := new(Profile)
 	x.BPath = "scripts/"
 	x.Globals = make(map[string]string)
+	// Set some globals
 	x.Globals["chain"] = "on"
 	x.Globals["VERBOSE"] = "true"
 

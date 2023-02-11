@@ -6,6 +6,20 @@ Venera is a tool for automating customized tests and attacks agaist many kinds o
 ![](img/banner.png)
 ---
 
+### Download and Run
+
+No binary files are included, have go environment installed.
+
+```bash
+make install-go-apt
+```
+
+```bash
+git clone git@github.com:farinap5/Venera.git
+cd  Venera
+make run
+```
+
 ### Help Menu
 ```
 COMMAND  DESCRIPTION
@@ -65,17 +79,17 @@ The module has some essential tables as `METADATA` and `VARS` being loaded from 
 
 ### Table `METADATA`
 
-`METADATA` carries information reguarding the script so Venera can identify this module in its script base, all fields need to be configured.
+`METADATA` takes information reguarding the script so Venera can identify this module in its script base, all fields need to be configured properly.
 - `AUTHOR` is a list of strings, others who created the script or have participated in research for that flaw it abuses as example.
 - `VERSION` module/script version.
 - `TAGS` Some tags that define the script and its purpose. Scripts can be searched and executed based on their tags.
-- `INFO`The description of the script can, fault that abuses, type of test, proposed mitigations, it's up to the creator.
+- `INFO` The description of the script can, fault that abuses, type of test, proposed mitigations, it's up to the creator.
 
 ```lua
 METADATA = {
     AUTHOR = {"Author1 <author1@mail.com>"},
     VERSION = "0.1",
-    TAGS = {"example","http"},
+    TAGS = {"example","http","scanner"},
     INFO = [[HTTP requests with lua-go]]
 }
 ```
@@ -90,7 +104,7 @@ VARS = {
 }
 ```
 
-the user can see these variables with the `options` command:
+When the variables are setted in `VARS` table, the user is able to interact with them using the command `options` to list those variables, and then the command `set` to configure a value for a variable:
 
 ```
 (scripts/test/http.lua)>> options
@@ -101,7 +115,7 @@ URL       http://example.com  yes     URL
 METHOD    GET                 yes     METHOD
 ```
 
-User also can edit those variables with the `set` command:
+As mentioned, user also can edit those variables with the `set` command:
 
 ```
 (scripts/test/http.lua)>> set URL http://google.com
@@ -110,7 +124,7 @@ User also can edit those variables with the `set` command:
 
 ### Function `Init()`
 
-When you run `use <script.lua>` the `Init()` function is automatically executed, so the metadata and variables are loaded. You can put other things in the function to load on the first iteration.
+When you run `use <script.lua>` the `Init()` function is automatically executed, so the metadata and variables are loaded. You can put other things in the function to load on the first iteraction.
 
 ```lua
 function Init()
@@ -120,7 +134,9 @@ end
 ```
 
 ### Function `Main()`
-The function `Main()` is the entrypoint of your custom tests. It is called when user types `run`.
+
+The function `Main()` is the entrypoint of your custom script. It is called when user types `run`.
+
 ```lua
 function Main()
     local request = http.request(VARS.METHOD.VALUE, VARS.URL.VALUE)

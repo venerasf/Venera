@@ -22,7 +22,10 @@ type METADATA struct {
 	INFO	string
 }
 
-// Variavles in script
+/* Variavles in script
+	TODO: use "REQUIRED" instead of "NEEDED".
+ 	This change will affect all scripts done.
+ */
 type VarDef struct {
 	VALUE 		string
 	NEEDED 		string

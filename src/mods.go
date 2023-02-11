@@ -1,7 +1,7 @@
 // This file is to work with modules/script
 // like list modules, search for a module, etc...
 
-// Function must initiate with SC
+// Function must has SC prefix
 package src
 
 import (
@@ -13,17 +13,15 @@ import (
 	"sort"
 	"strings"
 	"venera/src/wlua"
-
 	"github.com/c-bata/go-prompt"
 	"github.com/cheynewallace/tabby"
-	//"strings"
 )
 
 var ScriptSuggentions *[]prompt.Suggest // script list with descriptions
 var SCTAG []ScriptTAGInfo // script list with tags
 
-
 // Load all paths, get metadata INFO and tags
+// TODO: The regex can be better
 func (p Profile)SCLoadScripts() {
 	re := regexp.MustCompile(`METADATA(\s)*=(\s)*\{((.|\n)*)INFO(\s)*=(\s)*\[\[((.|\n)*?)\]\]((.|\n)*)\}`)
 	//rea := *re
@@ -58,6 +56,7 @@ func (p Profile)SCGetPath() []string {
 }
 
 // Use for seaarch functions
+// TODO: Use `strings.ToLower()` to match strings without case sensitive
 func (p Profile)SCListScripts(key []string) {
 	pathList := p.SCGetPath()
 	t := tabby.New()
@@ -90,7 +89,7 @@ func (p Profile)SCListScripts(key []string) {
 		t.AddHeader("COUNT","PATH","DESCRIPTION","TAGS")
 		aux := SCTAG
 		for i := range(aux) {
-			if strings.Contains(aux[i].Path,key[2]) {
+			if strings.Contains(strings.ToLower(aux[i].Path), strings.ToLower(key[2])) {
 				t.AddLine(i+1,aux[i].Path,aux[i].Info,JoinTgs(aux[i].Tag))
 			}
 		}
@@ -164,7 +163,7 @@ func (p Profile)SCListScripts(key []string) {
 	}
 }
 
-//// Extract INFO from script
+//// Extract INFO from script based on the regex passed (in SCLoadScripts())
 func SCExtractINFO(path string, re *regexp.Regexp) string {
 	const l = 25
 	content, err := ioutil.ReadFile(path)
@@ -182,7 +181,7 @@ func SCExtractINFO(path string, re *regexp.Regexp) string {
 	}
 }
 
-// create a string with ths in fixed length
+// Create a string with ths in fixed length
 func JoinTgs(t []string) string {
 	const l = 25
 	aux := strings.Join(t,",")
@@ -193,7 +192,7 @@ func JoinTgs(t []string) string {
 	}
 }
 
-// create a string with all tags from all scripts
+// Create a string with all tags from all scripts
 func TagsJoinALL() string {
 	t := []string{}
 	for _,j := range(SCTAG) {

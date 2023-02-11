@@ -10,6 +10,10 @@ NM="venera"
 all: help
 
 
+## Configure Golang
+install-go-apt: ## Install or update golang env
+	apt install golang-go
+
 ## Run
 run: ## Build project in volatile mode
 	$(CC) run $(NM)

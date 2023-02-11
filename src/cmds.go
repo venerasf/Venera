@@ -89,11 +89,11 @@ func (p *Profile) Execute(cmd string) {
 			}
 		}
 
-
+	// spawn bash, useless func
 	} else if cmd == "bash" {
 		GetBash()
 
-
+	// just for tests
 	} else if cmds[0] == "setp" && len(cmds) == 2 {
 		p.Prompt = "["+cmds[1]+"]>> "
 		LivePrefixState.LivePrefix = p.Prompt
@@ -232,7 +232,7 @@ func useScriptTAG(p *Profile, cmds []string) {
 
 	/*
 		When using scripts based on tags the script cant be hard to configure
-		or has a complex stucture like ask prompts from the user, se scripts to
+		or has a complex stucture like asking prompts from the user, se scripts to
 		be used with tags are specified with the tag "scanner".
 
 		First its important to get all those scripts that have "scanner" tag,
@@ -245,6 +245,12 @@ func useScriptTAG(p *Profile, cmds []string) {
 			}
 		}
 	}
+	if len(scriptScanner) == 0 {
+		PrintErr("Error loading tags, no script found.")
+		return
+	}
+
+	
 	for _,sti := range(scriptScanner) {
 		for i := range(sti.Tag) {
 			for _,j := range(cmds[2:]) {

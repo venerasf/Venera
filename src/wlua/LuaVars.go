@@ -3,9 +3,8 @@
 package wlua
 
 import (
-	//"fmt"
+	"fmt"
 	//"strings"
-
 	"github.com/cheynewallace/tabby"
 	"github.com/yuin/gluamapper"
 	lua "github.com/yuin/gopher-lua"
@@ -20,9 +19,10 @@ func LoadVars(L *lua.LState) int {
 	return 1
 }
 
+// List variables
 func VarsList() {
 	t := tabby.New()
-	t.AddHeader("VARIABLE","DEFAULT","NEEDED","DESCRIPTION")
+	t.AddHeader("VARIABLE","DEFAULT","REQUIRED","DESCRIPTION")
 	for i,j := range(LoadVar) {
 		t.AddLine(i,j.VALUE,j.NEEDED,j.DESCRIPT)
 	}
@@ -32,7 +32,11 @@ func VarsList() {
 }
 
 
-// Set variales in manual use
+/* Set variales in manual use
+   TODO: escape string terminator that could allow lua injection
+	in SetVarValue func
+	the `VARS.%s.VALUE="%s"` is exploitable.
+*/
 func SetVarValue(L *lua.LState, key string, value string) {
 	ex := false
 	for i,_ := range(LoadVar) {
@@ -40,9 +44,8 @@ func SetVarValue(L *lua.LState, key string, value string) {
 			ex = true
 		}
 	}
-	//print(fmt.Sprintf(`VARS.%s.VALUE="%s"`,key,value))
 	if ex {
-		L.DoString("VARS."+key+".VALUE=\""+value+"\"")
+		L.DoString(fmt.Sprintf(`VARS.%s.VALUE="%s"`,key,value))
 		LoadVars(L)
 		println("[\u001B[1;32mOK\u001B[0;0m]",key,"<-",value)
 	} else {
@@ -60,7 +63,8 @@ func SetFromGlobals(L *lua.LState,p LuaProfile) {
 
 	for i := range(p.Globals) {
 		//println("VARS."+i+".VALUE=\""+p.Globals[i]+"\"")
-		L.DoString("VARS."+i+".VALUE=\""+p.Globals[i]+"\"")
+		L.DoString(fmt.Sprintf(`VARS.%s.VALUE="%s"`,i,p.Globals[i]))
+		//L.DoString("VARS."+i+".VALUE=\""+p.Globals[i]+"\"")
 	}
 }
 
