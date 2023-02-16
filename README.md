@@ -45,7 +45,7 @@ BASIC NAVEGATION:
 
 SEARCHING:
     `search` list scripts/modules.
-    `search match <key>` list matching patterns.
+    `search match <key>` list witch maches patter.
     `search match:path <key>` list path matching.
     `search match:description <key>` list description matching.
     `search tag <tag1 tag2...>` list tags matching.
