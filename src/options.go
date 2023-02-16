@@ -34,7 +34,7 @@ func CmdHelp() {
 	print("\n")
 	println("SEARCHING:")
 	println("    `search` list scripts/modules.")
-	println("    `search match <key>` list witch maches patter.")
+	println("    `search match <key>` list matching patterns.")
 	println("    `search match:path <key>` list path matching.")
 	println("    `search match:description <key>` list description matching.")
 	println("    `search tag <tag1 tag2...>` list tags matching.")
