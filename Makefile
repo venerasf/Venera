@@ -4,15 +4,46 @@ WHITE  := $(shell tput -Txterm setaf 7)
 CYAN   := $(shell tput -Txterm setaf 6)
 RESET  := $(shell tput -Txterm sgr0)
 
+UNAME := $(shell uname) ## Prone to error (in windows)
+ARCHT := $(shell uname -m)
+UNAMEP:= $(shell uname -smr)
+
 CC=go
 NM="venera"
-
 all: help
 
-
 ## Configure Golang
-install-go-apt: ## Install or update golang env
+install-go: ## Install or update golang env automatically
+  ifeq ($(OS),Windows_NT) ## OS (Windows_NT
+  else
+    ifeq ($(UNAME),Linux ) ## OS (Linux)
+			$(info $(UNAMEP))
+      ifneq ($(shell command -v pacman),)   ## pacman
+				pacman -S go
+        
+      else ifneq ($(shell command -v apt),) ## apt-get
+				apt install golang-go
+
+      else ifneq ($(shell command -v yum),) ## yum
+			  sudo yum -y install epel-release
+        sudo yum -y install golang         ## not tested
+
+      else
+        $(error No appliable package managers found)
+
+      endif
+
+    else ## OS (Other)
+
+    endif
+  endif
+
+
+install-go-apt: ## Install or update golang env with a preset 
 	apt install golang-go
+
+install-go-pacman: ## Install or update golang env with a preset
+	pacman -S golang-go
 
 ## Run
 run: ## Build project in volatile mode
