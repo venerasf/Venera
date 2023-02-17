@@ -13,23 +13,26 @@ NM="venera"
 all: help
 
 ## Configure Golang
-install-go: ## Install or update golang env automatically
+install-go: ## Install or update golang env automatically, 
   ifeq ($(OS),Windows_NT) ## OS (Windows_NT
+
   else
+
     ifeq ($(UNAME),Linux ) ## OS (Linux)
 			$(info $(UNAMEP))
+
       ifneq ($(shell command -v pacman),)   ## pacman
-				pacman -S go
+			pacman -S go
         
       else ifneq ($(shell command -v apt),) ## apt-get
-				apt install golang-go
+			apt install golang-go
 
       else ifneq ($(shell command -v yum),) ## yum
-			  sudo yum -y install epel-release
-        sudo yum -y install golang         ## not tested
+			sudo yum -y install epel-release   ## !!!!!!!!!
+			sudo yum -y install golang         ## not tested
 
       else
-        $(error No appliable package managers found)
+			$(error No appliable package managers found, you'll have to install it manually)
 
       endif
 
@@ -37,13 +40,6 @@ install-go: ## Install or update golang env automatically
 
     endif
   endif
-
-
-install-go-apt: ## Install or update golang env with a preset 
-	apt install golang-go
-
-install-go-pacman: ## Install or update golang env with a preset
-	pacman -S golang-go
 
 ## Run
 run: ## Build project in volatile mode
