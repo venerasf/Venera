@@ -10,8 +10,9 @@ import (
 
 func (p *Profile) Execute(cmd string) {
 	cmd = strings.TrimSpace(cmd)
-	cmds := strings.Split(cmd," ")
-	
+	cmds := strings.Split(cmd, " ")
+
+
 	if cmd == "help" {
 		CmdHelp()
 	} else if cmds[0] == "options" {
@@ -20,7 +21,7 @@ func (p *Profile) Execute(cmd string) {
 		} else {
 			PrintErr("No module setted. Type `help`.")
 		}
-	
+
 
 	} else if cmds[0] == "search" || cmds[0] == "s" {
 		p.SCListScripts(cmds)
@@ -37,18 +38,19 @@ func (p *Profile) Execute(cmd string) {
 	} else if cmds[0] == "elf" {
 		PrintSuccs("Elf")
 
-		
+
 	} else if cmds[0] == "reload" {
 		ReloadScript(p)
-	
+
+
 	} else if cmds[0] == "global" || cmds[0] == "globals" || cmds[0] == "g" {
 		p.ListGlobals()
 
-
-	} else if cmds[0] == "import" && len(cmds) == 3{
-		p.SCImportScript(cmds[1],cmds[2])
-	} else if cmds[0] == "export" && len(cmds) == 3{
-		p.SCExportScript(cmds[1],cmds[2])
+	
+	} else if cmds[0] == "import" && len(cmds) == 3 {
+		p.SCImportScript(cmds[1], cmds[2])
+	} else if cmds[0] == "export" && len(cmds) == 3 {
+		p.SCExportScript(cmds[1], cmds[2])
 
 
 	} else if cmds[0] == "back" || cmds[0] == "b" {
@@ -61,25 +63,27 @@ func (p *Profile) Execute(cmd string) {
 
 	} else if cmds[0] == "lua" && len(cmds) >= 2 {
 		if p.SSet {
-			wlua.LuaExecString(p.State,strings.Join(cmds[1:]," "))
+			wlua.LuaExecString(p.State, strings.Join(cmds[1:], " "))
 		} else {
 			PrintErr("No module setted. Type `help`.")
 		}
 
-
+	
 	// Set global variable
 	/*}  else if cmds[0] == "set" && len(cmds) >= 4 {
 		if cmds[1] == "global" || cmds[1] == "g" || cmds[1] == "globals" {
 			p.SetGlobals(cmds[2], strings.Join(cmds[3:]," "))
 		}*/
-    // Set normal variable
-	}  else if cmds[0] == "set" && len(cmds) >= 3 {
+
+
+	// Set normal variable
+	} else if cmds[0] == "set" && len(cmds) >= 3 {
 		if (cmds[1] == "global" || cmds[1] == "g" || cmds[1] == "globals") && len(cmds) >= 4 {
-			p.SetGlobals(cmds[2], strings.Join(cmds[3:]," "))
+			p.SetGlobals(cmds[2], strings.Join(cmds[3:], " "))
 		} else {
 			if p.SSet {
 				//print("aaaaa")
-				wlua.SetVarValue(p.State,cmds[1], strings.Join(cmds[2:]," "))
+				wlua.SetVarValue(p.State, cmds[1], strings.Join(cmds[2:], " "))
 			} else {
 				if p.Chain {
 					PrintErr("Use global variable.")
@@ -89,30 +93,33 @@ func (p *Profile) Execute(cmd string) {
 			}
 		}
 
+
 	// spawn bash, useless func
 	} else if cmd == "bash" {
 		GetBash()
 
+
 	// just for tests
 	} else if cmds[0] == "setp" && len(cmds) == 2 {
-		p.Prompt = "["+cmds[1]+"]>> "
+		p.Prompt = "[" + cmds[1] + "]>> "
 		LivePrefixState.LivePrefix = p.Prompt
 		LivePrefixState.IsEnable = true
 		return
 
+
 	// Use a script
 	} else if cmds[0] == "use" && len(cmds) == 2 {
 		if !p.SSet {
-			useScript(p,cmds)
+			useScript(p, cmds)
 		} else {
 			PrintErr("No module setted. Type `help`.")
 		}
-		
+
 
 	// Use a set of scripts based on tags
-	} else if cmds[0] == "use" && (cmds[1] == "tags" || cmds[1] == "tag" || cmds[1] == "t" ) && len(cmds) >= 3 {
+	} else if cmds[0] == "use" && len(cmds) >= 3 && (cmds[1] == "tags" || cmds[1] == "tag" || cmds[1] == "t") {
 		if !p.SSet {
-			useScriptTAG(p,cmds)
+			useScriptTAG(p, cmds)
 		} else {
 			PrintErr("No module setted. Type `help`.")
 		}
@@ -125,7 +132,10 @@ func (p *Profile) Execute(cmd string) {
 		} else {
 			runChain(p)
 		}
-		
+
+	} else if cmds[0] == "exit" {
+		// Talvez o bug do terminal esteja relacionado com o exit?
+		// revi algo semelhante à ele em prompt.go mas não direito
 
 
 	} else {
@@ -135,16 +145,16 @@ func (p *Profile) Execute(cmd string) {
 
 // Load script
 func useScript(p *Profile, cmds []string) {
-	p.Script = cmds[1] // Set script as passed over cmd
-	profile := *p // Take off pointer
-	pl := wlua.LuaProfile(profile) // Convert Profile to LuaProfile
-	p.State,p.SSet = wlua.LuaInitUniq(pl) // Init script
+	p.Script = cmds[1]                     // Set script as passed over cmd
+	profile := *p                          // Take off pointer
+	pl := wlua.LuaProfile(profile)         // Convert Profile to LuaProfile
+	p.State, p.SSet = wlua.LuaInitUniq(pl) // Init script
 	if !p.SSet {
 		PrintErr("Error loading script/module.")
 		return
 	}
 
-	p.Prompt = "("+cmds[1]+")>> " // Change prompt
+	p.Prompt = "(" + cmds[1] + ")>> " // Change prompt
 	LivePrefixState.LivePrefix = p.Prompt
 	LivePrefixState.IsEnable = true
 }
@@ -157,7 +167,6 @@ func runScript(p *Profile) {
 	}
 }
 
-
 // Erase everything of a script from the memory
 func FreeScript(p *Profile) {
 	if p.Chain {
@@ -165,7 +174,7 @@ func FreeScript(p *Profile) {
 		p.Chain = false
 		//print("cleaning\n")
 	}
-	
+
 	p.SSet = false
 	p.Chain = false
 	p.Script = ""
@@ -190,43 +199,41 @@ func ReloadScript(p *Profile) {
 	LivePrefixState.IsEnable = true
 
 	// load script
-	PrintSuccs("Loading "+aux)
-	p.Script = aux // Set script as passed over cmd
-	profile := *p // Take off pointer
-	pl := wlua.LuaProfile(profile) // Convert Profile to LuaProfile
-	p.State,p.SSet = wlua.LuaInitUniq(pl) // Init script
+	PrintSuccs("Loading " + aux)
+	p.Script = aux                         // Set script as passed over cmd
+	profile := *p                          // Take off pointer
+	pl := wlua.LuaProfile(profile)         // Convert Profile to LuaProfile
+	p.State, p.SSet = wlua.LuaInitUniq(pl) // Init script
 	if !p.SSet {
 		PrintErr("Error loading script/module.")
 		return
 	}
 
-	p.Prompt = "("+aux+")>> " // Change prompt
+	p.Prompt = "(" + aux + ")>> " // Change prompt
 	LivePrefixState.LivePrefix = p.Prompt
 	LivePrefixState.IsEnable = true
 }
 
-
 // ################################ Global variables ################################
-/// Set globals
-func (p *Profile)SetGlobals(key string, value string) {
+// / Set globals
+func (p *Profile) SetGlobals(key string, value string) {
 	p.Globals[key] = value
 }
 
-func (p Profile)ListGlobals() {
+func (p Profile) ListGlobals() {
 	t := tabby.New()
-	t.AddHeader("VARIABLE","VALUE")
-	for key,value := range(p.Globals) {
-		t.AddLine(key,value)
+	t.AddHeader("VARIABLE", "VALUE")
+	for key, value := range p.Globals {
+		t.AddLine(key, value)
 	}
 	print("\n")
 	t.Print()
 	print("\n")
 }
 
-
 func useScriptTAG(p *Profile, cmds []string) {
 	var scriptslist []string
-	
+
 	var scriptScanner []ScriptTAGInfo
 	aux := SCTAG
 
@@ -238,8 +245,8 @@ func useScriptTAG(p *Profile, cmds []string) {
 		First its important to get all those scripts that have "scanner" tag,
 		and after that we match the tags
 	*/
-	for _, sti := range(aux) {
-		for i := range(sti.Tag) {
+	for _, sti := range aux {
+		for i := range sti.Tag {
 			if sti.Tag[i] == "scanner" {
 				scriptScanner = append(scriptScanner, sti)
 			}
@@ -250,12 +257,11 @@ func useScriptTAG(p *Profile, cmds []string) {
 		return
 	}
 
-	
-	for _,sti := range(scriptScanner) {
-		for i := range(sti.Tag) {
-			for _,j := range(cmds[2:]) {
-				if sti.Tag[i]==j {
-					scriptslist	= append(scriptslist, sti.Path)
+	for _, sti := range scriptScanner {
+		for i := range sti.Tag {
+			for _, j := range cmds[2:] {
+				if sti.Tag[i] == j {
+					scriptslist = append(scriptslist, sti.Path)
 					break
 				}
 			}
@@ -272,7 +278,7 @@ func useScriptTAG(p *Profile, cmds []string) {
 	wlua.GetVarsToChainTAGS(pl)
 	//wlua.PopulateLoadVarsFromGlobals(pl)
 
-	p.Prompt = "("+JoinTgs(cmds[2:])+")>> " // Change prompt
+	p.Prompt = "(" + JoinTgs(cmds[2:]) + ")>> " // Change prompt
 	LivePrefixState.LivePrefix = p.Prompt
 	LivePrefixState.IsEnable = true
 	p.Chain = true
