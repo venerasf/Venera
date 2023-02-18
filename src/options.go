@@ -18,10 +18,11 @@ func CmdHelp() {
 	t.AddLine("info","Info/metadata about script/module")
 	t.AddLine("globals","Show global variables")
 	t.AddLine("run","Run a script/module")
-	t.AddLine("set","Set value for a ver")
-	t.AddLine("lua","Run Lua code in running mod")
+	t.AddLine("set","Set value for a variable")
+	t.AddLine("lua","Run Lua code in running script")
 	t.AddLine("import","Import a (to edited) script")
 	t.AddLine("export","Export a script (to edit)")
+	t.AddLine("exir","Exit from prompt")
 	print("\n")
 	t.Print()
 	print("\n")
@@ -29,7 +30,7 @@ func CmdHelp() {
 	println("    Press `TAB` to rotate suggestions.")
 	println("    Press `arrow key` to pass suggentions or history.")
 	println("    Press `CTRL-d` to exit.")
-	println("    Press `CTRL-l` to clear promp.")
+	println("    Press `CTRL-l` to clear prompt.")
 
 	print("\n")
 	println("SEARCHING:")
@@ -50,8 +51,8 @@ func CmdHelp() {
 
 	print("\n")
 	println("SET VARIABLE:")
-	println("    `set RHOST <value>` Configure var for an in use test.")
-	println("    `set global RHOST <value>` Configure var to a chain of tests.")
+	println("    `set RHOST <value>` Configure variable in a script.")
+	println("    `set global RHOST <value>` Configure variable to a chain of scripts.")
 	print("\n")
 	print("\n")
 }

@@ -7,19 +7,21 @@ import (
 	"github.com/c-bata/go-prompt"
 )
 
-func handleExit() {
-	rawModeOff := exec.Command("/bin/stty", "-raw", "echo")
-	rawModeOff.Stdin = os.Stdin
-	_ = rawModeOff.Run()
-	rawModeOff.Wait()
+func HandleExit() {
+	// Reset tty executing stty
+	// disable raw mode
+	rawoff := exec.Command("/bin/stty", "-raw", "echo")
+	rawoff.Stdin = os.Stdin
+	_ = rawoff.Run()
+	rawoff.Wait()
 }
 
 func (p *Profile) InitCLI() {
 	p.SCLoadScripts()
 	Banner()
 	p.SCGetPath()
-	
-	defer handleExit()
+
+	defer HandleExit()
 	prom := prompt.New(
 		p.Execute,
 		p.completer,
@@ -36,7 +38,7 @@ func changeLivePrefix() (string, bool) {
 	return LivePrefixState.LivePrefix, LivePrefixState.IsEnable
 }
 
-// Suggestions
+// Load suggestions
 func (p *Profile) completer(d prompt.Document) []prompt.Suggest {
 	//inputs := strings.Split(d.CurrentLine(), " ")
 	inputs := strings.Split(d.TextBeforeCursor(), " ")
@@ -50,20 +52,14 @@ func (p *Profile) completer(d prompt.Document) []prompt.Suggest {
 		aux := *ScriptSuggestions
 		return aux
 
-	case "s":
-		return []prompt.Suggest{
-			{Text: "match", Description: "Match string"},
-			{Text: "tag",   Description: "Search tags"},
-		}
-
 	case "search":
-		return []prompt.Suggest{
+		return prompt.FilterHasPrefix([]prompt.Suggest{
 			{Text: "match", Description: "Match string"},
 			{Text: "tag",   Description: "Search tags"},
-		}
+		}, inputs[1], true)
 
 	case "export":
-		aux := *ScriptSuggestions
+		aux := prompt.FilterHasPrefix(*ScriptSuggestions, inputs[1], true)
 		return aux
 
 	case "set":
@@ -73,9 +69,9 @@ func (p *Profile) completer(d prompt.Document) []prompt.Suggest {
 	}
 
 	// General options
-	// If script setted, show script options
+	// If script setted then show script options.
 	if p.SSet {
-		return []prompt.Suggest{
+		return prompt.FilterHasPrefix([]prompt.Suggest{
 			{Text: "set",     Description: "Set value for a var"},
 			{Text: "run",     Description: "Run a script/module"},
 			{Text: "help",    Description: "Show help menu"},
@@ -85,15 +81,17 @@ func (p *Profile) completer(d prompt.Document) []prompt.Suggest {
 			{Text: "options", Description: "Show variables of script/module"},
 			{Text: "info",    Description: "Info/metadata about script/module"},
 			{Text: "lua",     Description: "Run Lua code in running mod"},
-		}
+			{Text: "exit",    Description: "Exit from prompt"},
+		}, inputs[0], true)
 	} else {
-		return []prompt.Suggest{
+		return prompt.FilterHasPrefix([]prompt.Suggest{
 			{Text: "help",   Description: "Show help menu"},
 			{Text: "use",    Description: "Load a script/module"},
 			{Text: "search", Description: "Search script/module"},
 			{Text: "import", Description: "Import a script"},
 			{Text: "export", Description: "Export a script"},
-		}
+			{Text: "exit",   Description: "Exit from prompt"},
+		}, inputs[0], true)
 	}
 
 	/*

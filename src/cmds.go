@@ -1,9 +1,9 @@
 package src
 
 import (
+	"os"
 	"strings"
 	"venera/src/wlua"
-
 	"github.com/cheynewallace/tabby"
 	//"github.com/c-bata/go-prompt"
 )
@@ -106,7 +106,10 @@ func (p *Profile) Execute(cmd string) {
 		LivePrefixState.IsEnable = true
 		return
 
-
+	
+	/* TODO:
+	join "use" and "use tag" blocks in one function.
+	*/
 	// Use a script
 	} else if cmds[0] == "use" && len(cmds) == 2 {
 		if !p.SSet {
@@ -133,10 +136,9 @@ func (p *Profile) Execute(cmd string) {
 			runChain(p)
 		}
 
-	} else if cmds[0] == "exit" {
-		// Talvez o bug do terminal esteja relacionado com o exit?
-		// revi algo semelhante à ele em prompt.go mas não direito
-
+	} else if cmds[0] == "exit" || cmds[0] == "e" || cmds[0] == "quit" {
+		HandleExit()
+		os.Exit(0)
 
 	} else {
 		PrintErr("Not a command. Type `help`.")

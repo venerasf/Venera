@@ -8,7 +8,9 @@ import (
 	"io/ioutil"
 	"math/rand"
 	"os"
+	"os/exec"
 	"strings"
+
 	//"github.com/c-bata/go-prompt"
 	lua "github.com/yuin/gopher-lua"
 )
@@ -90,6 +92,11 @@ func Open(L *lua.LState) int {
 
 // Input
 func Input(L *lua.LState) int {
+	// fix tty disable raw mode
+	rawoff := exec.Command("/bin/stty", "-raw", "echo")
+	rawoff.Stdin = os.Stdin
+	_ = rawoff.Run()
+	rawoff.Wait()
 	p := L.ToString(1)
 	if p == "" {
 		p = ">> "
