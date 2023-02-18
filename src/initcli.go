@@ -2,14 +2,24 @@ package src
 
 import (
 	"strings"
-
+	"os/exec"
+	"os"
 	"github.com/c-bata/go-prompt"
 )
+
+func handleExit() {
+	rawModeOff := exec.Command("/bin/stty", "-raw", "echo")
+	rawModeOff.Stdin = os.Stdin
+	_ = rawModeOff.Run()
+	rawModeOff.Wait()
+}
 
 func (p *Profile) InitCLI() {
 	p.SCLoadScripts()
 	Banner()
 	p.SCGetPath()
+	
+	defer handleExit()
 	prom := prompt.New(
 		p.Execute,
 		p.completer,
@@ -43,13 +53,13 @@ func (p *Profile) completer(d prompt.Document) []prompt.Suggest {
 	case "s":
 		return []prompt.Suggest{
 			{Text: "match", Description: "Match string"},
-			{Text: "tag", Description: "Search tags"},
+			{Text: "tag",   Description: "Search tags"},
 		}
 
 	case "search":
 		return []prompt.Suggest{
 			{Text: "match", Description: "Match string"},
-			{Text: "tag", Description: "Search tags"},
+			{Text: "tag",   Description: "Search tags"},
 		}
 
 	case "export":
@@ -66,20 +76,20 @@ func (p *Profile) completer(d prompt.Document) []prompt.Suggest {
 	// If script setted, show script options
 	if p.SSet {
 		return []prompt.Suggest{
-			{Text: "set", Description: "Set value for a var"},
-			{Text: "run", Description: "Run a script/module"},
-			{Text: "help", Description: "Show help menu"},
-			{Text: "search", Description: "Search script/module"},
+			{Text: "set",     Description: "Set value for a var"},
+			{Text: "run",     Description: "Run a script/module"},
+			{Text: "help",    Description: "Show help menu"},
+			{Text: "search",  Description: "Search script/module"},
 			// Inside script/module options
-			{Text: "back", Description: "Exit module/script"},
+			{Text: "back",    Description: "Exit module/script"},
 			{Text: "options", Description: "Show variables of script/module"},
-			{Text: "info", Description: "Info/metadata about script/module"},
-			{Text: "lua", Description: "Run Lua code in running mod"},
+			{Text: "info",    Description: "Info/metadata about script/module"},
+			{Text: "lua",     Description: "Run Lua code in running mod"},
 		}
 	} else {
 		return []prompt.Suggest{
-			{Text: "help", Description: "Show help menu"},
-			{Text: "use", Description: "Load a script/module"},
+			{Text: "help",   Description: "Show help menu"},
+			{Text: "use",    Description: "Load a script/module"},
 			{Text: "search", Description: "Search script/module"},
 			{Text: "import", Description: "Import a script"},
 			{Text: "export", Description: "Export a script"},
