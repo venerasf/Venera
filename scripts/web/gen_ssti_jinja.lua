@@ -53,7 +53,7 @@ function exploit()
     local n = RandomString(8,"0-9")
     local lim = "{{"..n.."}}"
     local payload = lim..exp..lim
-    local patt = n.."(.*)"..n
+    local patt = n.."(.*)"..n -- pattern to find the data inside html code
 
     dbgg("Set payload "..payload)
 
