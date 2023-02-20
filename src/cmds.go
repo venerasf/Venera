@@ -139,7 +139,8 @@ func (p *Profile) Execute(cmd string) {
 	} else if cmds[0] == "exit" || cmds[0] == "e" || cmds[0] == "quit" {
 		HandleExit()
 		os.Exit(0)
-
+	} else if cmds[0] == "banner" {
+		Banner()
 	} else {
 		PrintErr("Not a command. Type `help`.")
 	}
