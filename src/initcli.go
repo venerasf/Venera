@@ -38,13 +38,21 @@ func changeLivePrefix() (string, bool) {
 	return LivePrefixState.LivePrefix, LivePrefixState.IsEnable
 }
 
+
 // Load suggestions
 func (p *Profile) completer(d prompt.Document) []prompt.Suggest {
 	//inputs := strings.Split(d.CurrentLine(), " ")
 	inputs := strings.Split(d.TextBeforeCursor(), " ")
+	
+	if len(inputs) == 0 {
+		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		// TODO retornando nil na falta de uma solução rápida melhor, retornar um prompt.suggest vazio ou 
+		// um 
+		return nil
+	}
+
 	switch inputs[0] {
 	case "use":
-		// TODO filtering suggestions after use
 		if len(inputs) == 2 {
 			aux := prompt.FilterHasPrefix(*ScriptSuggestions, inputs[1], true)
 			return aux
@@ -59,7 +67,12 @@ func (p *Profile) completer(d prompt.Document) []prompt.Suggest {
 		}, inputs[1], true)
 
 	case "export":
-		aux := prompt.FilterHasPrefix(*ScriptSuggestions, inputs[1], true)
+		if len(inputs) == 2 {
+			aux := prompt.FilterHasPrefix(*ScriptSuggestions, inputs[1], true)
+			return aux
+		}
+
+		aux := *ScriptSuggestions
 		return aux
 
 	case "set":

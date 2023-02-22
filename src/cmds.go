@@ -4,6 +4,7 @@ import (
 	"os"
 	"strings"
 	"venera/src/wlua"
+
 	"github.com/cheynewallace/tabby"
 	//"github.com/c-bata/go-prompt"
 )
@@ -12,122 +13,195 @@ func (p *Profile) Execute(cmd string) {
 	cmd = strings.TrimSpace(cmd)
 	cmds := strings.Split(cmd, " ")
 
-
+	/// Help
+	/// Displays the help table in options.go
 	if cmd == "help" {
+
 		CmdHelp()
+
+
+	/// Options
+	/// Displays the selected script's options
 	} else if cmds[0] == "options" {
+
 		if p.SSet || p.Chain {
 			wlua.VarsList()
 		} else {
-			PrintErr("No module setted. Type `help`.")
+			PrintErr("No set module. Type `help`.")
 		}
 
 
+	/// Search
+	/// Searches scripts
 	} else if cmds[0] == "search" || cmds[0] == "s" {
+
 		p.SCListScripts(cmds)
 
 
+	/// Info
+	/// Shows metadata about the selected script
 	} else if cmds[0] == "info" {
+
 		if p.SSet {
 			wlua.MetaShow()
 		} else {
-			PrintErr("No module setted. Type `help`.")
+			PrintErr("No set module. Type `help`.")
 		}
 
 
+	/// elf
+	/// Test?
 	} else if cmds[0] == "elf" {
 		PrintSuccs("Elf")
 
 
+	/// Reload
+	/// Reloads a script
 	} else if cmds[0] == "reload" {
-		ReloadScript(p)
+		/// TODO 
+		/// [signal SIGSEGV: segmentation violation code=0x1 addr=0x50 pc=0x5d8182] err
+
+		/// Only thing needed to cause this error is to run reload without a set script
+		/// by reviewing the function i came to the conclusion that it shouldn't run with 
+		/// p.SSet set to false. If this is a wrong conclusion then revert the changes and
+		/// address the SIGSEGV error, if it's the right conclusion then delete this comment
+		/// section.
+		if p.SSet {
+			ReloadScript(p)
+		} else {
+			PrintErr("No set module. Type `help`.")
+		}
 
 
+	/// Global
+	/// Lists global variables
 	} else if cmds[0] == "global" || cmds[0] == "globals" || cmds[0] == "g" {
 		p.ListGlobals()
 
-	
-	} else if cmds[0] == "import" && len(cmds) == 3 {
-		p.SCImportScript(cmds[1], cmds[2])
-	} else if cmds[0] == "export" && len(cmds) == 3 {
-		p.SCExportScript(cmds[1], cmds[2])
+
+	/// Import
+	/// Imports a script
+	} else if cmds[0] == "import" {
+
+		// needs len 3
+		if len(cmds) == 3 {
+			p.SCImportScript(cmds[1], cmds[2])
+		} else {
+			PrintErr("`import` takes in two arguments")
+		}
 
 
+	/// Export
+	/// Exports a script
+	} else if cmds[0] == "export" {
+
+		// needs len 3
+		if len(cmds) == 3 {
+			p.SCExportScript(cmds[1], cmds[2])
+		} else {
+			PrintErr("`export` takes in two arguments")
+		}
+
+
+	/// Back
+	/// Deselects a script
 	} else if cmds[0] == "back" || cmds[0] == "b" {
+
 		if p.SSet || p.Chain {
 			FreeScript(p)
 		} else {
-			PrintErr("No module setted. Type `help`.")
+			PrintErr("No set module. Type `help`.")
 		}
 
 
-	} else if cmds[0] == "lua" && len(cmds) >= 2 {
-		if p.SSet {
-			wlua.LuaExecString(p.State, strings.Join(cmds[1:], " "))
+	/// Lua
+	/// Runs lua code
+	} else if cmds[0] == "lua" {
+
+		// needs len 2+
+		if len(cmds) >= 2 {
+			if p.SSet {
+				wlua.LuaExecString(p.State, strings.Join(cmds[1:], " "))
+			} else {
+				PrintErr("No set module. Type `help`.")
+			}
 		} else {
-			PrintErr("No module setted. Type `help`.")
+			PrintErr("`lua` takes in one or more arguments")
 		}
 
-	
-	// Set global variable
+
+	/// Set global variable
+	/// I suppose this could be removed since it's in "Set"
 	/*}  else if cmds[0] == "set" && len(cmds) >= 4 {
 		if cmds[1] == "global" || cmds[1] == "g" || cmds[1] == "globals" {
 			p.SetGlobals(cmds[2], strings.Join(cmds[3:]," "))
-		}*/
+	}*/
 
 
-	// Set normal variable
-	} else if cmds[0] == "set" && len(cmds) >= 3 {
-		if (cmds[1] == "global" || cmds[1] == "g" || cmds[1] == "globals") && len(cmds) >= 4 {
-			p.SetGlobals(cmds[2], strings.Join(cmds[3:], " "))
-		} else {
-			if p.SSet {
-				//print("aaaaa")
-				wlua.SetVarValue(p.State, cmds[1], strings.Join(cmds[2:], " "))
+	/// Set 
+	/// Changes global or selected script(s) variable(s)
+	} else if cmds[0] == "set" {
+
+		// needs len 3+
+		if len(cmds) >= 3 {
+			if (cmds[1] == "global" || cmds[1] == "g" || cmds[1] == "globals") && len(cmds) >= 4 {
+				p.SetGlobals(cmds[2], strings.Join(cmds[3:], " "))
 			} else {
-				if p.Chain {
-					PrintErr("Use global variable.")
+				if p.SSet {
+					//print("aaaaa")
+					wlua.SetVarValue(p.State, cmds[1], strings.Join(cmds[2:], " "))
 				} else {
-					PrintErr("No module setted. Type `help`.")
+					if p.Chain {
+						PrintErr("Use global variable.")
+					} else {
+						PrintErr("No set module. Type `help`.")
+					}
 				}
 			}
+		} else {
+			PrintErr("`set` takes in two or more arguments")
 		}
 
 
-	// spawn bash, useless func
+	/// Bash
+	/// useless atm
 	} else if cmd == "bash" {
 		GetBash()
 
 
-	// just for tests
+	/// Setup
+	/// Testing funciton
 	} else if cmds[0] == "setp" && len(cmds) == 2 {
 		p.Prompt = "[" + cmds[1] + "]>> "
 		LivePrefixState.LivePrefix = p.Prompt
 		LivePrefixState.IsEnable = true
 		return
 
-	
-	/* TODO:
-	join "use" and "use tag" blocks in one function.
-	*/
-	// Use a script
+
+	/// Use
+	/// Used for both setting tags and scripts, behavior changes on len(cmds)
 	} else if cmds[0] == "use" && len(cmds) == 2 {
-		if !p.SSet {
-			useScript(p, cmds)
-		} else {
-			PrintErr("No module setted. Type `help`.")
+
+		// needs len 2
+		if len(cmds) == 2 {
+			if !p.SSet {
+				useScript(p, cmds)
+			} else {
+				PrintErr("No set module. Type `help`.")
+			}
+
+			// needs len 3+
+		} else if len(cmds) >= 3 && (cmds[1] == "tags" || cmds[1] == "tag" || cmds[1] == "t") {
+			if !p.SSet {
+				useScriptTAG(p, cmds)
+			} else {
+				PrintErr("No set module. Type `help`.")
+			}
 		}
 
 
-	// Use a set of scripts based on tags
-	} else if cmds[0] == "use" && len(cmds) >= 3 && (cmds[1] == "tags" || cmds[1] == "tag" || cmds[1] == "t") {
-		if !p.SSet {
-			useScriptTAG(p, cmds)
-		} else {
-			PrintErr("No module setted. Type `help`.")
-		}
-
-
+	/// Run
+	/// Runs a selected script or set of scripts
 	} else if cmd == "run" || cmd == "exploit" || cmd == "r" {
 		if !p.Chain {
 			runScript(p)
@@ -136,11 +210,21 @@ func (p *Profile) Execute(cmd string) {
 			runChain(p)
 		}
 
+
+	/// Exit
+	/// Exits the venera interfac.e
 	} else if cmds[0] == "exit" || cmds[0] == "e" || cmds[0] == "quit" {
 		HandleExit()
 		os.Exit(0)
+
+
+	/// Banner
+	/// Bruh.
 	} else if cmds[0] == "banner" {
 		Banner()
+
+
+	/// Invalid string
 	} else {
 		PrintErr("Not a command. Type `help`.")
 	}
@@ -192,6 +276,7 @@ func ReloadScript(p *Profile) {
 	aux := p.Script
 
 	PrintSuccs("Freeing memory.")
+
 	// Free script
 	p.State.Close()
 	p.SSet = false
