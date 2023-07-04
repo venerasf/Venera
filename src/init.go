@@ -1,18 +1,43 @@
 package src
 
+import (
+	"log"
+	"os/user"
+	"venera/src/db"
+)
+
 var Version	float32
 var Stable 	bool
 
 func Start(v float32, stb bool) {
+	user, err := user.Current()
+	if err != nil {
+		log.Println(err.Error())
+	}
+
+	// Init profile
+	profile := new(Profile)
+	// Init database definition
+	var dbdef db.DBDef
+	// set scripts folder
+	profile.BPath = "scripts/"
+
+	// Test vnr home directory
+	if db.TestVeneraDir(user.Username) == nil {
+		// Start database
+		dbdef = db.DBInit(user.Username)
+	}
+
 	Version = v
 	Stable = stb
+	
+	// Store global (or refector it) just if it is not setted yet
+	dbdef.DBStoreGlobal("chain","on")
+	dbdef.DBStoreGlobal("VERBOSE","true")
+	dbdef.DBStoreGlobal("user", user.Username)
 
-	x := new(Profile)
-	x.BPath = "scripts/"
-	x.Globals = make(map[string]string)
-	// Set some globals
-	x.Globals["chain"] = "on"
-	x.Globals["VERBOSE"] = "true"
+	// Load persistent global variables ad init map.
+	profile.Globals = dbdef.DBLoadIntoGlobals()
 
-	x.InitCLI()
+	profile.InitCLI()
 }
