@@ -10,6 +10,9 @@ var Version	float32
 var Stable 	bool
 
 func Start(v float32, stb bool) {
+	Version = v
+	Stable = stb
+
 	user, err := user.Current()
 	if err != nil {
 		log.Println(err.Error())
@@ -24,12 +27,10 @@ func Start(v float32, stb bool) {
 
 	// Test vnr home directory
 	if db.TestVeneraDir(user.Username) == nil {
-		// Start database
+		// Start database from home dir
 		dbdef = db.DBInit(user.Username)
 	}
-
-	Version = v
-	Stable = stb
+	profile.Database = &dbdef
 	
 	// Store global (or refector it) just if it is not setted yet
 	dbdef.DBStoreGlobal("chain","on")

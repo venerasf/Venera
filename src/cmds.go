@@ -8,7 +8,13 @@ import (
 	//"github.com/c-bata/go-prompt"
 )
 
-func (p *Profile) Execute(cmd string) {
+
+/*
+	TODO: Refactor the function completely. 
+	Maybe use a functional approach for function mapping.
+		Change from `cmds` to `args`.
+*/
+func (profile *Profile) Execute(cmd string) {
 	cmd = strings.TrimSpace(cmd)
 	cmds := strings.Split(cmd, " ")
 
@@ -16,7 +22,7 @@ func (p *Profile) Execute(cmd string) {
 	if cmd == "help" {
 		CmdHelp()
 	} else if cmds[0] == "options" {
-		if p.SSet || p.Chain {
+		if profile.SSet || profile.Chain {
 			wlua.VarsList()
 		} else {
 			PrintErr("No module setted. Type `help`.")
@@ -24,11 +30,11 @@ func (p *Profile) Execute(cmd string) {
 
 
 	} else if cmds[0] == "search" || cmds[0] == "s" {
-		p.SCListScripts(cmds)
+		profile.SCListScripts(cmds)
 
 
 	} else if cmds[0] == "info" {
-		if p.SSet {
+		if profile.SSet {
 			wlua.MetaShow()
 		} else {
 			PrintErr("No module setted. Type `help`.")
@@ -40,30 +46,30 @@ func (p *Profile) Execute(cmd string) {
 
 
 	} else if cmds[0] == "reload" {
-		ReloadScript(p)
+		profile.ReloadScript()
 
 
 	} else if cmds[0] == "global" || cmds[0] == "globals" || cmds[0] == "g" {
-		p.ListGlobals()
+		profile.ListGlobals()
 
 	
 	} else if cmds[0] == "import" && len(cmds) == 3 {
-		p.SCImportScript(cmds[1], cmds[2])
+		profile.SCImportScript(cmds[1], cmds[2])
 	} else if cmds[0] == "export" && len(cmds) == 3 {
-		p.SCExportScript(cmds[1], cmds[2])
+		profile.SCExportScript(cmds[1], cmds[2])
 
 
 	} else if cmds[0] == "back" || cmds[0] == "b" {
-		if p.SSet || p.Chain {
-			FreeScript(p)
+		if profile.SSet || profile.Chain {
+			FreeScript(profile)
 		} else {
 			PrintErr("No module setted. Type `help`.")
 		}
 
 
 	} else if cmds[0] == "lua" && len(cmds) >= 2 {
-		if p.SSet {
-			wlua.LuaExecString(p.State, strings.Join(cmds[1:], " "))
+		if profile.SSet {
+			wlua.LuaExecString(profile.State, strings.Join(cmds[1:], " "))
 		} else {
 			PrintErr("No module setted. Type `help`.")
 		}
@@ -79,13 +85,13 @@ func (p *Profile) Execute(cmd string) {
 	// Set normal variable
 	} else if cmds[0] == "set" && len(cmds) >= 3 {
 		if (cmds[1] == "global" || cmds[1] == "g" || cmds[1] == "globals") && len(cmds) >= 4 {
-			p.SetGlobals(cmds[2], strings.Join(cmds[3:], " "))
+			profile.SetGlobals(cmds[2], strings.Join(cmds[3:], " "))
 		} else {
-			if p.SSet {
+			if profile.SSet {
 				//print("aaaaa")
-				wlua.SetVarValue(p.State, cmds[1], strings.Join(cmds[2:], " "))
+				wlua.SetVarValue(profile.State, cmds[1], strings.Join(cmds[2:], " "))
 			} else {
-				if p.Chain {
+				if profile.Chain {
 					PrintErr("Use global variable.")
 				} else {
 					PrintErr("No module setted. Type `help`.")
@@ -101,8 +107,8 @@ func (p *Profile) Execute(cmd string) {
 
 	// just for tests
 	} else if cmds[0] == "setp" && len(cmds) == 2 {
-		p.Prompt = "[" + cmds[1] + "]>> "
-		LivePrefixState.LivePrefix = p.Prompt
+		profile.Prompt = "[" + cmds[1] + "]>> "
+		LivePrefixState.LivePrefix = profile.Prompt
 		LivePrefixState.IsEnable = true
 		return
 
@@ -112,8 +118,8 @@ func (p *Profile) Execute(cmd string) {
 	*/
 	// Use a script
 	} else if cmds[0] == "use" && len(cmds) == 2 {
-		if !p.SSet {
-			useScript(p, cmds)
+		if !profile.SSet {
+			useScript(profile, cmds)
 		} else {
 			PrintErr("No module setted. Type `help`.")
 		}
@@ -121,19 +127,19 @@ func (p *Profile) Execute(cmd string) {
 
 	// Use a set of scripts based on tags
 	} else if cmds[0] == "use" && len(cmds) >= 3 && (cmds[1] == "tags" || cmds[1] == "tag" || cmds[1] == "t") {
-		if !p.SSet {
-			useScriptTAG(p, cmds)
+		if !profile.SSet {
+			useScriptTAG(profile, cmds)
 		} else {
 			PrintErr("No module setted. Type `help`.")
 		}
 
 
 	} else if cmd == "run" || cmd == "exploit" || cmd == "r" {
-		if !p.Chain {
-			runScript(p)
+		if !profile.Chain {
+			runScript(profile)
 			//print("aaa")
 		} else {
-			runChain(p)
+			runChain(profile)
 		}
 
 	} else if cmds[0] == "exit" || cmds[0] == "e" || cmds[0] == "quit" {
@@ -188,7 +194,7 @@ func FreeScript(p *Profile) {
 }
 
 // This function will reload a script
-func ReloadScript(p *Profile) {
+func (p *Profile)ReloadScript() {
 	aux := p.Script
 
 	PrintSuccs("Freeing memory.")
@@ -221,6 +227,7 @@ func ReloadScript(p *Profile) {
 // / Set globals
 func (p *Profile) SetGlobals(key string, value string) {
 	p.Globals[key] = value
+	p.Database.DBStoreGlobal(key, value)
 }
 
 func (p Profile) ListGlobals() {

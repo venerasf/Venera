@@ -7,9 +7,14 @@ import (
 	"github.com/c-bata/go-prompt"
 )
 
+
 func HandleExit() {
-	// Reset tty executing stty
-	// disable raw mode
+	/*
+	it is necessary to deactivate the prompt in an 
+	appropriate way so as not to misconfigure the user's terminal.
+	Reset tty executing stty
+	disable raw mode
+	*/
 	rawoff := exec.Command("/bin/stty", "-raw", "echo")
 	rawoff.Stdin = os.Stdin
 	_ = rawoff.Run()
