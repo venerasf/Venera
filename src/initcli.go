@@ -42,33 +42,31 @@ func changeLivePrefix() (string, bool) {
 func (p *Profile) completer(d prompt.Document) []prompt.Suggest {
 	//inputs := strings.Split(d.CurrentLine(), " ")
 	inputs := strings.Split(d.TextBeforeCursor(), " ")
+	length := len(inputs)
+	// Specific options \\ Commands written
+
+	if (length == 2) {
 	switch inputs[0] {
-	case "use":
-		// TODO filtering suggestions after use
-		if len(inputs) == 2 {
-			aux := prompt.FilterHasPrefix(*ScriptSuggestions, inputs[1], true)
-			return aux
-		}
-		aux := *ScriptSuggestions
-		return aux
+		case "use":
+			return prompt.FilterHasPrefix(*ScriptSuggestions, inputs[1], true)
 
-	case "search":
-		return prompt.FilterHasPrefix([]prompt.Suggest{
-			{Text: "match", Description: "Match string"},
-			{Text: "tag",   Description: "Search tags"},
-		}, inputs[1], true)
+		case "search":
+			return prompt.FilterHasPrefix([]prompt.Suggest{
+				{Text: "match", Description: "Match string"},
+				{Text: "tag",   Description: "Search tags"},
+			}, inputs[1], true)
 
-	case "export":
-		aux := prompt.FilterHasPrefix(*ScriptSuggestions, inputs[1], true)
-		return aux
+		case "export":
+			return prompt.FilterHasPrefix(*ScriptSuggestions, inputs[1], true)
 
-	case "set":
-		return []prompt.Suggest{
-			{Text: "global", Description: "Set a global variable"},
+		case "set":
+			return []prompt.Suggest{
+				{Text: "global", Description: "Set a global variable"},
+			}
 		}
 	}
 
-	// General options
+	// General options \\ No written commands
 	// If script setted then show script options.
 	if p.SSet {
 		return prompt.FilterHasPrefix([]prompt.Suggest{
