@@ -13,6 +13,7 @@ import (
 	"sort"
 	"strings"
 	"venera/src/wlua"
+	"venera/src/utils"
 
 	"github.com/c-bata/go-prompt"
 	"github.com/cheynewallace/tabby"
@@ -50,7 +51,7 @@ func (p Profile) SCGetPath() []string {
 		return nil
 	})
 	if err != nil {
-		PrintErr(err.Error())
+		utils.PrintErr(err.Error())
 	}
 	return filePath
 }

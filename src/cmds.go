@@ -4,13 +4,13 @@ import (
 	"os"
 	"strings"
 	"venera/src/wlua"
+	"venera/src/utils"
 	"github.com/cheynewallace/tabby"
 	//"github.com/c-bata/go-prompt"
 )
 
-
 /*
-	TODO: Refactor the function completely. 
+	TODO: Refactor the function completely.
 	Maybe use a functional approach for function mapping.
 		Change from `cmds` to `args`.
 */
@@ -25,7 +25,7 @@ func (profile *Profile) Execute(cmd string) {
 		if profile.SSet || profile.Chain {
 			wlua.VarsList()
 		} else {
-			PrintErr("No module setted. Type `help`.")
+			utils.PrintErr("No module setted. Type `help`.")
 		}
 
 
@@ -37,12 +37,12 @@ func (profile *Profile) Execute(cmd string) {
 		if profile.SSet {
 			wlua.MetaShow()
 		} else {
-			PrintErr("No module setted. Type `help`.")
+			utils.PrintErr("No module setted. Type `help`.")
 		}
 
 
 	} else if cmds[0] == "elf" {
-		PrintSuccs("Elf")
+		utils.PrintSuccs("Elf")
 
 
 	} else if cmds[0] == "reload" {
@@ -63,7 +63,7 @@ func (profile *Profile) Execute(cmd string) {
 		if profile.SSet || profile.Chain {
 			FreeScript(profile)
 		} else {
-			PrintErr("No module setted. Type `help`.")
+			utils.PrintErr("No module setted. Type `help`.")
 		}
 
 
@@ -71,7 +71,7 @@ func (profile *Profile) Execute(cmd string) {
 		if profile.SSet {
 			wlua.LuaExecString(profile.State, strings.Join(cmds[1:], " "))
 		} else {
-			PrintErr("No module setted. Type `help`.")
+			utils.PrintErr("No module setted. Type `help`.")
 		}
 
 	
@@ -92,17 +92,17 @@ func (profile *Profile) Execute(cmd string) {
 				wlua.SetVarValue(profile.State, cmds[1], strings.Join(cmds[2:], " "))
 			} else {
 				if profile.Chain {
-					PrintErr("Use global variable.")
+					utils.PrintErr("Use global variable.")
 				} else {
-					PrintErr("No module setted. Type `help`.")
+					utils.PrintErr("No module setted. Type `help`.")
 				}
 			}
 		}
 
 
-	// spawn bash, useless func
+	// spawn bash, useless func but can be used for something (oO)
 	} else if cmd == "bash" {
-		GetBash()
+		utils.GetBash()
 
 
 	// just for tests
@@ -121,7 +121,7 @@ func (profile *Profile) Execute(cmd string) {
 		if !profile.SSet {
 			useScript(profile, cmds)
 		} else {
-			PrintErr("No module setted. Type `help`.")
+			utils.PrintErr("No module setted. Type `help`.")
 		}
 
 
@@ -130,7 +130,7 @@ func (profile *Profile) Execute(cmd string) {
 		if !profile.SSet {
 			useScriptTAG(profile, cmds)
 		} else {
-			PrintErr("No module setted. Type `help`.")
+			utils.PrintErr("No module setted. Type `help`.")
 		}
 
 
@@ -148,7 +148,7 @@ func (profile *Profile) Execute(cmd string) {
 	} else if cmds[0] == "banner" {
 		Banner()
 	} else {
-		PrintErr("Not a command. Type `help`.")
+		utils.PrintErr("Not a command. Type `help`.")
 	}
 }
 
@@ -159,7 +159,7 @@ func useScript(p *Profile, cmds []string) {
 	pl := wlua.LuaProfile(profile)         // Convert Profile to LuaProfile
 	p.State, p.SSet = wlua.LuaInitUniq(pl) // Init script
 	if !p.SSet {
-		PrintErr("Error loading script/module.")
+		utils.PrintErr("Error loading script/module.")
 		return
 	}
 
@@ -197,7 +197,7 @@ func FreeScript(p *Profile) {
 func (p *Profile)ReloadScript() {
 	aux := p.Script
 
-	PrintSuccs("Freeing memory.")
+	utils.PrintSuccs("Freeing memory.")
 	// Free script
 	p.State.Close()
 	p.SSet = false
@@ -208,13 +208,13 @@ func (p *Profile)ReloadScript() {
 	LivePrefixState.IsEnable = true
 
 	// load script
-	PrintSuccs("Loading " + aux)
+	utils.PrintSuccs("Loading " + aux)
 	p.Script = aux                         // Set script as passed over cmd
 	profile := *p                          // Take off pointer
 	pl := wlua.LuaProfile(profile)         // Convert Profile to LuaProfile
 	p.State, p.SSet = wlua.LuaInitUniq(pl) // Init script
 	if !p.SSet {
-		PrintErr("Error loading script/module.")
+		utils.PrintErr("Error loading script/module.")
 		return
 	}
 
@@ -263,7 +263,7 @@ func useScriptTAG(p *Profile, cmds []string) {
 		}
 	}
 	if len(scriptScanner) == 0 {
-		PrintErr("Error loading tags, no script found.")
+		utils.PrintErr("Error loading tags, no script found.")
 		return
 	}
 
@@ -278,7 +278,7 @@ func useScriptTAG(p *Profile, cmds []string) {
 		}
 	}
 	if len(scriptslist) == 0 {
-		PrintErr("Error loading tags, no script found.")
+		utils.PrintErr("Error loading tags, no script found.")
 		return
 	}
 
