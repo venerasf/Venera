@@ -7,6 +7,9 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+/* 
+	TODO: change `panic()` to write the output to the log file
+*/
 func DBInit(uname string) DBDef {
 	fname := "/home/"+uname+"/.venera/database.db"
 	_,err := os.Open(fname)
@@ -28,6 +31,9 @@ func DBInit(uname string) DBDef {
 	return *db
 }
 
+/* 
+	TODO: change `panic()` to write the output to the log file
+*/
 func (db *DBDef)dbCreateDs() {
 	sttm,err := db.DBConn.Prepare(`
 	CREATE TABLE IF NOT EXISTS global (
@@ -43,24 +49,39 @@ func (db *DBDef)dbCreateDs() {
 	}
 }
 
+/* 
+	TODO: change `panic()` to write the output to the log file
+*/
 func (db *DBDef)DBStoreGlobal(key string, value string) {
 	// validate if key exists
 	var v string = ""
 	row := db.DBConn.QueryRow("SELECT value FROM global WHERE key = ?;", key)
 	row.Scan(&v)
+
 	if v != "" {
-		return
+		// if key exists we update it
+		sttm, err := db.DBConn.Prepare("UPDATE global SET value = ? WHERE key = ?;")
+		if err != nil {
+			panic(err.Error())
+		}
+		sttm.Exec(value,key)
+	} else {
+		// if not set assing the velue
+		sttm, err := db.DBConn.Prepare(`
+			INSERT INTO global (key, value) VALUES (?,?);
+		`)
+		if err != nil {
+			panic(err.Error())
+		}
+		sttm.Exec(key,value)
 	}
-	sttm, err := db.DBConn.Prepare(`
-		INSERT INTO global (key, value) VALUES (?,?);
-	`)
-	if err != nil {
-		panic(err.Error())
-	}
-	sttm.Exec(key,value)
 }
 
-// Probably it is gonna be moved to outter package for the case of conflicts for cycling.
+
+/*
+	DBLoadIntoGlobals: loads the data from databaso into a map.
+	Probably it is gonna be moved to outter package for the case of conflicts for cycling.
+*/
 func (db *DBDef)DBLoadIntoGlobals() map[string]string {
 	g := make(map[string]string)
 	row, err := db.DBConn.Query("SELECT key, value FROM global;")

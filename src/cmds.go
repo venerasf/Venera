@@ -4,11 +4,17 @@ import (
 	"os"
 	"strings"
 	"venera/src/wlua"
+	"venera/src/utils"
 	"github.com/cheynewallace/tabby"
 	//"github.com/c-bata/go-prompt"
 )
 
-func (p *Profile) Execute(cmd string) {
+/*
+	TODO: Refactor the function completely.
+	Maybe use a functional approach for function mapping.
+		Change from `cmds` to `args`.
+*/
+func (profile *Profile) Execute(cmd string) {
 	cmd = strings.TrimSpace(cmd)
 	cmds := strings.Split(cmd, " ")
 	length := len(cmds)
@@ -30,16 +36,16 @@ func (p *Profile) Execute(cmd string) {
 
 	} else if h == "bash"{
 		// Starts a bash shell
-		GetBash()
+		utils.GetBash()
 
 
 
 	} else if h == "import" {
 		// Imports a script
 		if length != 3 {
-			PrintErr("Invalid arguments.")
+			utils.PrintErr("Invalid arguments.")
 		} else {
-			p.SCImportScript(cmds[1], cmds[2])
+			profile.SCImportScript(cmds[1], cmds[2])
 		}
 
 
@@ -47,16 +53,16 @@ func (p *Profile) Execute(cmd string) {
 	} else if h == "export" {
 		// Exports a script
 		if length != 3 {
-			PrintErr("Invalid arguments.")
+			utils.PrintErr("Invalid arguments.")
 		} else {
-			p.SCExportScript(cmds[1], cmds[2])
+			profile.SCExportScript(cmds[1], cmds[2])
 		}
 
 
 
 	} else if h == "globals" {
 		// Lists global variables
-		p.ListGlobals()
+		profile.ListGlobals()
 
 
 
@@ -69,19 +75,19 @@ func (p *Profile) Execute(cmd string) {
 
 	} else {
 		// Not generic commands
-		if p.SSet || p.Chain {
+		if profile.SSet || profile.Chain {
 			// If a script is set
 			if h == "set" {
 				// Sets a variable for the script
 				if length < 3 {
-					PrintErr("Invalid arguments.")
+					utils.PrintErr("Invalid arguments.")
 				} else {
 					if (cmds[1] == "global" || cmds[1] == "g" || cmds[1] == "globals") {
 						//continuar
-						PrintSuccs("Setting global variable")
-						p.SetGlobals(cmds[2], strings.Join(cmds[3:], " "))
+						utils.PrintSuccs("Setting global variable")
+						profile.SetGlobals(cmds[2], strings.Join(cmds[3:], " "))
 					} else {
-						wlua.SetVarValue(p.State, cmds[1], strings.Join(cmds[2:], " "))
+						wlua.SetVarValue(profile.State, cmds[1], strings.Join(cmds[2:], " "))
 					}
 				}
 
@@ -89,17 +95,17 @@ func (p *Profile) Execute(cmd string) {
 
 			} else if h == "run"  ||  h == "r"  ||  h == "exploit" {
 				// Runs the script
-				if p.Chain {
-					runChain(p)
+				if profile.Chain {
+					runChain(profile)
 				} else {
-					runScript(p)
+					runScript(profile)
 				}
 
 
 
 			} else if h == "back"  ||  h == "b" {
 				// Removes the current selected script
-				FreeScript(p)
+				FreeScript(profile)
 
 
 
@@ -112,9 +118,9 @@ func (p *Profile) Execute(cmd string) {
 			} else if h == "lua" {
 				// Executes lua code
 				if length < 2 {
-					PrintErr("Invalid arguments.")
+					utils.PrintErr("Invalid arguments.")
 				} else {
-					wlua.LuaExecString(p.State, strings.Join(cmds[1:], " "))
+					wlua.LuaExecString(profile.State, strings.Join(cmds[1:], " "))
 				}
 
 
@@ -127,13 +133,13 @@ func (p *Profile) Execute(cmd string) {
 
 			} else if h == "reload" {
 				// Reloads the selected script
-				ReloadScript(p)
+				profile.ReloadScript()
 
 
 
 			} else {
 				// No commands recognized
-				PrintErr("Not a valid command or unable to call it because a script is selected.")
+				utils.PrintErr("Not a valid command or unable to call it because a script is selected.")
 
 
 
@@ -143,24 +149,24 @@ func (p *Profile) Execute(cmd string) {
 			// If there's no script set
 			if h == "search"  ||  h == "s" {
 				// Searches a script
-				p.SCListScripts(cmds)
+				profile.SCListScripts(cmds)
 
 
 
 			} else if h == "use" {
 				// Uses a script
 				if length < 2 {
-					PrintErr("Invalid arguments.")
+					utils.PrintErr("Invalid arguments.")
 				} else {
 					if (cmds[1] == "tags" || cmds[1] == "tag" || cmds[1] == "t") {
-						PrintSuccs("Using tag context")
+						utils.PrintSuccs("Using tag context")
 						if length < 3 {
-							PrintErr("Invalid Arguments.")
+							utils.PrintErr("Invalid Arguments.")
 						} else {
-							useScriptTAG(p, cmds)
+							useScriptTAG(profile, cmds)
 						}
 					} else {
-						useScript(p, cmds)
+						useScript(profile, cmds)
 					}
 				}
 
@@ -168,7 +174,7 @@ func (p *Profile) Execute(cmd string) {
 
 			} else {
 				// No commands found
-				PrintErr("Not a valid command or missing a selected script. Type `help`.")
+				utils.PrintErr("Not a valid command or missing a selected script. Type `help`.")
 
 
 
@@ -180,21 +186,20 @@ func (p *Profile) Execute(cmd string) {
 	// misc commands
 	if cmds[0] == "elf" {
 		found = true
-		PrintSuccs("Elf")
+		utils.PrintSuccs("Elf")
 
 	} else if cmds[0] == "setp" && len(cmds) == 2 {
 		found = true
-		p.Prompt = "[" + cmds[1] + "]>> "
-		LivePrefixState.LivePrefix = p.Prompt
+		profile.Prompt = "[" + cmds[1] + "]>> "
+		LivePrefixState.LivePrefix = profile.Prompt
 		LivePrefixState.IsEnable = true
 
 	} else if cmds[0] == "banner" {
 		found = true
 		Banner()
-
 	}
 
-	if found { PrintSuccs("Yet it still did something.") }
+	if found { utils.PrintSuccs("Yet it still did something.") }
 }
 
 // Load script
@@ -204,7 +209,7 @@ func useScript(p *Profile, cmds []string) {
 	pl := wlua.LuaProfile(profile)         // Convert Profile to LuaProfile
 	p.State, p.SSet = wlua.LuaInitUniq(pl) // Init script
 	if !p.SSet {
-		PrintErr("Error loading script/module.")
+		utils.PrintErr("Error loading script/module.")
 		return
 	}
 
@@ -239,10 +244,10 @@ func FreeScript(p *Profile) {
 }
 
 // This function will reload a script
-func ReloadScript(p *Profile) {
+func (p *Profile)ReloadScript() {
 	aux := p.Script
 
-	PrintSuccs("Freeing memory.")
+	utils.PrintSuccs("Freeing memory.")
 	// Free script
 	p.State.Close()
 	p.SSet = false
@@ -253,13 +258,13 @@ func ReloadScript(p *Profile) {
 	LivePrefixState.IsEnable = true
 
 	// load script
-	PrintSuccs("Loading " + aux)
+	utils.PrintSuccs("Loading " + aux)
 	p.Script = aux                         // Set script as passed over cmd
 	profile := *p                          // Take off pointer
 	pl := wlua.LuaProfile(profile)         // Convert Profile to LuaProfile
 	p.State, p.SSet = wlua.LuaInitUniq(pl) // Init script
 	if !p.SSet {
-		PrintErr("Error loading script/module.")
+		utils.PrintErr("Error loading script/module.")
 		return
 	}
 
@@ -272,6 +277,7 @@ func ReloadScript(p *Profile) {
 // / Set globals
 func (p *Profile) SetGlobals(key string, value string) {
 	p.Globals[key] = value
+	p.Database.DBStoreGlobal(key, value)
 }
 
 func (p Profile) ListGlobals() {
@@ -307,7 +313,7 @@ func useScriptTAG(p *Profile, cmds []string) {
 		}
 	}
 	if len(scriptScanner) == 0 {
-		PrintErr("Error loading tags, no script found.")
+		utils.PrintErr("Error loading tags, no script found.")
 		return
 	}
 
@@ -322,7 +328,7 @@ func useScriptTAG(p *Profile, cmds []string) {
 		}
 	}
 	if len(scriptslist) == 0 {
-		PrintErr("Error loading tags, no script found.")
+		utils.PrintErr("Error loading tags, no script found.")
 		return
 	}
 

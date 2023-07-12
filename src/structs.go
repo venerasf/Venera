@@ -1,18 +1,24 @@
 package src
 
-import lua "github.com/yuin/gopher-lua"
+import (
+	"venera/src/db"
+
+	lua "github.com/yuin/gopher-lua"
+)
 
 // Main profile holds users configs
 type Profile struct {
 	Prompt 		string
 	Script 		string   // script path
 	Scriptslist []string // list of scripts for chaining
-	SSet 		bool     // Script setted
 	BPath 		string   // Base path
 
 	Globals map[string]string // Script Global variables
 	State 	*lua.LState
-	Chain 	bool // if it is running in tags mode
+	SSet 	bool // Script setted to validate if there is a script loaded
+	Chain 	bool // Store the info, if it is running in tags mode
+
+	Database *db.DBDef // Database for persistence data
 }
 
 // Live prefix for prompt configs
