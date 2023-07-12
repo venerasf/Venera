@@ -17,139 +17,189 @@ import (
 func (profile *Profile) Execute(cmd string) {
 	cmd = strings.TrimSpace(cmd)
 	cmds := strings.Split(cmd, " ")
+	length := len(cmds)
+	
+	// Validates length
+	if (length == 0) {
+		return; 
+	}
 
+	// header
+	h := cmds[0] 
 
-	if cmd == "help" {
+	// Generic commands
+    if h == "help" {
+		// Displays help pannel
 		CmdHelp()
-	} else if cmds[0] == "options" {
-		if profile.SSet || profile.Chain {
-			wlua.VarsList()
-		} else {
-			utils.PrintErr("No module setted. Type `help`.")
-		}
 
 
-	} else if cmds[0] == "search" || cmds[0] == "s" {
-		profile.SCListScripts(cmds)
 
-
-	} else if cmds[0] == "info" {
-		if profile.SSet {
-			wlua.MetaShow()
-		} else {
-			utils.PrintErr("No module setted. Type `help`.")
-		}
-
-
-	} else if cmds[0] == "elf" {
-		utils.PrintSuccs("Elf")
-
-
-	} else if cmds[0] == "reload" {
-		profile.ReloadScript()
-
-
-	} else if cmds[0] == "global" || cmds[0] == "globals" || cmds[0] == "g" {
-		profile.ListGlobals()
-
-	
-	} else if cmds[0] == "import" && len(cmds) == 3 {
-		profile.SCImportScript(cmds[1], cmds[2])
-	} else if cmds[0] == "export" && len(cmds) == 3 {
-		profile.SCExportScript(cmds[1], cmds[2])
-
-
-	} else if cmds[0] == "back" || cmds[0] == "b" {
-		if profile.SSet || profile.Chain {
-			FreeScript(profile)
-		} else {
-			utils.PrintErr("No module setted. Type `help`.")
-		}
-
-
-	} else if cmds[0] == "lua" && len(cmds) >= 2 {
-		if profile.SSet {
-			wlua.LuaExecString(profile.State, strings.Join(cmds[1:], " "))
-		} else {
-			utils.PrintErr("No module setted. Type `help`.")
-		}
-
-	
-	// Set global variable
-	/*}  else if cmds[0] == "set" && len(cmds) >= 4 {
-		if cmds[1] == "global" || cmds[1] == "g" || cmds[1] == "globals" {
-			p.SetGlobals(cmds[2], strings.Join(cmds[3:]," "))
-		}*/
-
-
-	// Set normal variable
-	} else if cmds[0] == "set" && len(cmds) >= 3 {
-		if (cmds[1] == "global" || cmds[1] == "g" || cmds[1] == "globals") && len(cmds) >= 4 {
-			profile.SetGlobals(cmds[2], strings.Join(cmds[3:], " "))
-		} else {
-			if profile.SSet {
-				//print("aaaaa")
-				wlua.SetVarValue(profile.State, cmds[1], strings.Join(cmds[2:], " "))
-			} else {
-				if profile.Chain {
-					utils.PrintErr("Use global variable.")
-				} else {
-					utils.PrintErr("No module setted. Type `help`.")
-				}
-			}
-		}
-
-
-	// spawn bash, useless func but can be used for something (oO)
-	} else if cmd == "bash" {
+	} else if h == "bash"{
+		// Starts a bash shell
 		utils.GetBash()
 
 
-	// just for tests
+
+	} else if h == "import" {
+		// Imports a script
+		if length != 3 {
+			utils.PrintErr("Invalid arguments.")
+		} else {
+			profile.SCImportScript(cmds[1], cmds[2])
+		}
+
+
+
+	} else if h == "export" {
+		// Exports a script
+		if length != 3 {
+			utils.PrintErr("Invalid arguments.")
+		} else {
+			profile.SCExportScript(cmds[1], cmds[2])
+		}
+
+
+
+	} else if h == "globals" {
+		// Lists global variables
+		profile.ListGlobals()
+
+
+
+	} else if h == "exit"  ||  h == "e"  ||  h == "quit" {
+		// Exits the program
+		HandleExit()
+		os.Exit(0)
+
+
+
+	} else {
+		// Not generic commands
+		if profile.SSet || profile.Chain {
+			// If a script is set
+			if h == "set" {
+				// Sets a variable for the script
+				if length < 3 {
+					utils.PrintErr("Invalid arguments.")
+				} else {
+					if (cmds[1] == "global" || cmds[1] == "g" || cmds[1] == "globals") {
+						//continuar
+						utils.PrintSuccs("Setting global variable")
+						profile.SetGlobals(cmds[2], strings.Join(cmds[3:], " "))
+					} else {
+						wlua.SetVarValue(profile.State, cmds[1], strings.Join(cmds[2:], " "))
+					}
+				}
+
+
+
+			} else if h == "run"  ||  h == "r"  ||  h == "exploit" {
+				// Runs the script
+				if profile.Chain {
+					runChain(profile)
+				} else {
+					runScript(profile)
+				}
+
+
+
+			} else if h == "back"  ||  h == "b" {
+				// Removes the current selected script
+				FreeScript(profile)
+
+
+
+			} else if h == "options" {
+				// Displays lua's variables
+				wlua.VarsList()
+
+
+
+			} else if h == "lua" {
+				// Executes lua code
+				if length < 2 {
+					utils.PrintErr("Invalid arguments.")
+				} else {
+					wlua.LuaExecString(profile.State, strings.Join(cmds[1:], " "))
+				}
+
+
+
+			} else if h == "info" {
+				// Displays information
+				wlua.MetaShow()
+
+
+
+			} else if h == "reload" {
+				// Reloads the selected script
+				profile.ReloadScript()
+
+
+
+			} else {
+				// No commands recognized
+				utils.PrintErr("Not a valid command or unable to call it because a script is selected.")
+
+
+
+			}
+
+		} else {
+			// If there's no script set
+			if h == "search"  ||  h == "s" {
+				// Searches a script
+				profile.SCListScripts(cmds)
+
+
+
+			} else if h == "use" {
+				// Uses a script
+				if length < 2 {
+					utils.PrintErr("Invalid arguments.")
+				} else {
+					if (cmds[1] == "tags" || cmds[1] == "tag" || cmds[1] == "t") {
+						utils.PrintSuccs("Using tag context")
+						if length < 3 {
+							utils.PrintErr("Invalid Arguments.")
+						} else {
+							useScriptTAG(profile, cmds)
+						}
+					} else {
+						useScript(profile, cmds)
+					}
+				}
+
+
+
+			} else {
+				// No commands found
+				utils.PrintErr("Not a valid command or missing a selected script. Type `help`.")
+
+
+
+			}
+		}
+	} // end
+
+	found := false
+	// misc commands
+	if cmds[0] == "elf" {
+		found = true
+		utils.PrintSuccs("Elf")
+
 	} else if cmds[0] == "setp" && len(cmds) == 2 {
+		found = true
 		profile.Prompt = "[" + cmds[1] + "]>> "
 		LivePrefixState.LivePrefix = profile.Prompt
 		LivePrefixState.IsEnable = true
-		return
 
-	
-	/* TODO:
-	join "use" and "use tag" blocks in one function.
-	*/
-	// Use a script
-	} else if cmds[0] == "use" && len(cmds) == 2 {
-		if !profile.SSet {
-			useScript(profile, cmds)
-		} else {
-			utils.PrintErr("No module setted. Type `help`.")
-		}
-
-
-	// Use a set of scripts based on tags
-	} else if cmds[0] == "use" && len(cmds) >= 3 && (cmds[1] == "tags" || cmds[1] == "tag" || cmds[1] == "t") {
-		if !profile.SSet {
-			useScriptTAG(profile, cmds)
-		} else {
-			utils.PrintErr("No module setted. Type `help`.")
-		}
-
-
-	} else if cmd == "run" || cmd == "exploit" || cmd == "r" {
-		if !profile.Chain {
-			runScript(profile)
-			//print("aaa")
-		} else {
-			runChain(profile)
-		}
-
-	} else if cmds[0] == "exit" || cmds[0] == "e" || cmds[0] == "quit" {
-		HandleExit()
-		os.Exit(0)
 	} else if cmds[0] == "banner" {
+		found = true
 		Banner()
-	} else {
-		utils.PrintErr("Not a command. Type `help`.")
 	}
+
+	if found { utils.PrintSuccs("Yet it still did something.") }
 }
 
 // Load script
