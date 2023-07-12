@@ -43,8 +43,8 @@ func (p *Profile) completer(d prompt.Document) []prompt.Suggest {
 	//inputs := strings.Split(d.CurrentLine(), " ")
 	inputs := strings.Split(d.TextBeforeCursor(), " ")
 	length := len(inputs)
-	// Specific options \\ Commands written
 
+	// Specific options \\ Commands written
 	if (length == 2) {
 	switch inputs[0] {
 		case "use":
@@ -67,31 +67,33 @@ func (p *Profile) completer(d prompt.Document) []prompt.Suggest {
 	}
 
 	// General options \\ No written commands
-	// If script setted then show script options.
-	if p.SSet {
-		return prompt.FilterHasPrefix([]prompt.Suggest{
-			{Text: "set",     Description: "Set value for a var"},
-			{Text: "run",     Description: "Run a script/module"},
-			{Text: "help",    Description: "Show help menu"},
-			{Text: "search",  Description: "Search script/module"},
-			// Inside script/module options
-			{Text: "back",    Description: "Exit module/script"},
-			{Text: "options", Description: "Show variables of script/module"},
-			{Text: "info",    Description: "Info/metadata about script/module"},
-			{Text: "lua",     Description: "Run Lua code in running mod"},
-			{Text: "exit",    Description: "Exit from prompt"},
-		}, inputs[0], true)
-	} else {
-		return prompt.FilterHasPrefix([]prompt.Suggest{
-			{Text: "help",   Description: "Show help menu"},
-			{Text: "use",    Description: "Load a script/module"},
-			{Text: "search", Description: "Search script/module"},
-			{Text: "import", Description: "Import a script"},
-			{Text: "export", Description: "Export a script"},
-			{Text: "exit",   Description: "Exit from prompt"},
-		}, inputs[0], true)
+	promptSuggestions := []prompt.Suggest {
+		{Text: "help",    	Description: "Show help menu"},
+		{Text: "bash",    	Description: "Spawn a command shell"},
+		{Text: "import",    Description: "Import a (to edited) script"},
+		{Text: "export",    Description: "Export a script (to edit)"},
+		{Text: "globals",   Description: "Show global variables"},
+		{Text: "exit", 		Description: "Exit from the prompt"},
 	}
 
+ 	if p.SSet { // Options only valid when there is a selected script.
+		promptSuggestions = append(promptSuggestions,
+			prompt.Suggest {Text: "set",     Description: "Set value for a var"},
+			prompt.Suggest {Text: "run",     Description: "Run a script/module"},
+			prompt.Suggest {Text: "back",    Description: "Exit module/script"},
+			prompt.Suggest {Text: "options", Description: "Show variables of script/module"},
+			prompt.Suggest {Text: "lua",     Description: "Run Lua code in running mod"},
+			prompt.Suggest {Text: "info",    Description: "Info/metadata about script/module"},
+			prompt.Suggest {Text: "reload",    Description: "Reloads the selected script"},
+		)
+	} else {	// Options only valid when there is no selected script.
+		promptSuggestions = append(promptSuggestions,
+			prompt.Suggest {Text: "search", Description: "Search script/module"},
+			prompt.Suggest {Text: "use",    Description: "Load a script/module"},
+		) 
+	}
+
+	return prompt.FilterHasPrefix(promptSuggestions, inputs[0], true)
 	/*
 		return prompt.FilterContains(
 			[]prompt.Suggest{
