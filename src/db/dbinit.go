@@ -3,28 +3,33 @@ package db
 import (
 	"database/sql"
 	"os"
+	"venera/src/utils"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
-/* 
+/*
 	TODO: change `panic()` to write the output to the log file
 */
-func DBInit(uname string) DBDef {
-	fname := "/home/"+uname+"/.venera/database.db"
+func DBInit(homeDir string) DBDef {
+	fname := homeDir+"/.venera/database.db"
 	_,err := os.Open(fname)
 	if err != nil {
+		utils.LogMsg(homeDir+"/.venera/message.log",0,"core","Creating database")
 		println("[+]- Creating database")
 		_,err := os.Create(fname)
 		if err != nil {
+			utils.LogMsg(homeDir+"/.venera/message.log",3,"core","Error creating database.")
 			panic(err.Error())
 		}
 	}
 
 	// Create db definition
 	db := new(DBDef)
+	utils.LogMsg(homeDir+"/.venera/message.log",0,"core","Open database.")
 	db.DBConn, err = sql.Open("sqlite3", fname)
 	if err != nil {
+		utils.LogMsg(homeDir+"/.venera/message.log",3,"core","Error while open db func.")
 		panic(err.Error())
 	}
 	db.dbCreateDs()
@@ -62,6 +67,7 @@ func (db *DBDef)DBStoreGlobal(key string, value string) {
 		// if key exists we update it
 		sttm, err := db.DBConn.Prepare("UPDATE global SET value = ? WHERE key = ?;")
 		if err != nil {
+			utils.LogMsg("~/venera/message.log",3,"core",err.Error())
 			panic(err.Error())
 		}
 		sttm.Exec(value,key)
@@ -71,6 +77,7 @@ func (db *DBDef)DBStoreGlobal(key string, value string) {
 			INSERT INTO global (key, value) VALUES (?,?);
 		`)
 		if err != nil {
+			utils.LogMsg("~/venera/message.log",3,"core",err.Error())
 			panic(err.Error())
 		}
 		sttm.Exec(key,value)
@@ -86,7 +93,7 @@ func (db *DBDef)DBLoadIntoGlobals() map[string]string {
 	g := make(map[string]string)
 	row, err := db.DBConn.Query("SELECT key, value FROM global;")
 	if err != nil {
-		println("DBLoadIntoGlobals")
+		utils.LogMsg("~/venera/message.log",3,"core",err.Error())
 		panic(err.Error())
 	}
 	for row.Next() {

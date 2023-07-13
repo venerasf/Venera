@@ -65,7 +65,8 @@ func LogMsg(logPath string, tp int, module string, message string) {
 
 	logMessage := fmt.Sprintf("type=%s module=%s message=%s",
 		ltype, module,message)
-	log.New(f,logMessage, log.LstdFlags|log.Lshortfile)
+	nLog := log.New(f,"", log.LstdFlags)
+	nLog.Println(logMessage)
 	if err != nil {
 		panic(err.Error())
 	}
