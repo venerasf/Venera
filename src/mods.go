@@ -39,7 +39,8 @@ func (p Profile) SCLoadScripts() {
 }
 
 func (p Profile) SCGetPath() []string {
-	root := p.BPath
+	//root := p.BPath
+	root := p.Globals["root"]
 	filePath := []string{} // List of file paths
 
 	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {

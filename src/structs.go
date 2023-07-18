@@ -11,7 +11,7 @@ type Profile struct {
 	Prompt 		string
 	Script 		string   // script path
 	Scriptslist []string // list of scripts for chaining
-	BPath 		string   // Base path
+	BPath 		string   // Base path, replaced to globals[root] instead
 
 	Globals map[string]string // Script Global variables
 	State 	*lua.LState

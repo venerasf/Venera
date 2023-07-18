@@ -24,7 +24,7 @@ func Start(v float32, stb bool) {
 	// Init database definition its a pointer.
 	var dbdef db.DBDef
 	// set scripts folder
-	profile.BPath = "scripts/"
+	//profile.BPath = "scripts/" // now taken from globals[root]
 
 	// Test vnr home directory
 	if db.TestVeneraDir(user.HomeDir) == nil {
@@ -47,6 +47,7 @@ func Start(v float32, stb bool) {
 	dbdef.DBStoreGlobal("logfile","~/.venera/message.log")
 	dbdef.DBStoreGlobal("user", user.Username)
 	dbdef.DBStoreGlobal("home", user.HomeDir)
+	dbdef.DBStoreGlobal("root","scripts/")
 
 	// Load persistent global variables to the map.
 	// It can be taken typing `globals` on prompt.
