@@ -5,6 +5,7 @@ import (
 	"strings"
 	"venera/src/wlua"
 	"venera/src/utils"
+	"venera/src/pacman"
 	"github.com/cheynewallace/tabby"
 	//"github.com/c-bata/go-prompt"
 )
@@ -170,6 +171,8 @@ func (profile *Profile) Execute(cmd string) {
 					}
 				}
 
+			} else if h == "vpm" {
+				pacman.VPMGetRemotePack("http://0.0.0.0:8000/package.yaml")
 
 
 			} else {
