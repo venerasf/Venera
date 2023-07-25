@@ -103,3 +103,12 @@ func (db *DBDef)DBLoadIntoGlobals() map[string]string {
 	}
 	return g
 }
+
+func (db *DBDef)DBRemoveGlobals(key string) {
+	sttm, err := db.DBConn.Prepare("DELETE FROM global WHERE key = ?;")
+	if err != nil {
+		utils.LogMsg("~/venera/message.log",3,"core",err.Error())
+		panic(err.Error())
+	}
+	sttm.Exec(key)
+}

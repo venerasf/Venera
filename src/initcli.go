@@ -64,10 +64,11 @@ func (p *Profile) completer(d prompt.Document) []prompt.Suggest {
 		case "export":
 			return prompt.FilterHasPrefix(*ScriptSuggestions, inputs[1], true)
 
-		case "set":
-			return []prompt.Suggest{
-				{Text: "global", Description: "Set a global variable"},
-			}
+		case "globals":
+			return prompt.FilterHasPrefix([]prompt.Suggest{
+				{Text: "set", Description: "Set global variable kv"},
+				{Text: "rm",   Description: "Remove global variable"},
+			}, inputs[1], true)
 		}
 	}
 

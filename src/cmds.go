@@ -62,8 +62,16 @@ func (profile *Profile) Execute(cmd string) {
 
 
 	} else if h == "globals" {
-		// Lists global variables
-		profile.ListGlobals()
+		if length == 3 && cmds[1] == "rm" {
+			profile.Database.DBRemoveGlobals(cmds[2])
+			profile.Globals = nil
+			profile.Globals = profile.Database.DBLoadIntoGlobals()
+		} else if length == 4 && cmds[1] == "set" {
+			profile.SetGlobals(cmds[2], strings.Join(cmds[3:], " "))
+		} else {
+			// Lists global variables
+			profile.ListGlobals()
+		}
 
 
 
@@ -83,13 +91,7 @@ func (profile *Profile) Execute(cmd string) {
 				if length < 3 {
 					utils.PrintErr("Invalid arguments.")
 				} else {
-					if (cmds[1] == "global" || cmds[1] == "g" || cmds[1] == "globals") {
-						//continuar
-						utils.PrintSuccs("Setting global variable")
-						profile.SetGlobals(cmds[2], strings.Join(cmds[3:], " "))
-					} else {
-						wlua.SetVarValue(profile.State, cmds[1], strings.Join(cmds[2:], " "))
-					}
+					wlua.SetVarValue(profile.State, cmds[1], strings.Join(cmds[2:], " "))
 				}
 
 
