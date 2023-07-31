@@ -30,10 +30,11 @@ func (p *Profile) InitCLI() {
 	prom := prompt.New(
 		p.Execute,
 		p.completer,
-		prompt.OptionPrefix("[*]>> "),
+		prompt.OptionPrefix("[vnr]>> "),
 		prompt.OptionLivePrefix(changeLivePrefix),
 		prompt.OptionCompletionOnDown(),
 		prompt.OptionMaxSuggestion(3),
+		//prompt.OptionAddKeyBind(prompt.KeyBind{})
 	)
 	prom.Run()
 }
@@ -69,6 +70,13 @@ func (p *Profile) completer(d prompt.Document) []prompt.Suggest {
 				{Text: "set", Description: "Set global variable kv"},
 				{Text: "rm",   Description: "Remove global variable"},
 			}, inputs[1], true)
+
+		case "vpm":
+			return prompt.FilterHasPrefix([]prompt.Suggest{
+				{Text: "search", 	Description: "Search for scripts with a pattern"},
+				{Text: "install",	Description: "Install a script"},
+				{Text: "sync",		Description: "Sincronize with remote repository"},
+			}, inputs[1], true)
 		}
 	}
 
@@ -76,9 +84,10 @@ func (p *Profile) completer(d prompt.Document) []prompt.Suggest {
 	promptSuggestions := []prompt.Suggest {
 		{Text: "help",    	Description: "Show help menu"},
 		{Text: "bash",    	Description: "Spawn a command shell"},
-		{Text: "import",    Description: "Import a (to edited) script"},
+		{Text: "import",    Description: "Import a (edited) script"},
 		{Text: "export",    Description: "Export a script (to edit)"},
 		{Text: "globals",   Description: "Show global variables"},
+		{Text: "vpm", 		Description: "Venera package manager"},
 		{Text: "exit", 		Description: "Exit from the prompt"},
 	}
 

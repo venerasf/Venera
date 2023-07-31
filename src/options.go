@@ -57,7 +57,7 @@ func CmdHelp() {
 	print("\n")
 	println("SET VARIABLE:")
 	println("    `set RHOST <value>` Configure variable in a script.")
-	println("    `set global RHOST <value>` Configure variable to a chain of scripts.")
+	println("    `global set RHOST <value>` Configure variable to a chain of scripts.")
 	print("\n")
 	print("\n")
 }
@@ -146,15 +146,4 @@ func Banner() {
 
 `,Version,stb)
 	}
-
-
-
-
-
-
-
-
-
-
-
 }

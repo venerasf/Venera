@@ -174,7 +174,7 @@ func (profile *Profile) Execute(cmd string) {
 				}
 
 			} else if h == "vpm" {
-				pacman.VPMGetRemotePack("http://0.0.0.0:8000/package.yaml")
+				pacman.VPMGetRemotePack(profile.Globals["repo"],profile.Globals["root"], cmds)
 
 
 			} else {

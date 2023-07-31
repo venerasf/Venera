@@ -48,6 +48,7 @@ func Start(v float32, stb bool) {
 	dbdef.DBStoreGlobal("user", user.Username)
 	dbdef.DBStoreGlobal("home", user.HomeDir)
 	dbdef.DBStoreGlobal("root","scripts/")
+	dbdef.DBStoreGlobal("repo","http://0.0.0.0:8000/package.yaml")
 
 	// Load persistent global variables to the map.
 	// It can be taken typing `globals` on prompt.
