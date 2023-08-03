@@ -37,6 +37,7 @@ func Sets(l *lua.LState) {
 	l.SetGlobal("PrintInfoln", l.NewFunction(PrintInfoln))
 	l.SetGlobal("Print", l.NewFunction(Print))
 	l.SetGlobal("Println", l.NewFunction(Println))
+	l.SetGlobal("LogMsg",l.NewFunction(LogMsg))
 
 	//Input/prompt
 	l.SetGlobal("Input",l.NewFunction(Input))

@@ -1,16 +1,21 @@
 package pacman
 
 import (
-	//"bytes"
 	"fmt"
 	"os"
 	"venera/src/utils"
-
-	//"os"
 	"strings"
 
 	"gopkg.in/yaml.v2"
 )
+
+func validateTarget(pack Pack) int {
+	if len(pack.Target) == 0 || pack.Target == nil {
+		return 2
+	} else {
+		return 0
+	}
+}
 
 func getPack(repo string) Pack {
 	pack := Pack{}
@@ -31,6 +36,12 @@ func getPack(repo string) Pack {
 func search(repo, pattern string) {
 	// Retrive the map package
 	pack := getPack(repo)
+	utils.PrintSuccs("Requesting "+repo+"\n")
+	if validateTarget(pack) != 0 {
+		utils.PrintAlert("No data to show.")
+	}
+
+	utils.PrintSuccs(fmt.Sprintf("%d scripts found.",len(pack.Target)))
 
 	for i := range(pack.Target) {
 		if strings.Contains(pack.Target[i].Description,pattern) ||
@@ -76,7 +87,14 @@ func installer(data []byte, vnrhome string, scriptPath string) int {
 }
 
 func sync(repo, vnrhome string) int {
+	utils.PrintSuccs("Requesting "+repo+"\n")
 	pack := getPack(repo)
+
+	v := validateTarget(pack)
+	if v != 0 {
+		return v
+	}
+
 	for i := range(pack.Target) {
 		utils.PrintAlert("Intalling "+pack.Target[i].Script)
 		b, err := DownloadData(pack.Target[i].Script)
@@ -100,6 +118,7 @@ func VPMGetRemotePack(repo string, vnrhome string, args []string) int {
 	if len(args) > 2 && args[1] == "search" {
 		search(repo, args[2])
 	} else if len(args) > 2 && args[1] == "install" {
+		utils.PrintSuccs("Requesting "+repo+"\n")
 		pack := getPack(repo)
 		for i := range(pack.Target) {
 			if pack.Target[i].Script == args[2] {
@@ -114,6 +133,9 @@ func VPMGetRemotePack(repo string, vnrhome string, args []string) int {
 					} else if r == 1 {
 						utils.PrintSuccs(pack.Target[i].Script+" updated.")
 						return 1
+					} else if r == 2 {
+						utils.PrintAlert("No data script found.")
+						return 2
 					} else if r == 3 {
 						utils.PrintAlert("error.")
 						return 3

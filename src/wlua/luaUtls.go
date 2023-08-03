@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"venera/src/utils"
 
 	//"github.com/c-bata/go-prompt"
 	lua "github.com/yuin/gopher-lua"
@@ -74,6 +75,11 @@ func PrintInfoln(L *lua.LState) int {
 }
 func Println(L *lua.LState) int {
 	fmt.Printf("%s\n",L.ToString(1))
+	return 1
+}
+
+func LogMsg(L *lua.LState) int {
+	utils.LogMsg(LuaProf.Globals["logfile"],L.ToInt(1),LuaProf.Script,L.ToString(2))
 	return 1
 }
 
