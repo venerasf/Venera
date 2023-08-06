@@ -77,6 +77,12 @@ func (p *Profile) completer(d prompt.Document) []prompt.Suggest {
 				{Text: "install",	Description: "Install a script"},
 				{Text: "sync",		Description: "Sincronize with remote repository"},
 			}, inputs[1], true)
+
+		case "reload":
+			return prompt.FilterHasPrefix([]prompt.Suggest{
+				{Text: "root", 		Description: "Reload root directory"},
+				{Text: "script",   	Description: "Reload script in memory"},
+			}, inputs[1], true)
 		}
 	}
 
@@ -87,6 +93,7 @@ func (p *Profile) completer(d prompt.Document) []prompt.Suggest {
 		{Text: "import",    Description: "Import a (edited) script"},
 		{Text: "export",    Description: "Export a script (to edit)"},
 		{Text: "globals",   Description: "Show global variables"},
+		{Text: "reload",  	Description: "Reload a memory resource"},
 		{Text: "vpm", 		Description: "Venera package manager"},
 		{Text: "exit", 		Description: "Exit from the prompt"},
 	}
@@ -99,7 +106,6 @@ func (p *Profile) completer(d prompt.Document) []prompt.Suggest {
 			prompt.Suggest {Text: "options", Description: "Show variables of script/module"},
 			prompt.Suggest {Text: "lua",     Description: "Run Lua code in running mod"},
 			prompt.Suggest {Text: "info",    Description: "Info/metadata about script/module"},
-			prompt.Suggest {Text: "reload",    Description: "Reloads the selected script"},
 		)
 	} else {	// Options only valid when there is no selected script.
 		promptSuggestions = append(promptSuggestions,

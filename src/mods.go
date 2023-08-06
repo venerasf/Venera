@@ -20,7 +20,8 @@ import (
 )
 
 var ScriptSuggestions *[]prompt.Suggest // script list with descriptions
-var SCTAG []ScriptTAGInfo               // script list with tags
+var SCTAG []ScriptTAGInfo               // script list with tags and infos,
+										// it will be in memory for later use.
 
 // Load all paths, get metadata INFO and tags
 // TODO: The regex can be better
@@ -32,7 +33,8 @@ func (p Profile) SCLoadScripts() {
 	aux := []prompt.Suggest{}
 	for _, file := range paths {
 		info := SCExtractINFO(file, re)
-		SCTAG = append(SCTAG, ScriptTAGInfo{file, wlua.ScriptGetTags(file), info})
+		tags := wlua.ScriptGetTags(file)
+		SCTAG = append(SCTAG, ScriptTAGInfo{file, tags, info})
 		aux = append(aux, prompt.Suggest{Text: file, Description: info})
 	}
 	ScriptSuggestions = &aux
@@ -208,4 +210,16 @@ func TagsJoinALL() string {
 		}
 	}
 	return strings.Join(list, ",")
+}
+
+
+func (p Profile)SCInfoForChaining() {
+	m := make(map[string]bool)
+	utils.PrintSuccs("Listing loaded scripts.")
+	for i := range(p.Scriptslist) {
+		if !m[p.Scriptslist[i]] {
+			m[p.Scriptslist[i]] = true
+			fmt.Println("- "+p.Scriptslist[i])
+		}
+	}
 }

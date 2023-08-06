@@ -80,7 +80,17 @@ func (profile *Profile) Execute(cmd string) {
 		HandleExit()
 		os.Exit(0)
 
-
+	} else if len(cmds) == 2 && h == "reload" {
+		if cmds[1] == "script" || cmds[1] == "s" {
+			// Reloads the selected script
+			if profile.SSet { 
+				profile.ReloadScript()
+			} else {
+				utils.PrintErr("Not a valid command out from script.")
+			}
+		} else if cmds[1] == "root" {
+			profile.SCLoadScripts()
+		}
 
 	} else {
 		// Not generic commands
@@ -117,7 +127,6 @@ func (profile *Profile) Execute(cmd string) {
 				wlua.VarsList()
 
 
-
 			} else if h == "lua" {
 				// Executes lua code
 				if length < 2 {
@@ -130,14 +139,11 @@ func (profile *Profile) Execute(cmd string) {
 
 			} else if h == "info" {
 				// Displays information
-				wlua.MetaShow()
-
-
-
-			} else if h == "reload" {
-				// Reloads the selected script
-				profile.ReloadScript()
-
+				if profile.Chain {
+					profile.SCInfoForChaining()
+				} else {
+					wlua.MetaShow()	
+				}
 
 
 			} else {
@@ -180,8 +186,6 @@ func (profile *Profile) Execute(cmd string) {
 			} else {
 				// No commands found
 				utils.PrintErr("Not a valid command or missing a selected script. Type `help`.")
-
-
 
 			}
 		}

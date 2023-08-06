@@ -1,8 +1,9 @@
 package src
 
 import (
-	"math/rand"
 	"fmt"
+	"math/rand"
+	"time"
 
 	"github.com/cheynewallace/tabby"
 )
@@ -12,7 +13,7 @@ func CmdHelp() {
 	t.AddHeader("GENERIC COMMAND","DESCRIPTION")
 	t.AddLine("help","Show help menu")
 	t.AddLine("bash","Spawns a shell")
-	t.AddLine("import","Import a (to edited) script")
+	t.AddLine("import","Import a (edited) script")
 	t.AddLine("export","Export a script (to edit)")
 	t.AddLine("globals","Show global variables")
 	t.AddLine("exit","Exits the prompt")
@@ -44,10 +45,6 @@ func CmdHelp() {
 	println("    `search match:path <key>` list path matching.")
 	println("    `search match:description <key>` list description matching.")
 	println("    `search tag <tag1 tag2...>` list tags matching.")
-	println("    `s m <key>` filter in collapsed format.")
-	println("        `s m:p <key>` filter by path.")
-	println("        `s m:d <key>` filter by description.")
-	println("        `s t <tag1 tag2...>` filter by tags.")
 
 	print("\n")
 	println("USE SCRIPT/MODULE:")
@@ -72,7 +69,9 @@ func Banner() {
 	}
 	//fmt.Printf("### Venera %.2f-%s ###\nType `help`\n\n",Version,stb)
 
-	x := rand.Intn(6)
+	r := rand.NewSource(time.Now().UnixNano())
+	rn := rand.New(r)
+	x := rn.Intn(6)
 	if x == 0 {
 		fmt.Printf(`
 	__    _ ____________________________________
@@ -82,6 +81,7 @@ func Banner() {
 	   \___|  \___| |_| _|  \___| |_|    \__,_| |
 	   -----------------------------------------+
 	   Recon Mission: github.com/farinap5/venera
+	   Read https://venera.farinap5.com/
                 type 'help'      %.2f-%s
 
 `,Version,stb)
@@ -93,6 +93,7 @@ func Banner() {
 	  \ V /  __/ | | |  __/ | | (_| |
 	   \_/ \___|_| |_|\___|_|  \__,_|	   
 	Recon Mission: github.com/farinap5/venera
+	Read https://venera.farinap5.com/
         type 'help'      %.2f-%s
 
 `,Version,stb)
@@ -105,6 +106,7 @@ func Banner() {
 	 ╚████╔╝ ███████╗██║ ╚████║███████╗██║  ██║██║  ██║
 	  ╚═══╝  ╚══════╝╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝	
 	   Recon Mission: github.com/farinap5/venera
+	   Read https://venera.farinap5.com/
                 type 'help'      %.2f-%s
 
 `,Version,stb)	
@@ -122,6 +124,7 @@ func Banner() {
 		  ░     ░  ░         ░    ░  ░   ░           ░  ░
 		 ░                                               	
 	   Recon Mission: github.com/farinap5/venera
+	   Read https://venera.farinap5.com/
                 type 'help'      %.2f-%s
 
 `,Version,stb)
@@ -133,6 +136,7 @@ func Banner() {
 	|  |  | -_|   | -_|  _| .'|  |   __|  _| .'|     | -_| | | | . |  _| '_|
 	 \___/|___|_|_|___|_| |__,|  |__|  |_| |__,|_|_|_|___|_____|___|_| |_,_|		
 	   Recon Mission: github.com/farinap5/venera
+	   Read https://venera.farinap5.com/
                 type 'help'      %.2f-%s
 
 `,Version,stb)
@@ -142,6 +146,7 @@ func Banner() {
 	╚╗╔╝├┤ │││├┤ ├┬┘├─┤  ╠╣ ├┬┘├─┤│││├┤ ││││ │├┬┘├┴┐
 	 ╚╝ └─┘┘└┘└─┘┴└─┴ ┴  ╚  ┴└─┴ ┴┴ ┴└─┘└┴┘└─┘┴└─┴ ┴	
 	   Recon Mission: github.com/farinap5/venera
+	   Read https://venera.farinap5.com/
                 type 'help'      %.2f-%s
 
 `,Version,stb)
