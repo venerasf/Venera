@@ -43,9 +43,11 @@ func search(repo, pattern string) {
 
 	utils.PrintSuccs(fmt.Sprintf("%d scripts found.",len(pack.Target)))
 
+	c := 0
 	for i := range(pack.Target) {
 		if strings.Contains(pack.Target[i].Description,pattern) ||
 		strings.Contains(pack.Target[i].Script,pattern) {
+			c++
 			if i > 0 {
 				print("-----------------------\n")
 			}
@@ -62,6 +64,7 @@ func search(repo, pattern string) {
 			print("\n")
 		}
 	}
+	utils.PrintSuccs(fmt.Sprintf("%d scripts.", c))
 }
 
 func installer(data []byte, vnrhome string, scriptPath string) int {
@@ -71,6 +74,9 @@ func installer(data []byte, vnrhome string, scriptPath string) int {
 	/*TODO:
 		Change the permissions after tests.
 	*/
+	if strings.Split(path,"")[0] != "/" {
+		path = "/"+path
+	}
 	err := os.MkdirAll(vnrhome+path,0700)
 	if err != nil {
 		utils.PrintErr(err.Error())
@@ -97,7 +103,7 @@ func sync(repo, vnrhome string) int {
 
 	for i := range(pack.Target) {
 		utils.PrintAlert("Intalling "+pack.Target[i].Script)
-		b, err := DownloadData(pack.Target[i].Script)
+		b, err := DownloadData(pack.Target[i].Path)
 		if err != nil {
 			utils.PrintErr("Error downloading script:"+err.Error())
 		} else {
