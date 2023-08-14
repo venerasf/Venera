@@ -43,11 +43,11 @@ func Start(v float32, stb bool) {
 	*/
 	dbdef.DBStoreGlobal("chain","on")
 	dbdef.DBStoreGlobal("VERBOSE","true")
-	dbdef.DBStoreGlobal("myscripts","~/.venera/scripts/myscripts/")
-	dbdef.DBStoreGlobal("logfile","~/.venera/message.log")
+	dbdef.DBStoreGlobal("myscripts",user.HomeDir+"/.venera/scripts/myscripts/")
+	dbdef.DBStoreGlobal("logfile",user.HomeDir+"/.venera/message.log")
 	dbdef.DBStoreGlobal("user", user.Username)
 	dbdef.DBStoreGlobal("home", user.HomeDir)
-	dbdef.DBStoreGlobal("root","~/.venera/scripts")
+	dbdef.DBStoreGlobal("root",user.HomeDir+"/.venera/scripts")
 	dbdef.DBStoreGlobal("repo","http://r.venera.farinap5.com/package.yaml")
 
 	// Load persistent global variables to the map.
