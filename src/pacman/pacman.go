@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"gopkg.in/yaml.v2"
+	"venera/src/db"
 )
 
 func validateTarget(pack Pack) int {
@@ -120,11 +121,20 @@ func sync(repo, vnrhome string) int {
 	return 0
 }
 
-func VPMGetRemotePack(repo string, vnrhome string, args []string) int {
-	if len(args) > 2 && args[1] == "search" {
-		search(repo, args[2])
-	} else if len(args) > 2 && args[1] == "install" {
-		utils.PrintSuccs("Requesting "+repo+"\n")
+func justverifysign(repo string, database *db.DBDef) {
+	yamlBytes, err := DownloadData(repo)
+	if err != nil {
+		utils.PrintErr(err.Error())
+	}
+	signBytes, err := DownloadData("http://0.0.0.0:8000/package.sgn")
+	if err != nil {
+		utils.PrintErr(err.Error())
+	}
+	VerifySignaturePack(yamlBytes, signBytes, *database)
+}
+
+func installCommand(repo string, args []string, vnrhome string) int {
+	utils.PrintSuccs("Requesting "+repo+"\n")
 		pack := getPack(repo)
 		for i := range(pack.Target) {
 			if pack.Target[i].Script == args[2] {
@@ -149,8 +159,18 @@ func VPMGetRemotePack(repo string, vnrhome string, args []string) int {
 				}
 			}
 		}
+	return 0
+}
+
+func VPMGetRemotePack(repo string, vnrhome string, args []string, database db.DBDef, verify string) int {
+	if len(args) > 2 && args[1] == "search" {
+		search(repo, args[2])
+	} else if len(args) > 2 && args[1] == "install" {
+		installCommand(repo, args, vnrhome)
 	} else if len(args) > 1 && args[1] == "sync" {
 		sync(repo, vnrhome)
+	} else if len(args) > 1 && args[1] == "verify" {
+		justverifysign(repo, &database)
 	} else {
 		utils.PrintAlert("No arg")
 	}

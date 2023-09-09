@@ -31,7 +31,7 @@ func DownloadData(url string) ([]byte,error) {
 	}
 
 	if r.StatusCode != 200 {
-		return nil, errors.New("status code different from 200")
+		return nil, errors.New("status code different from 200 calling for "+url)
 	}
 
 	body, err := ioutil.ReadAll(r.Body)

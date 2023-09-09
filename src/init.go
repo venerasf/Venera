@@ -49,6 +49,7 @@ func Start(v float32, stb bool) {
 	dbdef.DBStoreGlobal("home", user.HomeDir)
 	dbdef.DBStoreGlobal("root",user.HomeDir+"/.venera/scripts")
 	dbdef.DBStoreGlobal("repo","http://r.venera.farinap5.com/package.yaml")
+	dbdef.DBStoreGlobal("vpmvs","true")
 
 	// Load persistent global variables to the map.
 	// It can be taken typing `globals` on prompt.

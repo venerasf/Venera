@@ -149,9 +149,6 @@ func (profile *Profile) Execute(cmd string) {
 			} else {
 				// No commands recognized
 				utils.PrintErr("Not a valid command or unable to call it because a script is selected.")
-
-
-
 			}
 
 		} else {
@@ -180,8 +177,13 @@ func (profile *Profile) Execute(cmd string) {
 				}
 
 			} else if h == "vpm" {
-				pacman.VPMGetRemotePack(profile.Globals["repo"],profile.Globals["root"], cmds)
-
+				pacman.VPMGetRemotePack(
+					profile.Globals["repo"],
+					profile.Globals["root"], 
+					cmds, 
+					*profile.Database,
+					profile.Globals["vpmvs"],
+				)
 
 			} else {
 				// No commands found

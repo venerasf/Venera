@@ -52,6 +52,31 @@ func (db *DBDef)dbCreateDs() {
 	} else {
 		sttm.Exec()
 	}
+	sttm,err = db.DBConn.Prepare(`
+	CREATE TABLE IF NOT EXISTS Pubkey (
+		gid		INTEGER PRIMARY KEY AUTOINCREMENT,
+		Author	TEXT UNIQUE,
+		Key 	TEXT
+	)
+	`)
+	if err != nil {
+		panic(err.Error())
+	} else {
+		sttm.Exec()
+	}
+
+	key := `-----BEGIN PUBLIC KEY-----
+MIGbMBAGByqGSM49AgEGBSuBBAAjA4GGAAQADJX13tbFJYlQ0aWG6gHTZqJ6dLg3
+/n/Z/aoUdROOrRfvKGNdgxw0IOH8EetWADU7zcZFd65+wMqV+x4iM2SsBBUAx6U2
+vqaHn8ubrE+Z0GZtAAMR9Wusar4pjFS9G98XhILLPfzgZTCtY4BOpfenL+gqg/GT
+euivf5/tEQVeHt9f+MQ=
+-----END PUBLIC KEY-----`
+	sttm,err = db.DBConn.Prepare("INSERT INTO pubkey (Author,Key) VALUES (?,?);")
+	if err != nil {
+		panic(err.Error())
+	} else {
+		sttm.Exec("elf@mail.com",key)
+	}
 }
 
 /* 
@@ -112,3 +137,4 @@ func (db *DBDef)DBRemoveGlobals(key string) {
 	}
 	sttm.Exec(key)
 }
+
