@@ -21,8 +21,12 @@ func HandleExit() {
 	rawoff.Wait()
 }
 
+/*
+	Initialize command prompt.
+	p.Execute() from cmds.go has all commands.
+*/
 func (p *Profile) InitCLI() {
-	p.SCLoadScripts()
+	p.SCLoadScripts() // Load scripts from `stcript` root dir to memory.
 	Banner()
 	p.SCGetPath()
 
@@ -76,6 +80,7 @@ func (p *Profile) completer(d prompt.Document) []prompt.Suggest {
 				{Text: "search", 	Description: "Search for scripts with a pattern"},
 				{Text: "install",	Description: "Install a script"},
 				{Text: "sync",		Description: "Sincronize with remote repository"},
+				{Text: "verify",	Description: "Verify package signature"},
 			}, inputs[1], true)
 
 		case "reload":

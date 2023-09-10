@@ -179,7 +179,8 @@ func (profile *Profile) Execute(cmd string) {
 			} else if h == "vpm" {
 				pacman.VPMGetRemotePack(
 					profile.Globals["repo"],
-					profile.Globals["root"], 
+					profile.Globals["root"],
+					profile.Globals["sign"],
 					cmds, 
 					*profile.Database,
 					profile.Globals["vpmvs"],

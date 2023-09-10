@@ -121,12 +121,12 @@ func sync(repo, vnrhome string) int {
 	return 0
 }
 
-func justverifysign(repo string, database *db.DBDef) {
+func justverifysign(repo string, signRepo string,database *db.DBDef) {
 	yamlBytes, err := DownloadData(repo)
 	if err != nil {
 		utils.PrintErr(err.Error())
 	}
-	signBytes, err := DownloadData("http://0.0.0.0:8000/package.sgn")
+	signBytes, err := DownloadData(signRepo)
 	if err != nil {
 		utils.PrintErr(err.Error())
 	}
@@ -162,7 +162,7 @@ func installCommand(repo string, args []string, vnrhome string) int {
 	return 0
 }
 
-func VPMGetRemotePack(repo string, vnrhome string, args []string, database db.DBDef, verify string) int {
+func VPMGetRemotePack(repo string, vnrhome string, signRepo string, args []string, database db.DBDef, verify string) int {
 	if len(args) > 2 && args[1] == "search" {
 		search(repo, args[2])
 	} else if len(args) > 2 && args[1] == "install" {
@@ -170,7 +170,7 @@ func VPMGetRemotePack(repo string, vnrhome string, args []string, database db.DB
 	} else if len(args) > 1 && args[1] == "sync" {
 		sync(repo, vnrhome)
 	} else if len(args) > 1 && args[1] == "verify" {
-		justverifysign(repo, &database)
+		justverifysign(repo, signRepo, &database)
 	} else {
 		utils.PrintAlert("No arg")
 	}

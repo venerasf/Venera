@@ -16,6 +16,7 @@ func CmdHelp() {
 	t.AddLine("import","Import a (edited) script")
 	t.AddLine("export","Export a script (to edit)")
 	t.AddLine("globals","Show global variables")
+	t.AddLine("vpm","Venera package manager")
 	t.AddLine("exit","Exits the prompt")
 
 	t.AddLine("search","Searches a script/module")
