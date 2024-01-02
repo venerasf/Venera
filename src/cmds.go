@@ -226,7 +226,13 @@ func useScript(p *Profile, cmds []string) {
 		return
 	}
 
-	p.Prompt = "(" + utils.HideBasePath(p.Globals["root"], cmds[1]) + ")>> " // Change prompt
+	// hide the root path and extension when prompting the script path
+	promptedPath := utils.HideBasePath(p.Globals["root"], cmds[1])
+	promptedPath = utils.HideLuaExtension(promptedPath)
+
+	p.Prompt = "(" + promptedPath + ")>> " // save new prompt
+
+	// set new prompt
 	LivePrefixState.LivePrefix = p.Prompt
 	LivePrefixState.IsEnable = true
 }

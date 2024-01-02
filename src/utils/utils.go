@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+// useless func
 func GetBash() {
 	cmd := exec.Command("bash")
 	cmd.Stdin = os.Stdin
@@ -82,4 +83,14 @@ func LogMsg(logPath string, tp int, module string, message string) {
 func HideBasePath(rootePath, scrptName string) string {
 	//return scrptName[len(rootePath):]
 	return strings.TrimPrefix(scrptName, rootePath)
+}
+
+
+/*
+	Remove lua extension from path
+	from cms/wp_user_enum.lua
+	to cms/wp_user_enum
+*/
+func HideLuaExtension(scrptName string) string {
+	return strings.TrimSuffix(scrptName,".lua")
 }
