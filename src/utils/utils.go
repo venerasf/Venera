@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"strings"
 )
 
 func GetBash() {
@@ -71,4 +72,14 @@ func LogMsg(logPath string, tp int, module string, message string) {
 		panic(err.Error())
 	}
 	f.Close()
+}
+
+/*
+	We handle script path like /home/farinap/.venera/scripts/cms/wp_user_enum.lua
+	It is big and kinda useless due the rootPath (base path) is always the same.
+	It must be process to be just cms/wp_user_enum.lua.
+*/
+func HideBasePath(rootePath, scrptName string) string {
+	//return scrptName[len(rootePath):]
+	return strings.TrimPrefix(scrptName, rootePath)
 }

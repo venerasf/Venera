@@ -3,6 +3,8 @@
 
 Venera is a tool for automating customized tests and attacks agaist many kinds of protocol. It relies on a scripting engine based on the Lua scripting language that makes it possible to create modules for all types of checks and exploits. The framework is a manager and interpreter of lua scripts that provides functions and libraries for the creation of powerful tools integrated with services used during unitary tests, vulnerability scanning and exploitation fase. The user can create its own modules or use community made scripts, the tool is switchable for all kinds of need situation.
 
+See the docs [venera.farinap5.com](https://venera.farinap5.com/)
+
 ![](img/banner.png)
 ---
 

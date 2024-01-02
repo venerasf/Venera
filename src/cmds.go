@@ -176,6 +176,7 @@ func (profile *Profile) Execute(cmd string) {
 					}
 				}
 
+
 			} else if h == "vpm" {
 				pacman.VPMGetRemotePack(
 					profile.Globals["repo"],
@@ -225,7 +226,7 @@ func useScript(p *Profile, cmds []string) {
 		return
 	}
 
-	p.Prompt = "(" + cmds[1] + ")>> " // Change prompt
+	p.Prompt = "(" + utils.HideBasePath(p.Globals["root"], cmds[1]) + ")>> " // Change prompt
 	LivePrefixState.LivePrefix = p.Prompt
 	LivePrefixState.IsEnable = true
 }
