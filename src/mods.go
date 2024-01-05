@@ -1,4 +1,4 @@
-// This file is to work with modules/script
+// This file is for working with modules/script
 // like list modules, search for a module, etc...
 
 // Function must has SC prefix

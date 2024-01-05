@@ -8,9 +8,6 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-/*
-	TODO: change `panic()` to write the output to the log file
-*/
 func DBInit(homeDir string) DBDef {
 	fname := homeDir+"/.venera/database.db"
 	_,err := os.Open(fname)
@@ -20,7 +17,7 @@ func DBInit(homeDir string) DBDef {
 		_,err := os.Create(fname)
 		if err != nil {
 			utils.LogMsg(homeDir+"/.venera/message.log",3,"core","Error creating database.")
-			panic(err.Error())
+			utils.PrintErr(err.Error())
 		}
 	}
 
@@ -30,14 +27,14 @@ func DBInit(homeDir string) DBDef {
 	db.DBConn, err = sql.Open("sqlite3", fname)
 	if err != nil {
 		utils.LogMsg(homeDir+"/.venera/message.log",3,"core","Error while open db func.")
-		panic(err.Error())
+		utils.PrintErr(err.Error())
 	}
 	db.dbCreateDs()
 	return *db
 }
 
 /* 
-	TODO: change `panic()` to write the output to the log file
+	TODO: make logpath (from utils.LogMsg()) relative.
 */
 func (db *DBDef)dbCreateDs() {
 	sttm,err := db.DBConn.Prepare(`
@@ -48,7 +45,8 @@ func (db *DBDef)dbCreateDs() {
 	)
 	`)
 	if err != nil {
-		panic(err.Error())
+		utils.PrintErr(err.Error())
+		utils.LogMsg("~/venera/message.log",3,"core",err.Error())
 	} else {
 		sttm.Exec()
 	}
@@ -60,11 +58,13 @@ func (db *DBDef)dbCreateDs() {
 	)
 	`)
 	if err != nil {
-		panic(err.Error())
+		utils.PrintErr(err.Error())
+		utils.LogMsg("~/venera/message.log",3,"core",err.Error())
 	} else {
 		sttm.Exec()
 	}
 
+	// default root key must be changed and dynamic
 	key := `-----BEGIN PUBLIC KEY-----
 MIGbMBAGByqGSM49AgEGBSuBBAAjA4GGAAQADJX13tbFJYlQ0aWG6gHTZqJ6dLg3
 /n/Z/aoUdROOrRfvKGNdgxw0IOH8EetWADU7zcZFd65+wMqV+x4iM2SsBBUAx6U2
@@ -73,15 +73,14 @@ euivf5/tEQVeHt9f+MQ=
 -----END PUBLIC KEY-----`
 	sttm,err = db.DBConn.Prepare("INSERT INTO pubkey (Author,Key) VALUES (?,?);")
 	if err != nil {
-		panic(err.Error())
+		utils.PrintErr(err.Error())
+		utils.LogMsg("~/venera/message.log",3,"core",err.Error())
 	} else {
 		sttm.Exec("elf@mail.com",key)
 	}
 }
 
-/* 
-	TODO: change `panic()` to write the output to the log file
-*/
+
 func (db *DBDef)DBStoreGlobal(key string, value string) {
 	// validate if key exists
 	var v string = ""
@@ -93,7 +92,7 @@ func (db *DBDef)DBStoreGlobal(key string, value string) {
 		sttm, err := db.DBConn.Prepare("UPDATE global SET value = ? WHERE key = ?;")
 		if err != nil {
 			utils.LogMsg("~/venera/message.log",3,"core",err.Error())
-			panic(err.Error())
+			utils.PrintErr(err.Error())
 		}
 		sttm.Exec(value,key)
 	} else {
@@ -103,7 +102,7 @@ func (db *DBDef)DBStoreGlobal(key string, value string) {
 		`)
 		if err != nil {
 			utils.LogMsg("~/venera/message.log",3,"core",err.Error())
-			panic(err.Error())
+			utils.PrintErr(err.Error())
 		}
 		sttm.Exec(key,value)
 	}
