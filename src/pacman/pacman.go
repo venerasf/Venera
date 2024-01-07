@@ -10,6 +10,48 @@ import (
 	"venera/src/db"
 )
 
+
+func DownloadScript(pack Pack, vnrhome string, i int) int {
+	// download
+	data,err := DownloadData(pack.Target[i].Path)
+
+	// the signature block is explained during the sign.go file
+	// more references in https://venera.farinap5.com/6-venera-package-manager.html
+	sig := "Signed"
+	// bool
+	matchSignature := VerifySignatureScript(data, pack.Target[i].Hash)
+	if !matchSignature {
+		utils.PrintAlert("Signature Does Not Match!")
+		sig = "Signature error!"
+	}
+
+				
+	if err != nil {
+		utils.PrintErr(err.Error())
+		return 3
+	} else {
+		r := installer(data, vnrhome, pack.Target[i].Script)
+		if r == 0 {
+			utils.PrintSuccs(pack.Target[i].Script+" installed. "+sig)
+			return 0
+		} else if r == 1 {
+			utils.PrintSuccs(
+				fmt.Sprintf("%s updated to %.2f. %s", pack.Target[i].Script, pack.Target[i].Version, sig),
+			)
+			return 1
+		} else if r == 2 {
+			utils.PrintAlert("No data script found.")
+			return 2
+		} else if r == 3 {
+			utils.PrintAlert("error.")
+			return 3
+		}
+	}
+
+	return 3
+}
+
+
 func validateTarget(pack Pack) int {
 	if len(pack.Target) == 0 || pack.Target == nil {
 		return 2
@@ -115,24 +157,7 @@ func sync(repo, vnrhome string) int {
 	for i := range(pack.Target) {
 		utils.PrintAlert("Intalling "+pack.Target[i].Script)
 
-		b, err := DownloadData(pack.Target[i].Path)
-
-		if err != nil {
-			utils.PrintErr("Error downloading script:"+err.Error())
-		} else {
-
-
-			r := installer(b, vnrhome, pack.Target[i].Script)
-			if r == 0 {
-				utils.PrintSuccs(pack.Target[i].Script+" installed.")
-			} else if r == 1 {
-				utils.PrintSuccs(
-					fmt.Sprintf("%s updated to %.2f.", pack.Target[i].Script, pack.Target[i].Version),
-				)
-			} else if r == 3 {
-				utils.PrintAlert("error.")
-			}
-		}
+		DownloadScript(pack, vnrhome, i)
 	}
 	return 0
 }
@@ -155,34 +180,13 @@ func justverifysign(repo string, signRepo string,database *db.DBDef) {
 	VerifySignaturePack(yamlBytes, signBytes, *database)
 }
 
+
 func installCommand(repo string, args []string, vnrhome string) int {
 	utils.PrintSuccs("Requesting "+repo+"\n")
 		pack := getPack(repo)
 		for i := range(pack.Target) {
 			if pack.Target[i].Script == args[2] {
-				data,err := DownloadData(pack.Target[i].Path)
-
-
-				if err != nil {
-					utils.PrintErr(err.Error())
-				} else {
-					r := installer(data, vnrhome, pack.Target[i].Script)
-					if r == 0 {
-						utils.PrintSuccs(pack.Target[i].Script+" installed.")
-						return 0
-					} else if r == 1 {
-						utils.PrintSuccs(
-							fmt.Sprintf("%s updated to %.2f.", pack.Target[i].Script, pack.Target[i].Version),
-						)
-						return 1
-					} else if r == 2 {
-						utils.PrintAlert("No data script found.")
-						return 2
-					} else if r == 3 {
-						utils.PrintAlert("error.")
-						return 3
-					}
-				}
+				DownloadScript(pack, vnrhome, i)
 			}
 		}
 	return 0
