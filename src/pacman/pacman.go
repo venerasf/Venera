@@ -69,16 +69,24 @@ func search(repo, pattern string) {
 }
 
 func installer(data []byte, vnrhome string, scriptPath string) int {
+	returnInfo := 0
+	// Normalize path
 	scriptPath = strings.TrimPrefix(scriptPath,"/")
 	pathSplit := strings.Split(scriptPath,"/")
 	path := strings.Join(pathSplit[:len(pathSplit)-1],"/")
+	
+	_, err := os.Stat(vnrhome+"/"+scriptPath)
+	if err == nil {
+		returnInfo = 1
+	}
+	
 	/*TODO:
 		Change the permissions after tests.
 	*/
 	if strings.Split(path,"")[0] != "/" {
 		path = "/"+path
 	}
-	err := os.MkdirAll(vnrhome+path,0700)
+	err = os.MkdirAll(vnrhome+path,0700)
 	if err != nil {
 		utils.PrintErr(err.Error())
 		return 3
@@ -88,9 +96,11 @@ func installer(data []byte, vnrhome string, scriptPath string) int {
 		utils.PrintErr(err.Error())
 		return 3
 	}
+
 	file.Write(data)
 	file.Close()
-	return 0
+
+	return returnInfo
 }
 
 func sync(repo, vnrhome string) int {
@@ -104,15 +114,21 @@ func sync(repo, vnrhome string) int {
 
 	for i := range(pack.Target) {
 		utils.PrintAlert("Intalling "+pack.Target[i].Script)
+
 		b, err := DownloadData(pack.Target[i].Path)
+
 		if err != nil {
 			utils.PrintErr("Error downloading script:"+err.Error())
 		} else {
+
+
 			r := installer(b, vnrhome, pack.Target[i].Script)
 			if r == 0 {
 				utils.PrintSuccs(pack.Target[i].Script+" installed.")
 			} else if r == 1 {
-				utils.PrintSuccs(pack.Target[i].Script+" updated.")
+				utils.PrintSuccs(
+					fmt.Sprintf("%s updated to %.2f.", pack.Target[i].Script, pack.Target[i].Version),
+				)
 			} else if r == 3 {
 				utils.PrintAlert("error.")
 			}
@@ -121,6 +137,12 @@ func sync(repo, vnrhome string) int {
 	return 0
 }
 
+/*
+	It is currently verifying the signature just from the main .yaml. 
+	Script isn't verified by itself.
+
+	Usefull when you configured a new package repo.
+*/
 func justverifysign(repo string, signRepo string,database *db.DBDef) {
 	yamlBytes, err := DownloadData(repo)
 	if err != nil {
@@ -139,6 +161,8 @@ func installCommand(repo string, args []string, vnrhome string) int {
 		for i := range(pack.Target) {
 			if pack.Target[i].Script == args[2] {
 				data,err := DownloadData(pack.Target[i].Path)
+
+
 				if err != nil {
 					utils.PrintErr(err.Error())
 				} else {
@@ -147,7 +171,9 @@ func installCommand(repo string, args []string, vnrhome string) int {
 						utils.PrintSuccs(pack.Target[i].Script+" installed.")
 						return 0
 					} else if r == 1 {
-						utils.PrintSuccs(pack.Target[i].Script+" updated.")
+						utils.PrintSuccs(
+							fmt.Sprintf("%s updated to %.2f.", pack.Target[i].Script, pack.Target[i].Version),
+						)
 						return 1
 					} else if r == 2 {
 						utils.PrintAlert("No data script found.")
@@ -161,6 +187,21 @@ func installCommand(repo string, args []string, vnrhome string) int {
 		}
 	return 0
 }
+
+/*
+VPMGetRemotePack is the entrypoint for using Venera Package Manager
+
+The following exemplifies the way to call it.
+pacman.VPMGetRemotePack(
+	profile.Globals["repo"],  http://r.venera.farinap5.com/package.yaml
+	profile.Globals["root"],  root where to place scripts
+	profile.Globals["sign"],  http://r.venera.farinap5.com/package.sgn
+	cmds, 					  The command like "install", "sync"...
+	*profile.Database,        Database interface
+	profile.Globals["vpmvs"], If verification is on or off
+)
+
+*/
 
 func VPMGetRemotePack(repo string, vnrhome string, signRepo string, args []string, database db.DBDef, verify string) int {
 	if len(args) > 2 && args[1] == "search" {
