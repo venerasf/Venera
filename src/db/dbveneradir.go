@@ -2,27 +2,30 @@ package db
 
 import (
 	"os"
+	"venera/src/utils"
 )
 
 func createVeneraDir(homeDir string) error {
 	println("It seems like your first time running it!")
-	println("After all finished setup process please type `vpm sync`\nto sincronize packages.")
-	println("[+]- Setting up ~/.venera")
+	println("After all finished setup process, please type `vpm sync` to synchronize packages.")
+	utils.PrintSuccs("Setting up ~/.venera")
 	return os.Mkdir(homeDir+"/.venera", os.ModePerm)
 }
 
-//
+/*
+	TestVeneraDir will test the directory where venera will store everything
+*/
 func TestVeneraDir(homeDir string) error {
-	_, err := os.Stat(homeDir+"/.venera")
+	_, folderExist := os.Stat(homeDir+"/.venera")
 	/*
 		Many problems can occur but for now this unique will be validated.
 	*/
-	if err != nil {
-		err = createVeneraDir(homeDir)
+	if folderExist != nil {
+		err := createVeneraDir(homeDir)
 		if err != nil {
-			println("Fatal error: "+err.Error())
+			utils.PrintAlert("Fatal error: "+err.Error())
 			return err
 		}
 	}
-	return nil
+	return folderExist
 }

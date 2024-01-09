@@ -37,6 +37,10 @@ type SignPack struct {
 	Sign   string `json:"Sign"`
 }
 
+/*
+	VerifyPk will verify the sequence of bytes using 
+	the public key.
+*/
 func VerifyPk(r io.Reader,pemEncd []byte, bsign []byte) bool {
 	blk, _ := pem.Decode(pemEncd)
 	x509Encd := blk.Bytes
@@ -67,6 +71,9 @@ func GetKeyByEmail(mail string, db *db.DBDef) ([]byte,error) {
 func VerifySignaturePack(pack []byte, Signp []byte, db db.DBDef) bool {
 	p := SignPack{}
 	json.Unmarshal(Signp, &p)
+
+	// extract the email from the format <x@email.com>
+	// TODO: trim white spaces.
 	mail := strings.Split(
 		strings.Split(p.Author, "<")[1],
 		">",
@@ -81,11 +88,13 @@ func VerifySignaturePack(pack []byte, Signp []byte, db db.DBDef) bool {
 	if err != nil {
 		println(err.Error())
 	}
+
 	v := VerifyPk(
 		bytes.NewReader(pack),
 		pemkey,
 		sign,
 	)
+	
 	utils.PrintSuccs("Sign date: "+p.Date)
 	if v {
 		utils.PrintSuccs("Signed by trusted author: "+mail)

@@ -18,6 +18,7 @@ func DBInit(homeDir string) DBDef {
 		if err != nil {
 			utils.LogMsg(homeDir+"/.venera/message.log",3,"core","Error creating database.")
 			utils.PrintErr(err.Error())
+			os.Exit(1)
 		}
 	}
 
@@ -28,6 +29,7 @@ func DBInit(homeDir string) DBDef {
 	if err != nil {
 		utils.LogMsg(homeDir+"/.venera/message.log",3,"core","Error while open db func.")
 		utils.PrintErr(err.Error())
+		os.Exit(1)
 	}
 	db.dbCreateDs()
 	return *db
