@@ -8,24 +8,32 @@ import (
 	"strings"
 )
 
-// useless func
+// useless func that prob will f*** someone as a privesc vector :)
 func GetBash() {
 	cmd := exec.Command("bash")
-	cmd.Stdin = os.Stdin
+	cmd.Stdin  = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	cmd.Run()
 }
 
 // Types of pretty printing
-func PrintSuccs(s string) {
-	fmt.Printf("[\u001B[1;32mOK\u001B[0;0m]- %s\n",s)
+func PrintSuccs(a ...any) {
+	fmt.Printf("[\u001B[1;32mOK\u001B[0;0m]- %s\n", fmt.Sprint(a...))
 }
-func PrintErr(s string) {
-	fmt.Printf("[\u001B[1;31m!\u001B[0;0m]- %s\n",s)
+func PrintErr(a ...any) {
+	fmt.Printf("[\u001B[1;31m!\u001B[0;0m]- %s\n", fmt. Sprint(a...))
 }
-func PrintAlert(s string) {
-	fmt.Printf("[\u001B[1;31m!\u001B[0;0m]- %s\n",s)
+func PrintAlert(a ...any) {
+	fmt.Printf("[\u001B[1;31m!\u001B[0;0m]- %s\n", fmt.Sprint(a...))
+}
+
+/*
+	PrintPanic will print the message and exit with status code 1
+*/
+func PrintPanic(a ...any) {
+	fmt.Printf("[\u001B[1;31m!\u001B[0;0m]- %s\n", fmt.Sprint(a...))
+	os.Exit(1)
 }
 
 /*
@@ -60,6 +68,8 @@ func LogMsg(logPath string, tp int, module string, message string) {
 	default:
 		ltype = "nil"
 	}
+
+	// since it is not used all the time, lets open for each use
 	f, err := os.OpenFile(logPath,os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		return		
