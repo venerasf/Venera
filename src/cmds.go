@@ -14,19 +14,31 @@ import (
 	TODO: Refactor the function completely.
 	Maybe use a functional approach for function mapping.
 		Change from `cmds` to `args`.
+
+
+    New function style to call commands must be a map
+    map[string]command
+
+    The command must have a callback to a function.
+
+    command {
+      func(args)
+      description
+    }
+
 */
 func (profile *Profile) Execute(cmd string) {
 	cmd = strings.TrimSpace(cmd)
 	cmds := strings.Split(cmd, " ")
 	length := len(cmds)
-	
+  
 	// Validates length
 	if (length == 0) {
-		return; 
+		return;
 	}
 
 	// header
-	h := cmds[0] 
+	h := cmds[0]
 
 	// Generic commands
     if h == "help" {
