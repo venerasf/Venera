@@ -10,31 +10,38 @@ import (
 	//"github.com/c-bata/go-prompt"
 )
 
+// Will keep it global for now.
+var Mapping = make(map[string]Command)
+
 /*
 	TODO: Refactor the function completely.
 	Maybe use a functional approach for function mapping.
 		Change from `cmds` to `args`.
-
-
-    New function style to call commands must be a map
-    map[string]command
-
-    The command must have a callback to a function.
-
-    command {
-      func(args)
-      description
-    }
-
 */
 func (profile *Profile) Execute(cmd string) {
 	cmd = strings.TrimSpace(cmd)
 	cmds := strings.Split(cmd, " ")
 	length := len(cmds)
+
   
 	// Validates length
 	if (length == 0) {
-		return;
+		utils.PrintErr("Too few arguments. Try `help cmd`.")
+		return
+	}
+
+	switch cmds[0] {
+		case "help":
+			if length >= 2 {
+				callUsage(Mapping[cmds[1]].Usage)
+			} else {
+				utils.PrintErr("Too few arguments. Try `help cmd`.")
+			}
+		default:
+			err := Mapping[cmds[0]].Call(cmds)
+			if err != nil {
+				utils.PrintErr(err.Error())
+			}
 	}
 
 	// header
@@ -225,6 +232,11 @@ func (profile *Profile) Execute(cmd string) {
 	}
 
 	if found { utils.PrintSuccs("Yet it still did something.") }
+}
+
+
+func callUsage(usage func()) {
+	usage()
 }
 
 // Load script

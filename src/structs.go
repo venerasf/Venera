@@ -32,3 +32,13 @@ type ScriptTAGInfo struct {
 	Tag 	[]string
 	Info 	string
 }
+
+/*
+	The following struct define the patter of a command.
+*/
+type Command struct {
+	Call 	func([]string) error // Callback entrypoint
+	Usage 	func() // help function callback
+	Desc 	string // hight level description. may not be use
+	Promp 	[][]string // Prompt help and auto-complete
+}
