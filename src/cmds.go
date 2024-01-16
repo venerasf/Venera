@@ -35,7 +35,7 @@ func (profile *Profile) Execute(cmd string) {
 			if length >= 2 {
 				callUsage(Mapping[cmds[1]].Usage)
 			} else {
-				utils.PrintErr("Too few arguments. Try `help cmd`.")
+				CmdHelp()
 			}
 		default:
 			err := Mapping[cmds[0]].Call(cmds)
@@ -234,9 +234,13 @@ func (profile *Profile) Execute(cmd string) {
 	if found { utils.PrintSuccs("Yet it still did something.") }
 }
 
-
+// call usage of a script
 func callUsage(usage func()) {
 	usage()
+}
+
+func loadFunctions() {
+	
 }
 
 // Load script
@@ -260,6 +264,8 @@ func useScript(p *Profile, cmds []string) {
 	LivePrefixState.LivePrefix = p.Prompt
 	LivePrefixState.IsEnable = true
 }
+
+
 
 func runScript(p *Profile) {
 	if p.SSet {
