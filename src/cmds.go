@@ -3,9 +3,10 @@ package src
 import (
 	"os"
 	"strings"
-	"venera/src/wlua"
-	"venera/src/utils"
 	"venera/src/pacman"
+	"venera/src/utils"
+	"venera/src/wlua"
+
 	"github.com/cheynewallace/tabby"
 	//"github.com/c-bata/go-prompt"
 )
@@ -30,10 +31,10 @@ func (profile *Profile) Execute(cmd string) {
 		return
 	}
 
-	switch cmds[0] {
+	/*switch cmds[0] {
 		case "help":
 			if length >= 2 {
-				callUsage(Mapping[cmds[1]].Usage)
+				callUsage(Mapping[cmds[1]].Usage,profile)
 			} else {
 				CmdHelp()
 			}
@@ -42,7 +43,7 @@ func (profile *Profile) Execute(cmd string) {
 			if err != nil {
 				utils.PrintErr(err.Error())
 			}
-	}
+	}*/
 
 	// header
 	h := cmds[0]
@@ -81,16 +82,7 @@ func (profile *Profile) Execute(cmd string) {
 
 
 	} else if h == "globals" {
-		if length == 3 && cmds[1] == "rm" {
-			profile.Database.DBRemoveGlobals(cmds[2])
-			profile.Globals = nil
-			profile.Globals = profile.Database.DBLoadIntoGlobals()
-		} else if length == 4 && cmds[1] == "set" {
-			profile.SetGlobals(cmds[2], strings.Join(cmds[3:], " "))
-		} else {
-			// Lists global variables
-			profile.ListGlobals()
-		}
+		manageGlobals(cmds, profile)
 
 
 
@@ -99,17 +91,8 @@ func (profile *Profile) Execute(cmd string) {
 		HandleExit()
 		os.Exit(0)
 
-	} else if len(cmds) == 2 && h == "reload" {
-		if cmds[1] == "script" || cmds[1] == "s" {
-			// Reloads the selected script
-			if profile.SSet { 
-				profile.ReloadScript()
-			} else {
-				utils.PrintErr("Not a valid command out from script.")
-			}
-		} else if cmds[1] == "root" {
-			profile.SCLoadScripts()
-		}
+	} else if h == "reload" {
+		reload(cmds, profile)
 
 	} else {
 		// Not generic commands
@@ -147,12 +130,7 @@ func (profile *Profile) Execute(cmd string) {
 
 
 			} else if h == "lua" {
-				// Executes lua code
-				if length < 2 {
-					utils.PrintErr("Invalid arguments.")
-				} else {
-					wlua.LuaExecString(profile.State, strings.Join(cmds[1:], " "))
-				}
+				runLua(cmds, profile)
 
 
 
@@ -175,7 +153,6 @@ func (profile *Profile) Execute(cmd string) {
 			if h == "search"  ||  h == "s" {
 				// Searches a script
 				profile.SCListScripts(cmds)
-
 
 
 			} else if h == "use" {
@@ -234,8 +211,56 @@ func (profile *Profile) Execute(cmd string) {
 	if found { utils.PrintSuccs("Yet it still did something.") }
 }
 
+
+func runLua(cmds []string,profile *Profile) {
+	length := len(cmds)
+	// Executes lua code
+	if length < 2 {
+		utils.PrintErr("Invalid arguments.")
+	} else {
+		wlua.LuaExecString(profile.State, strings.Join(cmds[1:], " "))
+	}
+}
+
+func reload(cmds []string,profile *Profile) {
+	if len(cmds) != 2 {
+		utils.PrintErr("Invalid args.")
+		return
+	}
+
+	if cmds[1] == "script" || cmds[1] == "s" {
+		// Reloads the selected script
+		if profile.SSet { 
+			profile.ReloadScript()
+		} else {
+			utils.PrintErr("Not a valid command out from script.")
+		}
+	} else if cmds[1] == "root" {
+		profile.SCLoadScripts()
+	}
+}
+
+
+func manageGlobals(cmds []string, profile *Profile) {
+	length := len(cmds)
+	if length == 3 && cmds[1] == "rm" {
+		profile.Database.DBRemoveGlobals(cmds[2])
+		profile.Globals = nil
+		profile.Globals = profile.Database.DBLoadIntoGlobals()
+		// may be changed to >= 4
+	} else if length == 4 && cmds[1] == "set" {
+		profile.SetGlobals(cmds[2], strings.Join(cmds[3:], " "))
+	} else {
+		// Lists global variables
+		profile.ListGlobals()
+	}
+}
+
+// the funcs um this line isnt in defcallbacks
+// -------------------------------------------
+
 // call usage of a script
-func callUsage(usage func()) {
+func callUsage(usage func(), p *Profile, cmds []string) {
 	usage()
 }
 
