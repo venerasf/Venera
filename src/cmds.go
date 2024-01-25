@@ -113,7 +113,7 @@ func runBanner(cmds []string,profile *Profile) int {
 }
 
 func runUse(cmds []string,profile *Profile) int {
-	if profile.SSet || profile.Chain {
+	if !profile.SSet && !profile.Chain {
 		if len(cmds) < 2 {
 			utils.PrintErr("Invalid arguments.")
 		} else {
@@ -129,7 +129,7 @@ func runUse(cmds []string,profile *Profile) int {
 			}
 		}
 	} else {
-		utils.PrintErr("Must have script setted.")
+		utils.PrintErr("Free the script with `back` before using another .")
 	}
 	return 0
 }
