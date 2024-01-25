@@ -17,7 +17,6 @@ func (profile *Profile) Execute(cmd string) {
 	cmds := strings.Split(cmd, " ")
 	length := len(cmds)
 
-  
 	// Validates length
 	if (length == 0) {
 		utils.PrintErr("Too few arguments. Try `help cmd`.")
@@ -27,11 +26,29 @@ func (profile *Profile) Execute(cmd string) {
 	switch cmds[0] {
 		case "help":
 			if length >= 2 {
-				callUsage(Mapping[cmds[1]].Usage, profile, cmds)
+				/*
+					If there are more arguments the callback usage function is called.
+					Search for the structure that describes the command that `help` is being called.
+					Certify that command exists comparing the pointer with nil.
+					Run the `usage` function.
+				*/
+				cmdPtr := Mapping[cmds[1]]
+				if cmdPtr != nil {
+					functionP := *cmdPtr
+					functionP.Usage()
+				} else {
+					utils.PrintAlert("The command does not have help menu.")
+				}
 			} else {
 				CmdHelp()
 			}
 		default:
+			/*
+				The mapping must return the pointer to a struct that describes the command x (where x = cmds[0]).
+				We must certify if the command really exists by assuming nil if the command was't assigned.
+				The command is called passing the array of arguments that are passed through the command line
+				and the profile.
+			*/
 			cmdPtr := Mapping[cmds[0]]
 			if cmdPtr != nil {
 				functionP := *cmdPtr
@@ -101,10 +118,6 @@ func (profile *Profile) Execute(cmd string) {
 	}*/
 }
 
-// call usage of a script
-func callUsage(usage func(), p *Profile, cmds []string) {
-	usage()
-}
 
 
 /* 
