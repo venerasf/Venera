@@ -37,8 +37,8 @@ type ScriptTAGInfo struct {
 	The following struct define the patter of a command.
 */
 type Command struct {
-	Call 	func([]string) error // Callback entrypoint
+	Call 	func([]string, *Profile) int // Callback entrypoint
 	Usage 	func() // help function callback
-	Desc 	string // hight level description. may not be use
-	Promp 	[][]string // Prompt help and auto-complete
+	Desc 	string // hight level description.
+	Promp 	[][]string // Prompt help and auto-complete for subcmds
 }

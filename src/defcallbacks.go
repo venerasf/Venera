@@ -1,7 +1,214 @@
 package src
 
+import (
+	"os"
+	"strings"
+	"venera/src/pacman"
+	"venera/src/utils"
+	"venera/src/wlua"
 
-/*
+	"github.com/cheynewallace/tabby"
+	//"github.com/c-bata/go-prompt"
+)
+
+func runBanner(cmds []string,profile *Profile) int {
+	Banner()
+	return 0
+}
+
+func runUse(cmds []string,profile *Profile) int {
+	if !profile.SSet && !profile.Chain {
+		if len(cmds) < 2 {
+			utils.PrintErr("Invalid arguments.")
+		} else {
+			if (cmds[1] == "tags" || cmds[1] == "tag" || cmds[1] == "t") {
+				utils.PrintSuccs("Using tag context")
+				if len(cmds) < 3 {
+					utils.PrintErr("Invalid Arguments.")
+				} else {
+					useScriptTAG(profile, cmds)
+				}
+			} else {
+				useScript(profile, cmds)
+			}
+		}
+	} else {
+		utils.PrintErr("Free the script with `back` before using another .")
+	}
+	return 0
+}
+
+// Exit from a script
+func runOptions(cmds []string,profile *Profile) int {
+	if profile.SSet || profile.Chain {
+		wlua.VarsList()
+	} else {
+		utils.PrintErr("Must have script setted.")
+	}
+	return 0
+}
+
+// Exit from a script
+func runBack(cmds []string,profile *Profile) int {
+	if profile.SSet || profile.Chain {
+		FreeScript(profile)
+	} else {
+		utils.PrintErr("Must have script setted.")
+	}
+	return 0
+}
+
+func runInfo(cmds []string,profile *Profile) int {
+	if profile.SSet || profile.Chain {
+		// Displays information
+		if profile.Chain {
+			profile.SCInfoForChaining()
+		} else {
+			wlua.MetaShow()	
+		}
+	} else {
+		utils.PrintErr("Must have script setted.")
+	}
+	return 0
+}
+
+func runSearch(cmds []string,profile *Profile) int {
+	// Searches a script
+	profile.SCListScripts(cmds)
+	return 0
+}
+
+func runRunScript(cmds []string,profile *Profile) int {
+	if profile.SSet || profile.Chain {
+		// Runs the script
+		if profile.Chain {
+			runChain(profile)
+		} else {
+			runScript(profile)
+		}
+	} else {
+		utils.PrintErr("Must have script setted.")
+	}
+	return 0
+}
+
+func runSet(cmds []string,profile *Profile) int {
+	if profile.SSet || profile.Chain {
+		// Sets a variable for the script
+		if len(cmds) < 3 {
+			utils.PrintErr("Invalid arguments.")
+		} else {
+			wlua.SetVarValue(profile.State, cmds[1], strings.Join(cmds[2:], " "))
+		}
+	} else {
+		utils.PrintErr("Must have script setted.")
+	}
+	return 0
+}
+
+func runHelp(cmds []string,profile *Profile) int {
+	CmdHelp()
+	return 0
+}
+
+func runVPM(cmds []string,profile *Profile) int {
+	// TODO: Must not be executed with scrpt setted
+	// TODO: Validate return code
+	return pacman.VPMGetRemotePack(
+		profile.Globals["repo"],
+		profile.Globals["root"],
+		profile.Globals["sign"],
+		cmds, 
+		*profile.Database,
+		profile.Globals["vpmvs"],
+	)
+}
+
+func runExport(cmds []string,profile *Profile) int {
+	// Exports a script
+	if len(cmds) != 3 {
+		utils.PrintErr("Invalid arguments.")
+	} else {
+		profile.SCExportScript(cmds[1], cmds[2])
+	}
+	return 0
+}
+
+func runImport(cmds []string,profile *Profile) int {
+	// Imports a script
+	if len(cmds) != 3 {
+		utils.PrintErr("Invalid arguments.")
+	} else {
+		profile.SCImportScript(cmds[1], cmds[2])
+	}
+	return 0
+}
+
+func runBash(cmds []string,profile *Profile) int {
+	// Starts a bash shell
+	utils.GetBash()
+	return 0
+}
+
+func runExit(cmds []string,profile *Profile) int {
+	// Exits the program
+	HandleExit()
+	os.Exit(0)
+	return 0 // wont run
+}
+
+func runLua(cmds []string,profile *Profile) int {
+	if profile.SSet || profile.Chain {
+		length := len(cmds)
+		// Executes lua code
+		if length < 2 {
+			utils.PrintErr("Invalid arguments.")
+		} else {
+			wlua.LuaExecString(profile.State, strings.Join(cmds[1:], " "))
+		}
+	} else {
+		utils.PrintErr("Must have script setted.")
+	}
+	return 0
+}
+
+func runReload(cmds []string,profile *Profile) int {
+	if len(cmds) != 2 {
+		utils.PrintErr("Invalid args.")
+		return 1
+	}
+
+	if cmds[1] == "script" || cmds[1] == "s" {
+		// Reloads the selected script
+		if profile.SSet { 
+			profile.ReloadScript()
+		} else {
+			utils.PrintErr("Not a valid command out from script.")
+		}
+	} else if cmds[1] == "root" {
+		profile.SCLoadScripts()
+	}
+	return 0
+}
+
+
+func runManageGlobals(cmds []string, profile *Profile) int {
+	length := len(cmds)
+	if length == 3 && cmds[1] == "rm" {
+		profile.Database.DBRemoveGlobals(cmds[2])
+		profile.Globals = nil
+		profile.Globals = profile.Database.DBLoadIntoGlobals()
+		// may be changed to >= 4
+	} else if length == 4 && cmds[1] == "set" {
+		profile.SetGlobals(cmds[2], strings.Join(cmds[3:], " "))
+	} else {
+		// Lists global variables
+		profile.ListGlobals()
+	}
+	return 0
+}
+
+
 // Load script
 func useScript(p *Profile, cmds []string) {
 	p.Script = cmds[1]                     // Set script as passed over cmd
@@ -23,6 +230,8 @@ func useScript(p *Profile, cmds []string) {
 	LivePrefixState.LivePrefix = p.Prompt
 	LivePrefixState.IsEnable = true
 }
+
+
 
 func runScript(p *Profile) {
 	if p.SSet {
@@ -110,7 +319,7 @@ func useScriptTAG(p *Profile, cmds []string) {
 
 		First its important to get all those scripts that have "scanner" tag,
 		and after that we match the tags
-	*
+	*/
 	for _, sti := range aux {
 		for i := range sti.Tag {
 			if sti.Tag[i] == "scanner" {
@@ -150,7 +359,6 @@ func useScriptTAG(p *Profile, cmds []string) {
 	p.Chain = true
 }
 
-
 func runChain(p *Profile) {
 	profile := *p // Take off pointer
 	pl := wlua.LuaProfile(profile)
@@ -159,6 +367,5 @@ func runChain(p *Profile) {
 
 	/*for _,i := range (p.Scriptslist) {
 		println(i)
-	} *
+	} */
 }
-*/
