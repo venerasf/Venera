@@ -246,4 +246,11 @@ func loadFunctions() {
 		Desc:  "Use Venera package manager.",
 		Promp: nil,
 	}
+
+	Mapping["set"] = &Command{
+		Call:  runSet,
+		Usage: nil,
+		Desc:  "Set a ariable",
+		Promp: nil,
+	}
 }
