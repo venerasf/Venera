@@ -2,6 +2,7 @@ package src
 
 import (
 	"strings"
+
 	"venera/src/utils"
 )
 
@@ -18,110 +19,114 @@ func (profile *Profile) Execute(cmd string) {
 	length := len(cmds)
 
 	// Validates length
-	if (length == 0) {
+	if length == 0 {
 		utils.PrintErr("Too few arguments. Try `help cmd`.")
 		return
 	}
 
 	switch cmds[0] {
-		case "help":
-			if length >= 2 {
-				/*
-					If there are more arguments the callback usage function is called.
-					Search for the structure that describes the command that `help` is being called.
-					Certify that command exists comparing the pointer with nil.
-					Run the `usage` function.
-				*/
-				cmdPtr := Mapping[cmds[1]]
-				if cmdPtr != nil {
-					functionP := *cmdPtr
-					functionP.Usage()
-				} else {
-					utils.PrintAlert("The command does not have help menu.")
-				}
-			} else {
-				CmdHelp()
-			}
-		default:
+	case "help":
+		if length >= 2 {
 			/*
-				The mapping must return the pointer to a struct that describes the command x (where x = cmds[0]).
-				We must certify if the command really exists by assuming nil if the command was't assigned.
-				The command is called passing the array of arguments that are passed through the command line
-				and the profile.
+				If there are more arguments the callback usage function is called.
+				Search for the structure that describes the command that `help` is being called.
+				Certify that command exists comparing the pointer with nil.
+				Run the `usage` function.
 			*/
-			cmdPtr := Mapping[cmds[0]]
+			cmdPtr := Mapping[cmds[1]]
 			if cmdPtr != nil {
 				functionP := *cmdPtr
-				functionP.Call(cmds, profile)
+				if functionP.Usage == nil {
+					utils.PrintAlert("The command does not have a valid usage callback.")
+					utils.PrintLn(functionP.Desc)
+				} else {
+					functionP.Usage()
+				}
 			} else {
-				utils.PrintErr("Not a valid command or missing a selected script. Type `help`.")
+				utils.PrintAlert("The command does not have help menu.")
 			}
+		} else {
+			CmdHelp()
+		}
+	default:
+		/*
+			The mapping must return the pointer to a struct that describes the command x (where x = cmds[0]).
+			We must certify if the command really exists by assuming nil if the command was't assigned.
+			The command is called passing the array of arguments that are passed through the command line
+			and the profile.
+		*/
+		cmdPtr := Mapping[cmds[0]]
+		if cmdPtr != nil {
+			functionP := *cmdPtr
+			functionP.Call(cmds, profile)
+		} else {
+			utils.PrintErr("Not a valid command or missing a selected script. Type `help`.")
+		}
 	}
 
 	/*// header
-	h := cmds[0]
+		h := cmds[0]
 
-	// Generic commands
-    if h == "help" {
-		runHelp(cmds, profile)
-	} else if h == "bash"{
-		runBash(cmds, profile)
-	} else if h == "import" {
-		runImport(cmds, profile)
-	} else if h == "export" {
-		runExport(cmds, profile)
-	} else if h == "globals" {
-		runManageGlobals(cmds, profile)
+		// Generic commands
+	    if h == "help" {
+			runHelp(cmds, profile)
+		} else if h == "bash"{
+			runBash(cmds, profile)
+		} else if h == "import" {
+			runImport(cmds, profile)
+		} else if h == "export" {
+			runExport(cmds, profile)
+		} else if h == "globals" {
+			runManageGlobals(cmds, profile)
 
-	} else if h == "exit" {
-		runExit(cmds, profile)
+		} else if h == "exit" {
+			runExit(cmds, profile)
 
-	} else if h == "reload" {
-		runReload(cmds, profile)
+		} else if h == "reload" {
+			runReload(cmds, profile)
 
-	} else if h == "set" {
-		runSet(cmds, profile)
-	
-	} else if h == "run" {
-		runRunScript(cmds, profile)
+		} else if h == "set" {
+			runSet(cmds, profile)
 
-	} else if h == "search" {
-		runSearch(cmds, profile)
+		} else if h == "run" {
+			runRunScript(cmds, profile)
 
-	} else if h == "info" {
-		runInfo(cmds, profile)
+		} else if h == "search" {
+			runSearch(cmds, profile)
 
-	} else if h == "lua" {
-		runLua(cmds, profile)
+		} else if h == "info" {
+			runInfo(cmds, profile)
 
-	} else if h == "vpm" {
-		runVPM(cmds, profile)
+		} else if h == "lua" {
+			runLua(cmds, profile)
 
-	} else if h == "back"  ||  h == "b" {
-		// Removes the current selected script
-		runBack(cmds, profile)
+		} else if h == "vpm" {
+			runVPM(cmds, profile)
 
-	} else if h == "options"  ||  h == "o" {
-		// Removes the current selected script
-		runOptions(cmds, profile)
-	
-	} else if h == "use" {
-		// Uses a script
-		runUse(cmds, profile)
+		} else if h == "back"  ||  h == "b" {
+			// Removes the current selected script
+			runBack(cmds, profile)
 
-	} else if h == "banner" {
-		// Uses a script
-		runBanner(cmds, profile)
-			
-	} else {
-		utils.PrintErr("Not a valid command or missing a selected script. Type `help`.")
-	}*/
+		} else if h == "options"  ||  h == "o" {
+			// Removes the current selected script
+			runOptions(cmds, profile)
+
+		} else if h == "use" {
+			// Uses a script
+			runUse(cmds, profile)
+
+		} else if h == "banner" {
+			// Uses a script
+			runBanner(cmds, profile)
+
+		} else {
+			utils.PrintErr("Not a valid command or missing a selected script. Type `help`.")
+		}*/
 }
 
+/*
+Register the default commands
 
-
-/* 
-	Register the default commands
 	type Command struct {
 		Call 	func([]string, *Profile) int // Callback entrypoint
 		Usage 	func() // help function callback
@@ -130,123 +135,115 @@ func (profile *Profile) Execute(cmd string) {
 	}
 */
 func loadFunctions() {
-	 Mapping["help"] = &Command{
-		Call: runHelp,
+	Mapping["help"] = &Command{
+		Call:  runHelp,
 		Usage: nil,
-		Desc: "Show help menu.",
+		Desc:  "Show help menu.",
 		Promp: nil,
 	}
 
 	Mapping["bash"] = &Command{
-		Call: runBash,
+		Call:  runBash,
 		Usage: nil,
-		Desc: "Execute Bash.",
+		Desc:  "Spawns a shell.",
 		Promp: nil,
 	}
 
 	Mapping["import"] = &Command{
-		Call: runImport,
+		Call:  runImport,
 		Usage: nil,
-		Desc: "Execute Bash.",
+		Desc:  "Import a (edited) script.",
 		Promp: nil,
 	}
 
 	Mapping["export"] = &Command{
-		Call: runExport,
+		Call:  runExport,
 		Usage: nil,
-		Desc: "Execute Bash.",
+		Desc:  "Export a script.",
 		Promp: nil,
 	}
 
 	Mapping["globals"] = &Command{
-		Call: runManageGlobals,
+		Call:  runManageGlobals,
 		Usage: nil,
-		Desc: "Execute Bash.",
+		Desc:  "Manage global variables.",
 		Promp: nil,
 	}
 
 	Mapping["run"] = &Command{
-		Call: runRunScript,
+		Call:  runRunScript,
 		Usage: nil,
-		Desc: "Execute Bash.",
-		Promp: nil,
-	}
-
-	Mapping["globals"] = &Command{
-		Call: runManageGlobals,
-		Usage: nil,
-		Desc: "Execute Bash.",
+		Desc:  "Execute the script.",
 		Promp: nil,
 	}
 
 	Mapping["exit"] = &Command{
-		Call: runExit,
+		Call:  runExit,
 		Usage: nil,
-		Desc: "Execute Bash.",
+		Desc:  "Properly exit the too.",
 		Promp: nil,
 	}
 
 	Mapping["reload"] = &Command{
-		Call: runReload,
+		Call:  runReload,
 		Usage: nil,
-		Desc: "Execute Bash.",
+		Desc:  "Reload (root|script).",
 		Promp: nil,
 	}
 
 	Mapping["search"] = &Command{
-		Call: runSearch,
+		Call:  runSearch,
 		Usage: nil,
-		Desc: "Execute Bash.",
+		Desc:  "Search a script using patterns.",
 		Promp: nil,
 	}
 
 	Mapping["info"] = &Command{
-		Call: runInfo,
+		Call:  runInfo,
 		Usage: nil,
-		Desc: "Execute Bash.",
+		Desc:  "Information reguarding the loaded script.",
 		Promp: nil,
 	}
 
 	Mapping["options"] = &Command{
-		Call: runOptions,
+		Call:  runOptions,
 		Usage: nil,
-		Desc: "Execute Bash.",
+		Desc:  "Show configurable variables for loaded script.",
 		Promp: nil,
 	}
 
 	Mapping["lua"] = &Command{
-		Call: runLua,
+		Call:  runLua,
 		Usage: nil,
-		Desc: "Execute Bash.",
+		Desc:  "Execute lua inline commands.",
 		Promp: nil,
 	}
 
-
 	Mapping["back"] = &Command{
-		Call: runBack,
+		Call:  runBack,
 		Usage: nil,
-		Desc: "Execute Bash.",
+		Desc:  "Free the script.",
 		Promp: nil,
 	}
 
 	Mapping["use"] = &Command{
-		Call: runUse,
+		Call:  runUse,
 		Usage: nil,
-		Desc: "Execute Bash.",
+		Desc:  "Use a script.",
 		Promp: nil,
 	}
 
 	Mapping["banner"] = &Command{
-		Call: runBanner,
+		Call:  runBanner,
 		Usage: nil,
-		Desc: "Execute Bash.",
+		Desc:  "Show banner.",
 		Promp: nil,
 	}
 
 	Mapping["vpm"] = &Command{
-		Call: runVPM,
+		Call:  runVPM,
 		Usage: nil,
-		Desc: "Execute Bash.",
+		Desc:  "Use Venera package manager.",
 		Promp: nil,
 	}
 }
