@@ -10,10 +10,10 @@ import (
 
 func HandleExit() {
 	/*
-	it is necessary to deactivate the prompt in an 
-	appropriate way so as not to misconfigure the user's terminal.
-	Reset tty executing stty
-	disable raw mode
+		it is necessary to deactivate the prompt in an 
+		appropriate way so as not to misconfigure the user's terminal.
+		Reset tty executing stty
+		disable raw mode
 	*/
 	rawoff := exec.Command("/bin/stty", "-raw", "echo")
 	rawoff.Stdin = os.Stdin
@@ -88,6 +88,9 @@ func (p *Profile) completer(d prompt.Document) []prompt.Suggest {
 				{Text: "root", 		Description: "Reload root directory"},
 				{Text: "script",   	Description: "Reload script in memory"},
 			}, inputs[1], true)
+		
+		case "help":
+			return prompt.FilterHasPrefix(HelpSugg, inputs[1], true)
 		}
 	}
 

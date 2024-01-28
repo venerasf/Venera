@@ -24,45 +24,27 @@ make run
 
 ### Help Menu
 ```
-COMMAND  DESCRIPTION
--------  -----------
-help     Show help menu
-bash     Spawn shell           
-use      Load a script/module
-back     Exit module/script
-options  Show variables of script/module
-info     Info/metadata about script/module
-globals  Show global variables
-run      Run a script/module
-set      Set value for a variable
-lua      Run Lua code in running mod
-import   Import a (to edited) script
-export   Export a script (to edit)
+GENERIC COMMAND  DESCRIPTION
+---------------  -----------
+help             Show help menu. Type `help <cmd>`.
+bash             Spawns a shell
+import           Import a (edited) script
+export           Export a script (to edit)
+globals          Show global variables
+vpm              Venera package manager
+exit             Exits the prompt
+search           Searches a script
+use              Load a script
 
-BASIC NAVEGATION:
-    Press `TAB` to rotate suggestions.
-    Press `arrow key` to pass suggentions or history.
-    Press `CTRL-d` to exit.
-    Press `CTRL-l` to clear prompt.
-
-SEARCHING:
-    `search` list scripts/modules.
-    `search match <key>` list matching patterns.
-    `search match:path <key>` list path matching.
-    `search match:description <key>` list description matching.
-    `search tag <tag1 tag2...>` list tags matching.
-    `s m <key>` filter in collapsed format.
-        `s m:p <key>` filter by path.
-        `s m:d <key>` filter by description.
-        `s t <tag1 tag2...>` filter by tags.
-
-USE SCRIPT/MODULE:
-    `use path/to/script.lua` Configure a script.
-    `use tags http sql` Set scripts matching with tags.
-
-SET VARIABLE:
-    `set RHOST <value>` Configure var for an in use test.
-    `set global RHOST <value>` Configure var to a chain of tests.
+SCRIPT COMMAND  DESCRIPTION
+--------------  -----------
+set             Set value for a variable
+run             Run a script/module
+back            Exit module/script
+options         Show variables of script/module
+lua             Run Lua code in running script
+info            Info/metadata about script/module
+reload          Reloads the current script/module
 ```
 
 ![](img/sstiexp.png)

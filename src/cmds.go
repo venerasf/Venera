@@ -4,14 +4,24 @@ import (
 	"strings"
 
 	"venera/src/utils"
+
+	"github.com/c-bata/go-prompt"
 )
 
-func init() {
-	loadFunctions()
-}
+var HelpSugg = []prompt.Suggest{}
 
 // Will keep it global for now.
 var Mapping = make(map[string]*Command)
+
+func init() {
+	loadFunctions()
+	for k,v := range Mapping {
+		HelpSugg = append(HelpSugg, prompt.Suggest{
+			Text: k,
+			Description: v.Desc,
+		})
+	}
+}
 
 func (profile *Profile) Execute(cmd string) {
 	cmd = strings.TrimSpace(cmd)
@@ -40,7 +50,7 @@ func (profile *Profile) Execute(cmd string) {
 					utils.PrintAlert("The command does not have a valid usage callback.")
 					utils.PrintLn(functionP.Desc)
 				} else {
-					functionP.Usage()
+					functionP.Usage(cmds)
 				}
 			} else {
 				utils.PrintAlert("The command does not have help menu.")
@@ -63,65 +73,6 @@ func (profile *Profile) Execute(cmd string) {
 			utils.PrintErr("Not a valid command or missing a selected script. Type `help`.")
 		}
 	}
-
-	/*// header
-		h := cmds[0]
-
-		// Generic commands
-	    if h == "help" {
-			runHelp(cmds, profile)
-		} else if h == "bash"{
-			runBash(cmds, profile)
-		} else if h == "import" {
-			runImport(cmds, profile)
-		} else if h == "export" {
-			runExport(cmds, profile)
-		} else if h == "globals" {
-			runManageGlobals(cmds, profile)
-
-		} else if h == "exit" {
-			runExit(cmds, profile)
-
-		} else if h == "reload" {
-			runReload(cmds, profile)
-
-		} else if h == "set" {
-			runSet(cmds, profile)
-
-		} else if h == "run" {
-			runRunScript(cmds, profile)
-
-		} else if h == "search" {
-			runSearch(cmds, profile)
-
-		} else if h == "info" {
-			runInfo(cmds, profile)
-
-		} else if h == "lua" {
-			runLua(cmds, profile)
-
-		} else if h == "vpm" {
-			runVPM(cmds, profile)
-
-		} else if h == "back"  ||  h == "b" {
-			// Removes the current selected script
-			runBack(cmds, profile)
-
-		} else if h == "options"  ||  h == "o" {
-			// Removes the current selected script
-			runOptions(cmds, profile)
-
-		} else if h == "use" {
-			// Uses a script
-			runUse(cmds, profile)
-
-		} else if h == "banner" {
-			// Uses a script
-			runBanner(cmds, profile)
-
-		} else {
-			utils.PrintErr("Not a valid command or missing a selected script. Type `help`.")
-		}*/
 }
 
 /*
@@ -129,7 +80,7 @@ Register the default commands
 
 	type Command struct {
 		Call 	func([]string, *Profile) int // Callback entrypoint
-		Usage 	func() // help function callback
+		Usage 	func([]string) // help function callback
 		Desc 	string // hight level description.
 		Promp 	[][]string // Prompt help and auto-complete for subcmds
 	}
@@ -137,7 +88,7 @@ Register the default commands
 func loadFunctions() {
 	Mapping["help"] = &Command{
 		Call:  runHelp,
-		Usage: nil,
+		Usage: usageHelp,
 		Desc:  "Show help menu.",
 		Promp: nil,
 	}
@@ -165,7 +116,7 @@ func loadFunctions() {
 
 	Mapping["globals"] = &Command{
 		Call:  runManageGlobals,
-		Usage: nil,
+		Usage: usageGlobal,
 		Desc:  "Manage global variables.",
 		Promp: nil,
 	}
@@ -186,14 +137,14 @@ func loadFunctions() {
 
 	Mapping["reload"] = &Command{
 		Call:  runReload,
-		Usage: nil,
+		Usage: usageReload,
 		Desc:  "Reload (root|script).",
 		Promp: nil,
 	}
 
 	Mapping["search"] = &Command{
 		Call:  runSearch,
-		Usage: nil,
+		Usage: usageSearch,
 		Desc:  "Search a script using patterns.",
 		Promp: nil,
 	}
@@ -215,7 +166,7 @@ func loadFunctions() {
 	Mapping["lua"] = &Command{
 		Call:  runLua,
 		Usage: nil,
-		Desc:  "Execute lua inline commands.",
+		Desc:  "Execute inline lua commands.",
 		Promp: nil,
 	}
 
@@ -228,7 +179,7 @@ func loadFunctions() {
 
 	Mapping["use"] = &Command{
 		Call:  runUse,
-		Usage: nil,
+		Usage: usageUse,
 		Desc:  "Use a script.",
 		Promp: nil,
 	}

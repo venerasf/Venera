@@ -11,29 +11,29 @@ import (
 func CmdHelp() {
 	t := tabby.New()
 	t.AddHeader("GENERIC COMMAND","DESCRIPTION")
-	t.AddLine("help","Show help menu")
-	t.AddLine("bash","Spawns a shell")
-	t.AddLine("import","Import a (edited) script")
-	t.AddLine("export","Export a script (to edit)")
-	t.AddLine("globals","Show global variables")
-	t.AddLine("vpm","Venera package manager")
-	t.AddLine("exit","Exits the prompt")
+	t.AddLine("help","Show help menu. Use `help <cmd>`.")//
+	t.AddLine("bash","Spawns a shell")//
+	t.AddLine("import","Import a (edited) script")//
+	t.AddLine("export","Export a script (to edit)")//
+	t.AddLine("globals","Show global variables")//
+	t.AddLine("vpm","Venera package manager")//
+	t.AddLine("exit","Exits the prompt")//
 
-	t.AddLine("search","Searches a script/module")
-	t.AddLine("use","Load a script/module\n")
+	t.AddLine("search","Searches a script/module")//
+	t.AddLine("use","Load a script/module\n")//
 	
-	t.AddHeader("SCRIPT COMMAND","DESCRIPTION")
-	t.AddLine("set","Set value for a variable")
-	t.AddLine("run","Run a script/module")
-	t.AddLine("back","Exit module/script")
-	t.AddLine("options","Show variables of script/module")
-	t.AddLine("lua","Run Lua code in running script")
-	t.AddLine("info","Info/metadata about script/module")
-	t.AddLine("reload","Reloads the current script/module\n")
+	t.AddHeader("SCRIPT COMMAND","DESCRIPTION")//
+	t.AddLine("set","Set value for a variable")//
+	t.AddLine("run","Run a script/module")//
+	t.AddLine("back","Exit module/script")//
+	t.AddLine("options","Show variables of script/module")//
+	t.AddLine("lua","Run Lua code in running script")//
+	t.AddLine("info","Info/metadata about script/module")//
+	t.AddLine("reload","Reloads the current script/module\n")//
 	print("\n")
 	t.Print()
 	print("\n")
-	println("BASIC NAVEGATION:")
+	/*println("BASIC NAVEGATION:")
 	println("    Press `TAB` to rotate suggestions.")
 	println("    Press `arrow key` to pass suggentions or history.")
 	println("    Press `CTRL-d` to exit.")
@@ -57,6 +57,52 @@ func CmdHelp() {
 	println("    `set RHOST <value>` Configure variable in a script.")
 	println("    `global set RHOST <value>` Configure variable to a chain of scripts.")
 	print("\n")
+	print("\n")*/
+}
+
+func usageGlobal(cmds []string) {
+	print("\n")
+	println("GLOBALS:")
+	println("    `globals` Show global variables.")
+	println("    `globals set <key> <value>` Set a global variable.")
+	println("    `globals rm <key>` Remove a global variable.")
+	print("\n")
+}
+
+func usageUse(cmds []string) {
+	print("\n")
+	println("USE:")
+	println("    `use <script>` Load a script.")
+	println("    When executed, the `Init()` function is called for default rotines.")
+	print("\n")
+}
+
+func usageHelp(cmds []string) {
+	print("\n")
+	println("HELP:")
+	println("    `help` Show help menu.")
+	println("    `help <cmd>` Show help menu for that command.")
+	println("    `help <cmd> arg1 arg2` Arguments are accepted if implemented for that coommand.")
+	print("\n")
+}
+
+func usageReload(cmds []string) {
+	print("\n")
+	println("RELOAD:")
+	println("    `reload script` Free memory and load script again.")
+	println("    `reload root` Will reload the root directory.")
+	println("    May be used when you set a new root directory from where Venera loads the scripts.")
+	print("\n")
+}
+
+func usageSearch(cmds []string) {
+	print("\n")
+	println("SEARCHING:")
+	println("    `search` list scripts.")
+	println("    `search match <key>` list matching patterns.")
+	println("    `search match:path <key>` list path matching.")
+	println("    `search match:description <key>` list description matching.")
+	println("    `search tag <tag1 tag2...>` list matching tags.")
 	print("\n")
 }
 

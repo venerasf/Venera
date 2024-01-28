@@ -38,7 +38,7 @@ type ScriptTAGInfo struct {
 */
 type Command struct {
 	Call 	func([]string, *Profile) int // Callback entrypoint
-	Usage 	func() // help function callback
+	Usage 	func([]string) // help function callback
 	Desc 	string // hight level description.
 	Promp 	[][]string // Prompt help and auto-complete for subcmds
 }
