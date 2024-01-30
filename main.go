@@ -5,7 +5,7 @@ import (
 )
 
 func main() {
-	var v float32 = 1.01 // version
-	var s bool    = false  // stable
-	src.Start(v,s)
+	var v float32 = 1.02 // version
+	var s bool = false   // stable
+	src.Start(v, s)
 }

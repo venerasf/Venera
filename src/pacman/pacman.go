@@ -17,12 +17,12 @@ func DownloadScript(pack Pack, vnrhome string, i int) int {
 
 	// the signature block is explained during the sign.go file
 	// more references in https://venera.farinap5.com/6-venera-package-manager.html
-	sig := "Signed"
+	sig := "\u001B[1;32mSigned\u001B[0;0m"
 	// bool
 	matchSignature := VerifySignatureScript(data, pack.Target[i].Hash)
 	if !matchSignature {
 		utils.PrintAlert("Signature Does Not Match!")
-		sig = "Signature error!"
+		sig = "\u001B[1;31mSignature error!\u001B[0;0m"
 	}
 
 	if err != nil {
