@@ -10,26 +10,26 @@ import (
 
 func CmdHelp() {
 	t := tabby.New()
-	t.AddHeader("GENERIC COMMAND","DESCRIPTION")
-	t.AddLine("help","Show help menu. Use `help <cmd>`.")//
-	t.AddLine("bash","Spawns a shell")//
-	t.AddLine("import","Import a (edited) script")//
-	t.AddLine("export","Export a script (to edit)")//
-	t.AddLine("globals","Show global variables")//
-	t.AddLine("vpm","Venera package manager")//
-	t.AddLine("exit","Exits the prompt")//
+	t.AddHeader("GENERIC COMMAND", "DESCRIPTION")
+	t.AddLine("help", "Show help menu. Use `help <cmd>`.") //
+	t.AddLine("bash", "Spawns a shell")                    //
+	t.AddLine("import", "Import a (edited) script")        //
+	t.AddLine("export", "Export a script (to edit)")       //
+	t.AddLine("globals", "Show global variables")          //
+	t.AddLine("vpm", "Venera package manager")             //
+	t.AddLine("exit", "Exits the prompt")                  //
 
-	t.AddLine("search","Searches a script/module")//
-	t.AddLine("use","Load a script/module\n")//
-	
-	t.AddHeader("SCRIPT COMMAND","DESCRIPTION")//
-	t.AddLine("set","Set value for a variable")//
-	t.AddLine("run","Run a script/module")//
-	t.AddLine("back","Exit module/script")//
-	t.AddLine("options","Show variables of script/module")//
-	t.AddLine("lua","Run Lua code in running script")//
-	t.AddLine("info","Info/metadata about script/module")//
-	t.AddLine("reload","Reloads the current script/module\n")//
+	t.AddLine("search", "Searches a script/module") //
+	t.AddLine("use", "Load a script/module\n")      //
+
+	t.AddHeader("SCRIPT COMMAND", "DESCRIPTION")               //
+	t.AddLine("set", "Set value for a variable")               //
+	t.AddLine("run", "Run a script/module")                    //
+	t.AddLine("back", "Exit module/script")                    //
+	t.AddLine("options", "Show variables of script/module")    //
+	t.AddLine("lua", "Run Lua code in running script")         //
+	t.AddLine("info", "Info/metadata about script/module")     //
+	t.AddLine("reload", "Reloads the current script/module\n") //
 	print("\n")
 	t.Print()
 	print("\n")
@@ -106,6 +106,17 @@ func usageSearch(cmds []string) {
 	print("\n")
 }
 
+func usageVPM(cmds []string) {
+	print("\n")
+	println("Venera Package Manager:")
+	println("    `vpm` Call vpm commands.")
+	println("    `vpm search <pattern>` List matching substring.")
+	println("    `vpm install <script>` Install a script.")
+	println("       Usage:`vpm install /path/to/the/script.lua`")
+	println("    `vpm sync` Sincronize with remote repository.")
+	println("    `vpm verify` Verify the signature of the configured remote repository.")
+	print("\n")
+}
 
 func Banner() {
 	stb := ""
@@ -114,7 +125,7 @@ func Banner() {
 	} else {
 		stb = "NotStable"
 	}
-	//fmt.Printf("### Venera %.2f-%s ###\nType `help`\n\n",Version,stb)
+	// fmt.Printf("### Venera %.2f-%s ###\nType `help`\n\n",Version,stb)
 
 	r := rand.NewSource(time.Now().UnixNano())
 	rn := rand.New(r)
@@ -131,7 +142,7 @@ func Banner() {
 	   Read https://venera.farinap5.com/
                 type 'help'      %.2f-%s
 
-`,Version,stb)
+`, Version, stb)
 	} else if x == 1 {
 		fmt.Printf(`
 	__     __                        
@@ -143,7 +154,7 @@ func Banner() {
 	Read https://venera.farinap5.com/
         type 'help'      %.2f-%s
 
-`,Version,stb)
+`, Version, stb)
 	} else if x == 2 {
 		fmt.Printf(`
 	██╗   ██╗███████╗███╗   ██╗███████╗██████╗  █████╗ 
@@ -156,9 +167,9 @@ func Banner() {
 	   Read https://venera.farinap5.com/
                 type 'help'      %.2f-%s
 
-`,Version,stb)	
+`, Version, stb)
 	} else if x == 3 {
-		//print("\u001B[1;31m")
+		// print("\u001B[1;31m")
 		fmt.Printf(`
 	██▒   █▓▓█████  ███▄    █ ▓█████  ██▀███   ▄▄▄      
 	▓██░   █▒▓█   ▀  ██ ▀█   █ ▓█   ▀ ▓██ ▒ ██▒▒████▄    
@@ -174,8 +185,8 @@ func Banner() {
 	   Read https://venera.farinap5.com/
                 type 'help'      %.2f-%s
 
-`,Version,stb)
-		//print("\u001B[0;0m")
+`, Version, stb)
+		// print("\u001B[0;0m")
 	} else if x == 4 {
 		fmt.Printf(`
 	 _____                        _____                                 _   
@@ -186,7 +197,7 @@ func Banner() {
 	   Read https://venera.farinap5.com/
                 type 'help'      %.2f-%s
 
-`,Version,stb)
+`, Version, stb)
 	} else if x == 5 {
 		fmt.Printf(`
 	╦  ╦┌─┐┌┐┌┌─┐┬─┐┌─┐  ╔═╗┬─┐┌─┐┌┬┐┌─┐┬ ┬┌─┐┬─┐┬┌─
@@ -196,6 +207,6 @@ func Banner() {
 	   Read https://venera.farinap5.com/
                 type 'help'      %.2f-%s
 
-`,Version,stb)
+`, Version, stb)
 	}
 }

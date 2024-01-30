@@ -3,9 +3,9 @@ package src
 import (
 	"strings"
 
-	"venera/src/utils"
-
 	"github.com/c-bata/go-prompt"
+
+	"venera/src/utils"
 )
 
 var HelpSugg = []prompt.Suggest{}
@@ -15,9 +15,9 @@ var Mapping = make(map[string]*Command)
 
 func init() {
 	loadFunctions()
-	for k,v := range Mapping {
+	for k, v := range Mapping {
 		HelpSugg = append(HelpSugg, prompt.Suggest{
-			Text: k,
+			Text:        k,
 			Description: v.Desc,
 		})
 	}
@@ -193,7 +193,7 @@ func loadFunctions() {
 
 	Mapping["vpm"] = &Command{
 		Call:  runVPM,
-		Usage: nil,
+		Usage: usageVPM,
 		Desc:  "Use Venera package manager.",
 		Promp: nil,
 	}

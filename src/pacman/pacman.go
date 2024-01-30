@@ -3,17 +3,17 @@ package pacman
 import (
 	"fmt"
 	"os"
-	"venera/src/utils"
 	"strings"
 
 	"gopkg.in/yaml.v2"
-	"venera/src/db"
-)
 
+	"venera/src/db"
+	"venera/src/utils"
+)
 
 func DownloadScript(pack Pack, vnrhome string, i int) int {
 	// download
-	data,err := DownloadData(pack.Target[i].Path)
+	data, err := DownloadData(pack.Target[i].Path)
 
 	// the signature block is explained during the sign.go file
 	// more references in https://venera.farinap5.com/6-venera-package-manager.html
@@ -25,14 +25,13 @@ func DownloadScript(pack Pack, vnrhome string, i int) int {
 		sig = "Signature error!"
 	}
 
-				
 	if err != nil {
 		utils.PrintErr(err.Error())
 		return 3
 	} else {
 		r := installer(data, vnrhome, pack.Target[i].Script)
 		if r == 0 {
-			utils.PrintSuccs(pack.Target[i].Script+" installed. "+sig)
+			utils.PrintSuccs(pack.Target[i].Script + " installed. " + sig)
 			return 0
 		} else if r == 1 {
 			utils.PrintSuccs(
@@ -50,7 +49,6 @@ func DownloadScript(pack Pack, vnrhome string, i int) int {
 
 	return 3
 }
-
 
 func validateTarget(pack Pack) int {
 	if len(pack.Target) == 0 || pack.Target == nil {
@@ -79,26 +77,26 @@ func getPack(repo string) Pack {
 func search(repo, pattern string) {
 	// Retrive the map package
 	pack := getPack(repo)
-	utils.PrintSuccs("Requesting "+repo+"\n")
+	utils.PrintSuccs("Requesting " + repo + "\n")
 	if validateTarget(pack) != 0 {
 		utils.PrintAlert("No data to show.")
 	}
 
-	utils.PrintSuccs(fmt.Sprintf("%d scripts found.",len(pack.Target)))
+	utils.PrintSuccs(fmt.Sprintf("%d scripts found.", len(pack.Target)))
 
 	c := 0
-	for i := range(pack.Target) {
-		if strings.Contains(pack.Target[i].Description,pattern) ||
-		strings.Contains(pack.Target[i].Script,pattern) {
+	for i := range pack.Target {
+		if strings.Contains(pack.Target[i].Description, pattern) ||
+			strings.Contains(pack.Target[i].Script, pattern) {
 			c++
 			if i > 0 {
 				print("-----------------------\n")
 			}
-			fmt.Printf("Script: 	%s\n",pack.Target[i].Script)
-			fmt.Printf("Version:	%f\n",pack.Target[i].Version)
-			fmt.Printf("Decription:	%s\n",pack.Target[i].Description)
-			fmt.Printf("Tags:		",)
-			for j := range(pack.Target[i].Tags) {
+			fmt.Printf("Script: 	%s\n", pack.Target[i].Script)
+			fmt.Printf("Version:	%f\n", pack.Target[i].Version)
+			fmt.Printf("Decription:	%s\n", pack.Target[i].Description)
+			fmt.Printf("Tags:		")
+			for j := range pack.Target[i].Tags {
 				if j != 0 {
 					print(", ")
 				}
@@ -113,27 +111,27 @@ func search(repo, pattern string) {
 func installer(data []byte, vnrhome string, scriptPath string) int {
 	returnInfo := 0
 	// Normalize path
-	scriptPath = strings.TrimPrefix(scriptPath,"/")
-	pathSplit := strings.Split(scriptPath,"/")
-	path := strings.Join(pathSplit[:len(pathSplit)-1],"/")
-	
-	_, err := os.Stat(vnrhome+"/"+scriptPath)
+	scriptPath = strings.TrimPrefix(scriptPath, "/")
+	pathSplit := strings.Split(scriptPath, "/")
+	path := strings.Join(pathSplit[:len(pathSplit)-1], "/")
+
+	_, err := os.Stat(vnrhome + "/" + scriptPath)
 	if err == nil {
 		returnInfo = 1
 	}
-	
+
 	/*TODO:
-		Change the permissions after tests.
+	Change the permissions after tests.
 	*/
-	if strings.Split(path,"")[0] != "/" {
-		path = "/"+path
+	if strings.Split(path, "")[0] != "/" {
+		path = "/" + path
 	}
-	err = os.MkdirAll(vnrhome+path,0700)
+	err = os.MkdirAll(vnrhome+path, 0700)
 	if err != nil {
 		utils.PrintErr(err.Error())
 		return 3
 	}
-	file,err := os.Create(vnrhome+"/"+scriptPath)
+	file, err := os.Create(vnrhome + "/" + scriptPath)
 	if err != nil {
 		utils.PrintErr(err.Error())
 		return 3
@@ -146,7 +144,7 @@ func installer(data []byte, vnrhome string, scriptPath string) int {
 }
 
 func sync(repo, vnrhome string) int {
-	utils.PrintSuccs("Requesting "+repo+"\n")
+	utils.PrintSuccs("Requesting " + repo + "\n")
 	pack := getPack(repo)
 
 	v := validateTarget(pack)
@@ -154,8 +152,8 @@ func sync(repo, vnrhome string) int {
 		return v
 	}
 
-	for i := range(pack.Target) {
-		utils.PrintAlert("Intalling "+pack.Target[i].Script)
+	for i := range pack.Target {
+		utils.PrintAlert("Intalling " + pack.Target[i].Script)
 
 		DownloadScript(pack, vnrhome, i)
 	}
@@ -163,12 +161,12 @@ func sync(repo, vnrhome string) int {
 }
 
 /*
-	It is currently verifying the signature just from the main .yaml. 
-	Script isn't verified by itself.
+It is currently verifying the signature just from the main .yaml.
+Script isn't verified by itself.
 
-	Usefull when you configured a new package repo.
+Usefull when you configured a new package repo.
 */
-func justverifysign(repo string, signRepo string,database *db.DBDef) {
+func justverifysign(repo string, signRepo string, database *db.DBDef) {
 	yamlBytes, err := DownloadData(repo)
 	if err != nil {
 		utils.PrintErr(err.Error())
@@ -180,15 +178,14 @@ func justverifysign(repo string, signRepo string,database *db.DBDef) {
 	VerifySignaturePack(yamlBytes, signBytes, *database)
 }
 
-
 func installCommand(repo string, args []string, vnrhome string) int {
-	utils.PrintSuccs("Requesting "+repo+"\n")
-		pack := getPack(repo)
-		for i := range(pack.Target) {
-			if pack.Target[i].Script == args[2] {
-				DownloadScript(pack, vnrhome, i)
-			}
+	utils.PrintSuccs("Requesting " + repo + "\n")
+	pack := getPack(repo)
+	for i := range pack.Target {
+		if pack.Target[i].Script == args[2] {
+			DownloadScript(pack, vnrhome, i)
 		}
+	}
 	return 0
 }
 
@@ -217,7 +214,7 @@ func VPMGetRemotePack(repo string, vnrhome string, signRepo string, args []strin
 	} else if len(args) > 1 && args[1] == "verify" {
 		justverifysign(repo, signRepo, &database)
 	} else {
-		utils.PrintAlert("No arg")
+		utils.PrintAlert("Type `help vpm`.")
 	}
 	return 0
 }
