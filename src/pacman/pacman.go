@@ -93,7 +93,7 @@ func search(repo, pattern string) {
 				print("-----------------------\n")
 			}
 			fmt.Printf("Script: 	%s\n", pack.Target[i].Script)
-			fmt.Printf("Version:	%f\n", pack.Target[i].Version)
+			fmt.Printf("Version:	%.2f\n", pack.Target[i].Version)
 			fmt.Printf("Decription:	%s\n", pack.Target[i].Description)
 			fmt.Printf("Tags:		")
 			for j := range pack.Target[i].Tags {
@@ -131,6 +131,7 @@ func installer(data []byte, vnrhome string, scriptPath string) int {
 		utils.PrintErr(err.Error())
 		return 3
 	}
+
 	file, err := os.Create(vnrhome + "/" + scriptPath)
 	if err != nil {
 		utils.PrintErr(err.Error())

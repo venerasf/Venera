@@ -1,28 +1,27 @@
 package wlua
 
 import (
-	// "venera/src"
-	// "os"
 	libs "github.com/vadv/gopher-lua-libs"
 	"github.com/yuin/gopher-lua"
 )
 
-
 // TODO: Create a sctruct and mas to methods or as var, i don't like globals
 // This global var receives metadata from the running script
-var Metad METADATA
-// Global variable vars
-var LoadVar = make(map[string]VarDef)
-var LuaProf LuaProfile
+var (
+	Metad METADATA
+	// Global variable vars
+	LoadVar = make(map[string]VarDef)
+	LuaProf LuaProfile
+)
 
 // Execute arbitrary strings
-func LuaExecString(l *lua.LState,s string) {
+func LuaExecString(l *lua.LState, s string) {
 	l.DoString(s)
 }
 
 func loadLibs(l *lua.LState) {
 	libs.Preload(l)
-	//l.PreloadModule("lio",lio.Loader)
+	// l.PreloadModule("lio",lio.Loader)
 }
 
 func Sets(l *lua.LState) {
@@ -37,16 +36,16 @@ func Sets(l *lua.LState) {
 	l.SetGlobal("PrintInfoln", l.NewFunction(PrintInfoln))
 	l.SetGlobal("Print", l.NewFunction(Print))
 	l.SetGlobal("Println", l.NewFunction(Println))
-	l.SetGlobal("LogMsg",l.NewFunction(LogMsg))
+	l.SetGlobal("LogMsg", l.NewFunction(LogMsg))
 
-	//Input/prompt
-	l.SetGlobal("Input",l.NewFunction(Input))
-	//Open file
-	l.SetGlobal("Open",l.NewFunction(Open))
+	// Input/prompt
+	l.SetGlobal("Input", l.NewFunction(Input))
+	// Open file
+	l.SetGlobal("Open", l.NewFunction(Open))
 
 	l.SetGlobal("Meta", l.NewFunction(Meta))
-	l.SetGlobal("LoadVars",l.NewFunction(LoadVars))
-	l.SetGlobal("Call",l.NewFunction(LuaProf.Calls))
+	l.SetGlobal("LoadVars", l.NewFunction(LoadVars))
+	l.SetGlobal("Call", l.NewFunction(LuaProf.Calls))
 	loadLibs(l)
 }
 
@@ -64,11 +63,11 @@ func LuaInitUniq(p LuaProfile) (*lua.LState, bool) {
 	err := l.DoFile(p.Script)
 	if err != nil {
 		println(err.Error())
-		return nil,false
+		return nil, false
 	}
 	l.DoString("Init()")
-	SetFromVarsScriptGlobals(l,p)
-	return l,true
+	SetFromVarsScriptGlobals(l, p)
+	return l, true
 }
 
 // Run a LState already instatiated
@@ -76,15 +75,12 @@ func LuaRunUniq(l *lua.LState) {
 	l.DoString("Main()")
 }
 
-
-
 func LuaRunChaining(p LuaProfile) {
-	for _,i := range(p.Scriptslist) {
+	for _, i := range p.Scriptslist {
 		p.Script = i
 		LuaInitChain(p)
 	}
 }
-
 
 // Start lua chai for working with multiple scripts
 // when we use tags to index.
@@ -95,18 +91,18 @@ func LuaInitChain(p LuaProfile) {
 	err := l.DoFile(p.Script)
 
 	if p.Globals["VERBOSE"] == "true" {
-		println("-> "+p.Script)
+		println("-> " + p.Script)
 	}
+
 	if err != nil {
 		println(err.Error())
 		return
 	}
+
 	l.DoString("Init()")
-	SetFromGlobals(l,p)
+	SetFromGlobals(l, p)
 	l.DoString("Main()")
 }
-
-
 
 // LuaFreeScript deletes everything of a script from the memory
 func LuaFreeScript() {

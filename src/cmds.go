@@ -200,7 +200,7 @@ func loadFunctions() {
 
 	Mapping["set"] = &Command{
 		Call:  runSet,
-		Usage: nil,
+		Usage: usageSet,
 		Desc:  "Set a ariable",
 		Promp: nil,
 	}
