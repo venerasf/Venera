@@ -34,46 +34,22 @@ func (profile *Profile) Execute(cmd string) {
 		return
 	}
 
-	switch cmds[0] {
-	case "help":
-		if length >= 2 {
-			/*
-				If there are more arguments the callback usage function is called.
-				Search for the structure that describes the command that `help` is being called.
-				Certify that command exists comparing the pointer with nil.
-				Run the `usage` function.
-			*/
-			cmdPtr := Mapping[cmds[1]]
-			if cmdPtr != nil {
-				functionP := *cmdPtr
-				if functionP.Usage == nil {
-					utils.PrintAlert("The command does not have a valid usage callback.")
-					utils.PrintLn(functionP.Desc)
-				} else {
-					functionP.Usage(cmds)
-				}
-			} else {
-				utils.PrintAlert("The command does not have help menu.")
-			}
-		} else {
-			CmdHelp()
-		}
-	default:
-		/*
-			The mapping must return the pointer to a struct that describes the command x (where x = cmds[0]).
-			We must certify if the command really exists by assuming nil if the command was't assigned.
-			The command is called passing the array of arguments that are passed through the command line
-			and the profile.
-		*/
-		cmdPtr := Mapping[cmds[0]]
-		if cmdPtr != nil {
-			functionP := *cmdPtr
-			functionP.Call(cmds, profile)
-		} else {
-			utils.PrintErr("Not a valid command or missing a selected script. Type `help`.")
-		}
+	/*
+		The mapping must return the pointer to a struct that describes the command x (where x = cmds[0]).
+		We must certify if the command really exists by assuming nil if the command was't assigned.
+		The command is called passing the array of arguments that are passed through the command line
+		and the profile.
+	*/
+	cmdPtr := Mapping[cmds[0]]
+	if cmdPtr != nil {
+		functionP := *cmdPtr
+		functionP.Call(cmds, profile)
+	} else {
+		utils.PrintErr("Not a valid command or missing a selected script. Type `help`.")
 	}
 }
+
+
 
 /*
 Register the default commands

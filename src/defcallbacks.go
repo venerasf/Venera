@@ -106,8 +106,29 @@ func runSet(cmds []string,profile *Profile) int {
 	return 0
 }
 
-func runHelp(cmds []string,profile *Profile) int {
-	CmdHelp()
+func runHelp(cmds []string, p *Profile) int {
+	if len(cmds) >= 2 {
+		/*
+			If there are more arguments the callback usage function is called.
+			Search for the structure that describes the command that `help` is being called.
+			Certify that command exists comparing the pointer with nil.
+			Run the `usage` function.
+		*/
+		cmdPtr := Mapping[cmds[1]]
+		if cmdPtr != nil {
+			functionP := *cmdPtr
+			if functionP.Usage == nil {
+				utils.PrintAlert("The command does not have a valid usage callback.")
+				utils.PrintLn(functionP.Desc)
+			} else {
+				functionP.Usage(cmds)
+			}
+		} else {
+			utils.PrintAlert("The command does not have help menu.")
+		}
+	} else {
+		CmdHelp()
+	}
 	return 0
 }
 

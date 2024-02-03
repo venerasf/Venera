@@ -9,6 +9,7 @@ import (
 )
 
 func CmdHelp() {
+	print("\n")
 	t := tabby.New()
 	t.AddHeader("GENERIC COMMAND", "DESCRIPTION")
 	t.AddLine("help", "Show help menu. Use `help <cmd>`.") //
@@ -29,8 +30,7 @@ func CmdHelp() {
 	t.AddLine("options", "Show variables of script/module")    //
 	t.AddLine("lua", "Run Lua code in running script")         //
 	t.AddLine("info", "Info/metadata about script/module")     //
-	t.AddLine("reload", "Reloads the current script/module\n") //
-	print("\n")
+	t.AddLine("reload", "Reloads the current script/module")   //
 	t.Print()
 	print("\n")
 	/*println("BASIC NAVEGATION:")
@@ -86,6 +86,7 @@ func usageUse(cmds []string) {
 }
 
 func usageHelp(cmds []string) {
+	println("HELP:")
 	println("    `help` Show help menu.")
 	println("    `help <cmd>` Show help menu for that command.")
 	println("    `help <cmd> arg1 arg2` Arguments are accepted if implemented for that command.")
