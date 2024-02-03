@@ -93,7 +93,7 @@ func (db *DBDef) dbCreateDs() {
 		utils.PrintErr(err.Error())
 		utils.LogMsg("~/venera/message.log", 3, "core", err.Error())
 	} else {
-		sttm.Exec("elf@mail.com", keyPack.Key)
+		sttm.Exec(keyPack.Email, keyPack.Key)
 	}
 }
 
