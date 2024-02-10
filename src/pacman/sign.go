@@ -25,7 +25,9 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"strings"
+
 	"venera/src/db"
 	"venera/src/utils"
 )
@@ -37,32 +39,32 @@ type SignPack struct {
 }
 
 /*
-	VerifyPk will verify the sequence of bytes using 
-	the public key.
+VerifyPk will verify the sequence of bytes using
+the public key.
 */
-func VerifyPk(r io.Reader,pemEncd []byte, bsign []byte) bool {
+func VerifyPk(r io.Reader, pemEncd []byte, bsign []byte) bool {
 	blk, _ := pem.Decode(pemEncd)
 	x509Encd := blk.Bytes
 	publicKey, err := x509.ParsePKIXPublicKey(x509Encd) // generic key
 	if err != nil {
-			println(err.Error())
+		println(err.Error())
 	}
 	pk := publicKey.(*ecdsa.PublicKey)
 	h := sha256.New()
 	_, err = io.Copy(h, r)
 	if err != nil {
-			fmt.Println(err.Error())
+		fmt.Println(err.Error())
 	}
 	hash := h.Sum(nil)
 	return ecdsa.VerifyASN1(pk, hash, bsign)
 }
 
-func GetKeyByEmail(mail string, db *db.DBDef) ([]byte,error) {
+func GetKeyByEmail(mail string, db *db.DBDef) ([]byte, error) {
 	var pkey string
 	var err error
 	db.DBConn.QueryRow("SELECT key FROM Pubkey WHERE Author = ?;", mail).Scan(&pkey)
 	if len(pkey) == 0 {
-		err = errors.New("No key for email: "+mail)
+		err = errors.New("No key for email: " + mail)
 	}
 	return []byte(pkey), err
 }
@@ -77,8 +79,8 @@ func VerifySignaturePack(pack []byte, Signp []byte, db db.DBDef) bool {
 		strings.Split(p.Author, "<")[1],
 		">",
 	)[0]
-	utils.PrintSuccs("Getting key for author: "+mail)
-	pemkey,err := GetKeyByEmail(mail, &db)
+	utils.PrintSuccs("Getting key for author: " + mail)
+	pemkey, err := GetKeyByEmail(mail, &db)
 	if err != nil {
 		utils.PrintErr(err.Error())
 	}
@@ -93,17 +95,16 @@ func VerifySignaturePack(pack []byte, Signp []byte, db db.DBDef) bool {
 		pemkey,
 		sign,
 	)
-	
-	utils.PrintSuccs("Sign date: "+p.Date)
+
+	utils.PrintSuccs("Sign date: " + p.Date)
 	if v {
-		utils.PrintSuccs("Signed by trusted author: "+mail)
+		utils.PrintSuccs("Signed by trusted author: " + mail)
 		return true
 	} else {
-		utils.PrintErr("Invalid signature");
+		utils.PrintErr("Invalid signature")
 		return false
 	}
 }
-
 
 func VerifySignatureScript(data []byte, hash string) bool {
 	m := md5.New()
@@ -115,4 +116,17 @@ func VerifySignatureScript(data []byte, hash string) bool {
 	} else {
 		return false
 	}
+}
+
+func ImportKeyFromPack(path string) error {
+	bytes, err := ioutil.ReadFile(path)
+	if err != nil {
+		return err
+	}
+
+	pack, err := utils.GetKeyFromPack(bytes)
+	if err != nil {
+		return err
+	}
+	return nil
 }
