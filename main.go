@@ -6,6 +6,6 @@ import (
 
 func main() {
 	var v float32 = 1.02 // version
-	var s bool = false   // stable
+	var s bool = true   // stable
 	src.Start(v, s)
 }
