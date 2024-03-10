@@ -195,23 +195,29 @@ VPMGetRemotePack is the entrypoint for using Venera Package Manager
 
 The following exemplifies the way to call it.
 pacman.VPMGetRemotePack(
-	profile.Globals["repo"],  http://r.venera.farinap5.com/package.yaml
-	profile.Globals["root"],  root where to place scripts
-	profile.Globals["sign"],  http://r.venera.farinap5.com/package.sgn
-	cmds, 					  The command like "install", "sync"...
-	*profile.Database,        Database interface
-	profile.Globals["vpmvs"], If verification is on or off
+	profile.Globals["repo"],  	http://r.venera.farinap5.com/package.yaml
+	profile.Globals["root"],  	root where to place scripts
+	profile.Globals["sign"],  	http://r.venera.farinap5.com/package.sgn
+	cmds, 					  	The command like "install", "sync"...
+	*profile.Database,        	Database interface
+	profile.Globals["vpmvs"], 	If verification is on or off
+	profile.Globals["logfile"],	Log path
 )
 
 */
 
-func VPMGetRemotePack(repo string, vnrhome string, signRepo string, args []string, database db.DBDef, verify string) int {
+func VPMGetRemotePack(repo string, vnrhome string, signRepo string, args []string, database db.DBDef, verify string, logfile string) int {
 	if len(args) > 2 && args[1] == "search" {
 		search(repo, args[2])
 	} else if len(args) > 2 && args[1] == "install" {
+		utils.LogMsg(logfile,0,"vmp","install from "+repo+" requested.")
 		installCommand(repo, args, vnrhome)
 	} else if len(args) > 1 && args[1] == "sync" {
-		sync(repo, vnrhome)
+		utils.LogMsg(logfile,0,"vmp","sync with "+repo+" requested.")
+		n := sync(repo, vnrhome)
+		if n != 0 {
+			utils.LogMsg(logfile,1,"vmp","Sync error reported.")
+		}
 	} else if len(args) > 1 && args[1] == "verify" {
 		justverifysign(repo, signRepo, &database)
 	} else {

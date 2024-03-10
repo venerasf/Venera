@@ -25,7 +25,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"strings"
 
 	"venera/src/db"
@@ -118,7 +117,7 @@ func VerifySignatureScript(data []byte, hash string) bool {
 	}
 }
 
-func ImportKeyFromPack(path string) error {
+/*func ImportKeyFromPack(path string) error {
 	bytes, err := ioutil.ReadFile(path)
 	if err != nil {
 		return err
@@ -129,4 +128,4 @@ func ImportKeyFromPack(path string) error {
 		return err
 	}
 	return nil
-}
+}*/

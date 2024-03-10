@@ -142,6 +142,7 @@ func runVPM(cmds []string,profile *Profile) int {
 		cmds, 
 		*profile.Database,
 		profile.Globals["vpmvs"],
+		profile.Globals["logfile"],
 	)
 }
 

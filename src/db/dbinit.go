@@ -76,7 +76,7 @@ func (db *DBDef) dbCreateDs() {
 		utils.PrintErr(err.Error())
 		utils.LogMsg("~/venera/message.log", 3, "core", err.Error())
 	}
-	print(keyBytes)
+	//print(keyBytes)
 	keyPack, err := utils.GetKeyFromPack(keyBytes)
 	if err != nil {
 		utils.PrintErr(err.Error())
