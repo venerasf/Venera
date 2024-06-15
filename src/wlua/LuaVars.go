@@ -3,7 +3,6 @@
 package wlua
 
 import (
-	"fmt"
 	"strings"
 	"venera/src/utils"
 
@@ -35,25 +34,31 @@ func VarsList() {
 }
 
 
-/* Set variales in manual use
-   TODO: escape string terminator that could allow lua injection
-	in SetVarValue func
-	the `VARS.%s.VALUE="%s"` is exploitable.
+/* 
+	Set variales in manual use
 */
 func SetVarValue(L *lua.LState, key string, value string) {
 	key = strings.ToUpper(key)
 
 	ex := false
+	// Iterate all avaliable vars
 	for i, _ := range(LoadVar) {
 		if i == key {
-			ex = true
+			ex = true // The var exists
 		}
 	}
+
 	if ex {
-		L.DoString(fmt.Sprintf(`VARS.%s.VALUE="%s"`, key, value))
+		//L.DoString(fmt.Sprintf(`VARS.%s.VALUE="%s"`, key, value))
+
+		lvalue := L.GetGlobal("VARS")
+		lvalue1 := L.GetField(lvalue, key)
+		newValue := lua.LString(value)
+		L.SetField(lvalue1, "VALUE", newValue)
+
 		LoadVars(L) // Update var struct
 		utils.PrintSuccs(key," <- ",value)
-		//println("[\u001B[1;32mOK\u001B[0;0m]",)
+		// println("[\u001B[1;32mOK\u001B[0;0m]",)
 	} else {
 		utils.PrintErr(key," <- ",value)
 	}
@@ -69,7 +74,12 @@ func SetFromGlobals(L *lua.LState,p LuaProfile) {
 
 	for i := range(p.Globals) {
 		//println("VARS."+i+".VALUE=\""+p.Globals[i]+"\"")
-		L.DoString(fmt.Sprintf(`VARS.%s.VALUE="%s"`,i,p.Globals[i]))
+		lvalue := L.GetGlobal("VARS")
+		lvalue1 := L.GetField(lvalue, i)
+		newValue := lua.LString(p.Globals[i])
+		L.SetField(lvalue1, "VALUE", newValue)
+
+		//L.DoString(fmt.Sprintf(`VARS.%s.VALUE="%s"`,i,p.Globals[i]))
 		//L.DoString("VARS."+i+".VALUE=\""+p.Globals[i]+"\"")
 	}
 }
