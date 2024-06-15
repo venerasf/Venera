@@ -4,6 +4,9 @@ package wlua
 
 import (
 	"fmt"
+	"strings"
+	"venera/src/utils"
+
 	//"strings"
 	"github.com/cheynewallace/tabby"
 	"github.com/yuin/gluamapper"
@@ -38,22 +41,25 @@ func VarsList() {
 	the `VARS.%s.VALUE="%s"` is exploitable.
 */
 func SetVarValue(L *lua.LState, key string, value string) {
+	key = strings.ToUpper(key)
+
 	ex := false
-	for i,_ := range(LoadVar) {
+	for i, _ := range(LoadVar) {
 		if i == key {
 			ex = true
 		}
 	}
 	if ex {
-		L.DoString(fmt.Sprintf(`VARS.%s.VALUE="%s"`,key,value))
-		LoadVars(L)
-		println("[\u001B[1;32mOK\u001B[0;0m]",key,"<-",value)
+		L.DoString(fmt.Sprintf(`VARS.%s.VALUE="%s"`, key, value))
+		LoadVars(L) // Update var struct
+		utils.PrintSuccs(key," <- ",value)
+		//println("[\u001B[1;32mOK\u001B[0;0m]",)
 	} else {
-		println("[\u001B[1;31m!\u001B[0;0m] No variable",key,"<-",value)
+		utils.PrintErr(key," <- ",value)
 	}
 }
 
-// Set variables from globals 
+// InstSet variables from globals 
 func SetFromGlobals(L *lua.LState,p LuaProfile) {
 	vars := new(map[string]VarDef)
 
@@ -73,7 +79,7 @@ func SetFromGlobals(L *lua.LState,p LuaProfile) {
 func SetFromVarsScriptGlobals(L *lua.LState, p LuaProfile) {
 	for i := range(LoadVar) {
 		for j,y := range(p.Globals) {
-			if j==i {
+			if strings.ToUpper(j) == i {
 				SetVarValue(L,i,y)
 				break
 			}
