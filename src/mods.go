@@ -1,7 +1,7 @@
-// This file is for working with modules/script
+// This file for working with modules/script
 // like list modules, search for a module, etc...
 
-// Function must has SC prefix
+// Functions must have SC prefix
 package src
 
 import (
@@ -135,8 +135,8 @@ func (p Profile) SCListScripts(key []string) {
 		for x, tag := range aux {
 			for i := range tag.Tag {
 				for _, j := range key[2:] {
-					if strings.Contains(tag.Tag[i], j) {
-						tags := strings.Join(tag.Tag, ",")
+					if strings.Contains(strings.ToLower(tag.Tag[i]), strings.ToLower(j)) {
+						tags := strings.Join(tag.Tag, ", ")
 						if len(tags) < 20 {
 							t.AddLine(x+1, tag.Path, tag.Info, tags)
 						} else {
