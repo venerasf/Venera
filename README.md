@@ -47,6 +47,21 @@ info            Info/metadata about script/module
 reload          Reloads the current script/module
 ```
 
+Use help command to describe each command with examples.
+
+```
+[vnr]>> help search
+
+SEARCHING:
+    `search` list scripts.
+    `search match <key>` list matching patterns.
+    `search match:path <key>` list path matching.
+    `search match:description <key>` list description matching.
+    `search tag <tag1 tag2...>` list matching tags.
+```
+
+A simple example of the interface:
+
 ![](img/sstiexp.png)
 
 ---

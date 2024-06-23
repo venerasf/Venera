@@ -11,12 +11,12 @@ import (
 	//"github.com/c-bata/go-prompt"
 )
 
-func runBanner(cmds []string,profile *Profile) int {
+func runBanner(cmds []string, profile *Profile) int {
 	Banner()
 	return 0
 }
 
-func runUse(cmds []string,profile *Profile) int {
+func runUse(cmds []string, profile *Profile) int {
 	if !profile.SSet && !profile.Chain {
 		if len(cmds) < 2 {
 			utils.PrintErr("Invalid arguments.")

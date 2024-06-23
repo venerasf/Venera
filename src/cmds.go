@@ -107,7 +107,7 @@ func loadFunctions() {
 	Mapping["exit"] = &Command{
 		Call:  runExit,
 		Usage: nil,
-		Desc:  "Properly exit the too.",
+		Desc:  "Properly exit the tool.",
 		Promp: nil,
 	}
 
