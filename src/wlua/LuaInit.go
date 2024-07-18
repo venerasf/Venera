@@ -47,6 +47,7 @@ func Sets(l *lua.LState) {
 	l.SetGlobal("LoadVars", l.NewFunction(LoadVars))
 	l.SetGlobal("Call", l.NewFunction(LuaProf.Calls))
 	loadLibs(l)
+	SliverPreload(l)
 }
 
 // Start Lua sandbox run once at a time
