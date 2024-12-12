@@ -1,7 +1,7 @@
 package wlua
 
 import (
-	libs "github.com/vadv/gopher-lua-libs"
+	libs "github.com/venerasf/go-lua-libs"
 	"github.com/yuin/gopher-lua"
 )
 
