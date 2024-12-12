@@ -52,7 +52,7 @@ func Sets(l *lua.LState) {
 // Start Lua sandbox run once at a time
 // The func will instance the source code
 // so it can be configured from main prompt
-// return lua.state and if the script culd be
+// return lua.state and if the script could be
 // runned (true) or not (false)
 func LuaInitUniq(p LuaProfile) (*lua.LState, bool) {
 	// Activate script global variables
@@ -70,7 +70,7 @@ func LuaInitUniq(p LuaProfile) (*lua.LState, bool) {
 	return l, true
 }
 
-// Run a LState already instatiated
+// Run a LState already instantiated
 func LuaRunUniq(l *lua.LState) {
 	l.DoString("Main()")
 }

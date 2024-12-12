@@ -28,7 +28,7 @@ type METADATA struct {
 	INFO	string
 }
 
-/* Variavles in script
+/* Variables in script
 	TODO: use "REQUIRED" instead of "NEEDED".
  	This change will affect all scripts done.
  */

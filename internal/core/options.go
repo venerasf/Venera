@@ -82,7 +82,7 @@ func usageUse(cmds []string) {
 	print("\n")
 	println("USE:")
 	println("    `use <script>` Load a script.")
-	println("    When executed, the `Init()` function is called for default rotines.")
+	println("    When executed, the `Init()` function is called for default routines.")
 }
 
 func usageHelp(cmds []string) {
