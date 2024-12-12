@@ -4,7 +4,7 @@ package wlua
 
 import (
 	"strings"
-	"venera/src/utils"
+	"venera/internal/utils"
 
 	//"strings"
 	"github.com/cheynewallace/tabby"

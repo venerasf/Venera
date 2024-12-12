@@ -1,10 +1,11 @@
-package src
+package core
 
 import (
 	"log"
 	"os/user"
-	"venera/src/db"
-	"venera/src/utils"
+	"venera/internal/db"
+	"venera/internal/utils"
+	"venera/internal/types"
 )
 
 var Version	float32
@@ -34,7 +35,7 @@ func Start(v float32, stb bool) {
 	}
 
 	// Init profile
-	profile := new(Profile)
+	profile := new(types.Profile)
 	// Init database definition its a pointer.
 	var dbdef db.DBDef
 	// set scripts folder
@@ -57,5 +58,5 @@ func Start(v float32, stb bool) {
 	utils.LogMsg(profile.Globals["logfile"],0,"core","Startup initialized.")
 
 	// Init prompt
-	profile.InitCLI()
+	InitCLI(profile)
 }

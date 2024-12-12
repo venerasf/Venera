@@ -7,8 +7,8 @@ import (
 
 	"gopkg.in/yaml.v2"
 
-	"venera/src/db"
-	"venera/src/utils"
+	"venera/internal/db"
+	"venera/internal/utils"
 )
 
 func DownloadScript(pack Pack, vnrhome string, i int) int {

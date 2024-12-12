@@ -2,7 +2,7 @@
 // like list modules, search for a module, etc...
 
 // Functions must have SC prefix
-package src
+package core
 
 import (
 	"fmt"
@@ -12,35 +12,36 @@ import (
 	"regexp"
 	"sort"
 	"strings"
-	"venera/src/wlua"
-	"venera/src/utils"
+	"venera/internal/wlua"
+	"venera/internal/utils"
+	"venera/internal/types"
 
 	"github.com/c-bata/go-prompt"
 	"github.com/cheynewallace/tabby"
 )
 
 var ScriptSuggestions *[]prompt.Suggest // script list with descriptions
-var SCTAG []ScriptTAGInfo               // script list with tags and infos,
+var SCTAG []types.ScriptTAGInfo               // script list with tags and infos,
 										// it will be in memory for later use.
 
 // Load all paths, get metadata INFO and tags
 // TODO: The regex can be better
-func (p Profile) SCLoadScripts() {
+func SCLoadScripts(p types.Profile) {
 	re := regexp.MustCompile(`METADATA(\s)*=(\s)*\{((.|\n)*)INFO(\s)*=(\s)*\[\[((.|\n)*?)\]\]((.|\n)*)\}`)
 	//rea := *re
-	paths := p.SCGetPath()
+	paths := SCGetPath(p)
 
 	aux := []prompt.Suggest{}
 	for _, file := range paths {
 		info := SCExtractINFO(file, re)
 		tags := wlua.ScriptGetTags(file)
-		SCTAG = append(SCTAG, ScriptTAGInfo{file, tags, info})
+		SCTAG = append(SCTAG, types.ScriptTAGInfo{file, tags, info})
 		aux = append(aux, prompt.Suggest{Text: file, Description: info})
 	}
 	ScriptSuggestions = &aux
 }
 
-func (p Profile) SCGetPath() []string {
+func SCGetPath(p types.Profile) []string {
 	//root := p.BPath
 	root := p.Globals["root"]
 	filePath := []string{} // List of file paths
@@ -61,8 +62,8 @@ func (p Profile) SCGetPath() []string {
 
 // Use for seaarch functions
 // TODO: Use `strings.ToLower()` to match strings without case sensitive
-func (p Profile) SCListScripts(key []string) {
-	pathList := p.SCGetPath()
+func SCListScripts(p types.Profile, key []string) {
+	pathList := SCGetPath(p)
 	t := tabby.New()
 
 	if len(key) == 1 {
@@ -213,7 +214,7 @@ func TagsJoinALL() string {
 }
 
 
-func (p Profile)SCInfoForChaining() {
+func SCInfoForChaining(p types.Profile) {
 	m := make(map[string]bool)
 	utils.PrintSuccs("Listing loaded scripts.")
 	for i := range(p.Scriptslist) {

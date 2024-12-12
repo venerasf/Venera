@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"embed"
 	"os"
-	"venera/src/utils"
+	"venera/internal/utils"
 
 	_ "github.com/mattn/go-sqlite3"
 )

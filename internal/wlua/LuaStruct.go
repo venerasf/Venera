@@ -1,7 +1,7 @@
 package wlua
 
 import (
-	"venera/src/db"
+	"venera/internal/db"
 
 	lua "github.com/yuin/gopher-lua"
 )

@@ -1,22 +1,22 @@
-package src
+package core
 
 import (
 	"os"
 	"strings"
-	"venera/src/pacman"
-	"venera/src/utils"
-	"venera/src/wlua"
+	"venera/internal/pacman"
+	"venera/internal/utils"
+	"venera/internal/wlua"
+	"venera/internal/types"
 
-	"github.com/cheynewallace/tabby"
 	//"github.com/c-bata/go-prompt"
 )
 
-func runBanner(cmds []string, profile *Profile) int {
+func runBanner(cmds []string, profile *types.Profile) int {
 	Banner()
 	return 0
 }
 
-func runUse(cmds []string, profile *Profile) int {
+func runUse(cmds []string, profile *types.Profile) int {
 	if !profile.SSet && !profile.Chain {
 		if len(cmds) < 2 {
 			utils.PrintErr("Invalid arguments.")
@@ -39,7 +39,7 @@ func runUse(cmds []string, profile *Profile) int {
 }
 
 // Exit from a script
-func runOptions(cmds []string,profile *Profile) int {
+func runOptions(cmds []string,profile *types.Profile) int {
 	if profile.SSet || profile.Chain {
 		wlua.VarsList()
 	} else {
@@ -49,7 +49,7 @@ func runOptions(cmds []string,profile *Profile) int {
 }
 
 // Exit from a script
-func runBack(cmds []string,profile *Profile) int {
+func runBack(cmds []string,profile *types.Profile) int {
 	if profile.SSet || profile.Chain {
 		FreeScript(profile)
 	} else {
@@ -58,11 +58,11 @@ func runBack(cmds []string,profile *Profile) int {
 	return 0
 }
 
-func runInfo(cmds []string,profile *Profile) int {
+func runInfo(cmds []string,profile *types.Profile) int {
 	if profile.SSet || profile.Chain {
 		// Displays information
 		if profile.Chain {
-			profile.SCInfoForChaining()
+			SCInfoForChaining(*profile)
 		} else {
 			wlua.MetaShow()	
 		}
@@ -72,13 +72,13 @@ func runInfo(cmds []string,profile *Profile) int {
 	return 0
 }
 
-func runSearch(cmds []string,profile *Profile) int {
+func runSearch(cmds []string,profile *types.Profile) int {
 	// Searches a script
-	profile.SCListScripts(cmds)
+	SCListScripts(*profile, cmds)
 	return 0
 }
 
-func runRunScript(cmds []string,profile *Profile) int {
+func runRunScript(cmds []string,profile *types.Profile) int {
 	if profile.SSet || profile.Chain {
 		// Runs the script
 		if profile.Chain {
@@ -92,7 +92,7 @@ func runRunScript(cmds []string,profile *Profile) int {
 	return 0
 }
 
-func runSet(cmds []string,profile *Profile) int {
+func runSet(cmds []string,profile *types.Profile) int {
 	if profile.SSet || profile.Chain {
 		// Sets a variable for the script
 		if len(cmds) < 3 {
@@ -106,7 +106,7 @@ func runSet(cmds []string,profile *Profile) int {
 	return 0
 }
 
-func runHelp(cmds []string, p *Profile) int {
+func runHelp(cmds []string, p *types.Profile) int {
 	if len(cmds) >= 2 {
 		/*
 			If there are more arguments the callback usage function is called.
@@ -132,7 +132,7 @@ func runHelp(cmds []string, p *Profile) int {
 	return 0
 }
 
-func runVPM(cmds []string,profile *Profile) int {
+func runVPM(cmds []string,profile *types.Profile) int {
 	// TODO: Must not be executed with scrpt setted
 	// TODO: Validate return code
 	return pacman.VPMGetRemotePack(
@@ -146,40 +146,40 @@ func runVPM(cmds []string,profile *Profile) int {
 	)
 }
 
-func runExport(cmds []string,profile *Profile) int {
+func runExport(cmds []string,profile *types.Profile) int {
 	// Exports a script
 	if len(cmds) != 3 {
 		utils.PrintErr("Invalid arguments.")
 	} else {
-		profile.SCExportScript(cmds[1], cmds[2])
+		SCExportScript(*profile, cmds[1], cmds[2])
 	}
 	return 0
 }
 
-func runImport(cmds []string,profile *Profile) int {
+func runImport(cmds []string, profile *types.Profile) int {
 	// Imports a script
 	if len(cmds) != 3 {
 		utils.PrintErr("Invalid arguments.")
 	} else {
-		profile.SCImportScript(cmds[1], cmds[2])
+		SCImportScript(*profile, cmds[1], cmds[2])
 	}
 	return 0
 }
 
-func runBash(cmds []string,profile *Profile) int {
+func runBash(cmds []string,profile *types.Profile) int {
 	// Starts a bash shell
 	utils.GetBash()
 	return 0
 }
 
-func runExit(cmds []string,profile *Profile) int {
+func runExit(cmds []string,profile *types.Profile) int {
 	// Exits the program
 	HandleExit()
 	os.Exit(0)
 	return 0 // wont run
 }
 
-func runLua(cmds []string,profile *Profile) int {
+func runLua(cmds []string,profile *types.Profile) int {
 	if profile.SSet || profile.Chain {
 		length := len(cmds)
 		// Executes lua code
@@ -194,7 +194,7 @@ func runLua(cmds []string,profile *Profile) int {
 	return 0
 }
 
-func runReload(cmds []string,profile *Profile) int {
+func runReload(cmds []string,profile *types.Profile) int {
 	if len(cmds) != 2 {
 		utils.PrintErr("Invalid args.")
 		return 1
@@ -203,36 +203,19 @@ func runReload(cmds []string,profile *Profile) int {
 	if cmds[1] == "script" || cmds[1] == "s" {
 		// Reloads the selected script
 		if profile.SSet { 
-			profile.ReloadScript()
+			ReloadScript(profile)
 		} else {
 			utils.PrintErr("Not a valid command out from script.")
 		}
 	} else if cmds[1] == "root" {
-		profile.SCLoadScripts()
-	}
-	return 0
-}
-
-
-func runManageGlobals(cmds []string, profile *Profile) int {
-	length := len(cmds)
-	if length == 3 && cmds[1] == "rm" {
-		profile.Database.DBRemoveGlobals(cmds[2])
-		profile.Globals = nil
-		profile.Globals = profile.Database.DBLoadIntoGlobals()
-		// may be changed to >= 4
-	} else if length == 4 && cmds[1] == "set" {
-		profile.SetGlobals(cmds[2], strings.Join(cmds[3:], " "))
-	} else {
-		// Lists global variables
-		profile.ListGlobals()
+		SCLoadScripts(*profile)
 	}
 	return 0
 }
 
 
 // Load script
-func useScript(p *Profile, cmds []string) {
+func useScript(p *types.Profile, cmds []string) {
 	p.Script = cmds[1]                     // Set script as passed over cmd
 	profile := *p                          // Take off pointer
 	pl := wlua.LuaProfile(profile)         // Convert Profile to LuaProfile
@@ -255,7 +238,7 @@ func useScript(p *Profile, cmds []string) {
 
 
 
-func runScript(p *Profile) {
+func runScript(p *types.Profile) {
 	if p.SSet {
 		wlua.LuaRunUniq(p.State)
 	} else {
@@ -264,7 +247,7 @@ func runScript(p *Profile) {
 }
 
 // Erase everything of a script from the memory
-func FreeScript(p *Profile) {
+func FreeScript(p *types.Profile) {
 	if p.Chain {
 		//p.State.Close()
 		p.Chain = false
@@ -281,7 +264,7 @@ func FreeScript(p *Profile) {
 }
 
 // This function will reload a script
-func (p *Profile)ReloadScript() {
+func ReloadScript(p *types.Profile) {
 	aux := p.Script
 
 	utils.PrintSuccs("Freeing memory.")
@@ -310,28 +293,11 @@ func (p *Profile)ReloadScript() {
 	LivePrefixState.IsEnable = true
 }
 
-// ################################ Global variables ################################
-// / Set globals
-func (p *Profile) SetGlobals(key string, value string) {
-	p.Globals[key] = value
-	p.Database.DBStoreGlobal(key, value)
-}
 
-func (p Profile) ListGlobals() {
-	t := tabby.New()
-	t.AddHeader("VARIABLE", "VALUE")
-	for key, value := range p.Globals {
-		t.AddLine(key, value)
-	}
-	print("\n")
-	t.Print()
-	print("\n")
-}
-
-func useScriptTAG(p *Profile, cmds []string) {
+func useScriptTAG(p *types.Profile, cmds []string) {
 	var scriptslist []string
 
-	var scriptScanner []ScriptTAGInfo
+	var scriptScanner []types.ScriptTAGInfo
 	aux := SCTAG
 
 	/*
@@ -381,7 +347,7 @@ func useScriptTAG(p *Profile, cmds []string) {
 	p.Chain = true
 }
 
-func runChain(p *Profile) {
+func runChain(p *types.Profile) {
 	profile := *p // Take off pointer
 	pl := wlua.LuaProfile(profile)
 	wlua.LuaRunChaining(pl)

@@ -27,8 +27,8 @@ import (
 	"io"
 	"strings"
 
-	"venera/src/db"
-	"venera/src/utils"
+	"venera/internal/db"
+	"venera/internal/utils"
 )
 
 type SignPack struct {

@@ -1,11 +1,11 @@
 package main
 
 import (
-	"venera/src"
+	"venera/internal/core"
 )
 
 func main() {
-	var v float32 = 1.02 // version
-	var s bool = true   // stable
-	src.Start(v, s)
+	var v float32 = 1.03 // version
+	var s bool = false   // stable
+	core.Start(v, s)
 }

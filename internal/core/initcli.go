@@ -1,11 +1,28 @@
-package src
+package core
 
 import (
-	"strings"
-	"os/exec"
 	"os"
+	"os/exec"
+	"strings"
+	"venera/internal/types"
+
 	"github.com/c-bata/go-prompt"
 )
+
+
+// Live prefix for prompt configs
+var LivePrefixState struct {
+	LivePrefix string
+	IsEnable   bool
+}
+
+/*
+	Only used for the types.Profile to be passed as closure for
+	prompt.New()
+*/
+type ProfAux struct {
+	p *types.Profile
+}
 
 
 func HandleExit() {
@@ -25,15 +42,18 @@ func HandleExit() {
 	Initialize command prompt.
 	p.Execute() from cmds.go has all commands.
 */
-func (p *Profile) InitCLI() {
-	p.SCLoadScripts() // Load scripts from `stcript` root dir to memory.
+func InitCLI(p *types.Profile) {
+	SCLoadScripts(*p) // Load scripts from `stcript` root dir to memory.
 	Banner()
-	p.SCGetPath()
+	SCGetPath(*p)
+
+	paux := new(ProfAux)
+	paux.p = p
 
 	defer HandleExit()
 	prom := prompt.New(
-		p.Execute,
-		p.completer,
+		paux.Execute,
+		paux.completer,
 		prompt.OptionPrefix("[vnr]>> "),
 		prompt.OptionLivePrefix(changeLivePrefix),
 		prompt.OptionCompletionOnDown(),
@@ -49,7 +69,7 @@ func changeLivePrefix() (string, bool) {
 }
 
 // Load suggestions
-func (p *Profile) completer(d prompt.Document) []prompt.Suggest {
+func (paux *ProfAux) completer(d prompt.Document) []prompt.Suggest {
 	//inputs := strings.Split(d.CurrentLine(), " ")
 	inputs := strings.Split(d.TextBeforeCursor(), " ")
 	length := len(inputs)
@@ -106,7 +126,7 @@ func (p *Profile) completer(d prompt.Document) []prompt.Suggest {
 		{Text: "exit", 		Description: "Exit from the prompt"},
 	}
 
- 	if p.SSet { // Options only valid when there is a selected script.
+ 	if paux.p.SSet { // Options only valid when there is a selected script.
 		promptSuggestions = append(promptSuggestions,
 			prompt.Suggest {Text: "set",     Description: "Set value for a var"},
 			prompt.Suggest {Text: "run",     Description: "Run a script/module"},

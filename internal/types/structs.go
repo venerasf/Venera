@@ -1,7 +1,7 @@
-package src
+package types
 
 import (
-	"venera/src/db"
+	"venera/internal/db"
 
 	lua "github.com/yuin/gopher-lua"
 )
@@ -19,12 +19,6 @@ type Profile struct {
 	Chain 	bool // Store the info, if it is running in tags mode
 
 	Database *db.DBDef // Database for persistence data
-}
-
-// Live prefix for prompt configs
-var LivePrefixState struct {
-	LivePrefix string
-	IsEnable   bool
 }
 
 type ScriptTAGInfo struct {

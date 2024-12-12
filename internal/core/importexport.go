@@ -1,16 +1,17 @@
 // This file imports and exports scripts/modules
 // to directory scripts/myscripts
 
-package src
+package core
 
 import (
 	"io/ioutil"
 	"os"
-	"venera/src/utils"
+	"venera/internal/types"
+	"venera/internal/utils"
 )
 
 // Import script from somewhere to inside scripts file
-func (p Profile)SCImportScript(pathFrom string, pathTo string) {
+func SCImportScript(p types.Profile,pathFrom string, pathTo string) {
 	cont, err := ioutil.ReadFile(pathFrom)
 	if err != nil {
 		utils.PrintErr(err.Error())
@@ -35,7 +36,7 @@ func (p Profile)SCImportScript(pathFrom string, pathTo string) {
 }
 
 // export a script
-func (p Profile)SCExportScript(pathFrom string, pathTo string) {
+func SCExportScript(p types.Profile, pathFrom string, pathTo string) {
 	cont, err := ioutil.ReadFile(pathFrom)
 	if err != nil {
 		utils.PrintErr(err.Error())

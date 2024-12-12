@@ -2,7 +2,7 @@ package db
 
 import (
 	"os"
-	"venera/src/utils"
+	"venera/internal/utils"
 )
 
 func createVeneraDir(homeDir string) error {

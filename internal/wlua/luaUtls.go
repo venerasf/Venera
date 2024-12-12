@@ -10,7 +10,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
-	"venera/src/utils"
+	"venera/internal/utils"
 
 	//"github.com/c-bata/go-prompt"
 	lua "github.com/yuin/gopher-lua"
