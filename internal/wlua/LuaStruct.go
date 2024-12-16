@@ -6,6 +6,7 @@ import (
 	lua "github.com/yuin/gopher-lua"
 )
 
+// This structure wont be used anymore 
 type LuaProfile struct {
 	Prompt 		string
 	Script 		string   // script path

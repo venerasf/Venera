@@ -125,8 +125,8 @@ func (db *DBDef) DBStoreGlobal(key string, value string) {
 }
 
 /*
-	DBLoadIntoGlobals: loads the data from databaso into a map.
-	Probably it is gonna be moved to outter package for the case of conflicts for cycling.
+	DBLoadIntoGlobals: loads the data from database into a map.
+	Probably it is gonna be moved to outer package for the case of conflicts from cycling.
 */
 func (db *DBDef) DBLoadIntoGlobals() map[string]string {
 	g := make(map[string]string)

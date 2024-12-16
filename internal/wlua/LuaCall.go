@@ -8,7 +8,7 @@ import (
 
 // This functions allows to run script from within other script.
 func (s LuaProfile)Calls(l *lua.LState) int {
-	// Chain global var disable chaining execution.
+	// Chain global var disable chaining execution, disallowing calls.
 	if s.Globals["chain"] == "off" || s.Globals["chain"] == "false" {
 		return 1
 	}
@@ -26,8 +26,14 @@ func (s LuaProfile)Calls(l *lua.LState) int {
 	}
 
 
+	// TODO: test it better
 	for key,value := range(*newFileVars) {
-		newFile.DoString("Vars."+key+".VALUE=\""+value.VALUE+"\"")
+		lvalue := newFile.GetGlobal("VARS")
+		lvalue1 := newFile.GetField(lvalue, key)
+		newValue := lua.LString(value.VALUE)
+		newFile.SetField(lvalue1, "VALUE", newValue)
+
+		//newFile.DoString("Vars."+key+".VALUE=\""+value.VALUE+"\"")
 	}
 
 	newFile.DoString("Main()")
