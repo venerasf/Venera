@@ -7,9 +7,9 @@ import (
 
 
 // This functions allows to run script from within other script.
-func (s LuaProfile)Calls(l *lua.LState) int {
+func Calls(l *lua.LState) int {
 	// Chain global var disable chaining execution, disallowing calls.
-	if s.Globals["chain"] == "off" || s.Globals["chain"] == "false" {
+	if LuaProf.Globals["chain"] == "off" || LuaProf.Globals["chain"] == "false" {
 		return 1
 	}
 

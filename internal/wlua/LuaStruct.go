@@ -1,12 +1,6 @@
 package wlua
 
-import (
-	"venera/internal/db"
-
-	lua "github.com/yuin/gopher-lua"
-)
-
-// This structure wont be used anymore 
+/* This structure wont be used anymore 
 type LuaProfile struct {
 	Prompt 		string
 	Script 		string   // script path
@@ -19,7 +13,7 @@ type LuaProfile struct {
 	Chain 	bool // Store the info, if it is running in tags mode
 
 	Database *db.DBDef // Database for persistence data
-}
+}*/
 
 // Script metadata
 type METADATA struct {

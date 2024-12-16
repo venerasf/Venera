@@ -4,6 +4,7 @@ package wlua
 
 import (
 	"strings"
+	"venera/internal/types"
 	"venera/internal/utils"
 
 	//"strings"
@@ -65,7 +66,7 @@ func SetVarValue(L *lua.LState, key string, value string) {
 }
 
 // InstSet variables from globals 
-func SetFromGlobals(L *lua.LState,p LuaProfile) {
+func SetFromGlobals(L *lua.LState, p *types.Profile) {
 	vars := new(map[string]VarDef)
 
 	if err := gluamapper.Map(L.GetGlobal("VARS").(*lua.LTable), &vars); err != nil {
@@ -86,7 +87,7 @@ func SetFromGlobals(L *lua.LState,p LuaProfile) {
 
 
 // Set vars from globals when running `use script/luascript.lua`
-func SetFromVarsScriptGlobals(L *lua.LState, p LuaProfile) {
+func SetFromVarsScriptGlobals(L *lua.LState, p *types.Profile) {
 	for i := range(LoadVar) {
 		for j,y := range(p.Globals) {
 			if strings.ToUpper(j) == i {
@@ -99,7 +100,7 @@ func SetFromVarsScriptGlobals(L *lua.LState, p LuaProfile) {
 
 
 // Get vars from scripts
-func GetVarsToChainTAGS(p LuaProfile) {
+func GetVarsToChainTAGS(p *types.Profile) {
 	//fmt.Println(p.Scriptslist)
 	for _,f := range(p.Scriptslist) {
 		L := lua.NewState()

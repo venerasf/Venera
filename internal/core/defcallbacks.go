@@ -217,9 +217,9 @@ func runReload(cmds []string,profile *types.Profile) int {
 // Load script
 func useScript(p *types.Profile, cmds []string) {
 	p.Script = cmds[1]                     // Set script as passed over cmd
-	profile := *p                          // Take off pointer
-	pl := wlua.LuaProfile(profile)         // Convert Profile to LuaProfile
-	p.State, p.SSet = wlua.LuaInitUniq(pl) // Init script
+	//profile := *p                          // Take off pointer
+	//pl := wlua.LuaProfile(profile)         // Convert Profile to LuaProfile
+	p.State, p.SSet = wlua.LuaInitUniq(p) // Init script
 	if !p.SSet {
 		utils.PrintErr("Error loading script/module.")
 		return
@@ -257,6 +257,7 @@ func FreeScript(p *types.Profile) {
 	p.SSet = false
 	p.Chain = false
 	p.Script = ""
+	p.State.Close()
 	wlua.LuaFreeScript()
 	p.Prompt = "[*]>> "
 	LivePrefixState.LivePrefix = p.Prompt
@@ -272,6 +273,7 @@ func ReloadScript(p *types.Profile) {
 	p.State.Close()
 	p.SSet = false
 	p.Script = ""
+
 	wlua.LuaFreeScript()
 	p.Prompt = "[*]>> "
 	LivePrefixState.LivePrefix = p.Prompt
@@ -280,9 +282,9 @@ func ReloadScript(p *types.Profile) {
 	// load script
 	utils.PrintSuccs("Loading " + aux)
 	p.Script = aux                         // Set script as passed over cmd
-	profile := *p                          // Take off pointer
-	pl := wlua.LuaProfile(profile)         // Convert Profile to LuaProfile
-	p.State, p.SSet = wlua.LuaInitUniq(pl) // Init script
+	//profile := *p                          // Take off pointer
+	//pl := wlua.LuaProfile(profile)         // Convert Profile to LuaProfile
+	p.State, p.SSet = wlua.LuaInitUniq(p) // Init script
 	if !p.SSet {
 		utils.PrintErr("Error loading script/module.")
 		return
@@ -336,9 +338,9 @@ func useScriptTAG(p *types.Profile, cmds []string) {
 	}
 
 	p.Scriptslist = scriptslist
-	profile := *p // Take off pointer
-	pl := wlua.LuaProfile(profile)
-	wlua.GetVarsToChainTAGS(pl)
+	//profile := *p // Take off pointer
+	//pl := wlua.LuaProfile(profile)
+	wlua.GetVarsToChainTAGS(p)
 	//wlua.PopulateLoadVarsFromGlobals(pl)
 
 	p.Prompt = "(" + JoinTgs(cmds[2:]) + ")>> " // Change prompt
@@ -348,9 +350,9 @@ func useScriptTAG(p *types.Profile, cmds []string) {
 }
 
 func runChain(p *types.Profile) {
-	profile := *p // Take off pointer
-	pl := wlua.LuaProfile(profile)
-	wlua.LuaRunChaining(pl)
+	//profile := *p // Take off pointer
+	//pl := wlua.LuaProfile(profile)
+	wlua.LuaRunChaining(p)
 	//p.Chain = true
 
 	/*for _,i := range (p.Scriptslist) {

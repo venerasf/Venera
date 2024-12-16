@@ -1,6 +1,8 @@
 package wlua
 
 import (
+	"venera/internal/types"
+
 	libs "github.com/venerasf/go-lua-libs"
 	"github.com/yuin/gopher-lua"
 )
@@ -11,7 +13,7 @@ var (
 	Metad METADATA
 	// Global variable vars
 	LoadVar = make(map[string]VarDef)
-	LuaProf LuaProfile
+	LuaProf *types.Profile
 )
 
 // Execute arbitrary strings
@@ -45,7 +47,7 @@ func Sets(l *lua.LState) {
 
 	l.SetGlobal("Meta", l.NewFunction(Meta))
 	l.SetGlobal("LoadVars", l.NewFunction(LoadVars))
-	l.SetGlobal("Call", l.NewFunction(LuaProf.Calls))
+	l.SetGlobal("Call", l.NewFunction(Calls))
 	loadLibs(l)
 }
 
@@ -54,7 +56,7 @@ func Sets(l *lua.LState) {
 // so it can be configured from main prompt
 // return lua.state and if the script could be
 // runned (true) or not (false)
-func LuaInitUniq(p LuaProfile) (*lua.LState, bool) {
+func LuaInitUniq(p *types.Profile) (*lua.LState, bool) {
 	// Activate script global variables
 	// it can pass to another script running in chain
 	LuaProf = p
@@ -75,7 +77,7 @@ func LuaRunUniq(l *lua.LState) {
 	l.DoString("Main()")
 }
 
-func LuaRunChaining(p LuaProfile) {
+func LuaRunChaining(p *types.Profile) {
 	for _, i := range p.Scriptslist {
 		p.Script = i
 		LuaInitChain(p)
@@ -84,7 +86,7 @@ func LuaRunChaining(p LuaProfile) {
 
 // Start lua chai for working with multiple scripts
 // when we use tags to index.
-func LuaInitChain(p LuaProfile) {
+func LuaInitChain(p *types.Profile) {
 	l := lua.NewState()
 	defer l.Close() // Applying close() here
 	Sets(l)
@@ -108,5 +110,9 @@ func LuaInitChain(p LuaProfile) {
 func LuaFreeScript() {
 	LoadVar = make(map[string]VarDef)
 	Metad = METADATA{}
-	LuaProf = LuaProfile{}
+
+	//LuaProf.State.Close()
+	//p.SSet = false
+	//p.Script = ""
+	LuaProf.State = nil
 }

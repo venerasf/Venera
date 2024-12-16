@@ -84,7 +84,7 @@ func LogMsg(L *lua.LState) int {
 }
 
 //##################################################
-// Openfile and getcontent
+// Open file and get content
 func Open(L *lua.LState) int {
 	p := L.ToString(1)
 	cont, err := ioutil.ReadFile(p)
