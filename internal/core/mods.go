@@ -21,7 +21,7 @@ import (
 )
 
 var ScriptSuggestions *[]prompt.Suggest // script list with descriptions
-var SCTAG []types.ScriptTAGInfo               // script list with tags and infos,
+var SCTAG []types.ScriptTAGInfo         // script list with tags and infos,
 										// it will be in memory for later use.
 
 // Load all paths, get metadata INFO and tags
@@ -33,7 +33,7 @@ func SCLoadScripts(p types.Profile) {
 
 	aux := []prompt.Suggest{}
 	for _, file := range paths {
-		info := SCExtractINFO(file, re)
+		info := SCExtractMetadataINFO(file, re)
 		tags := wlua.ScriptGetTags(file)
 		SCTAG = append(SCTAG, types.ScriptTAGInfo{file, tags, info})
 		aux = append(aux, prompt.Suggest{Text: file, Description: info})
@@ -60,7 +60,7 @@ func SCGetPath(p types.Profile) []string {
 	return filePath
 }
 
-// Use for seaarch functions
+// Use for search functions
 // TODO: Use `strings.ToLower()` to match strings without case sensitive
 func SCListScripts(p types.Profile, key []string) {
 	pathList := SCGetPath(p)
@@ -166,7 +166,7 @@ func SCListScripts(p types.Profile, key []string) {
 }
 
 // // Extract INFO from script based on the regex passed (in SCLoadScripts())
-func SCExtractINFO(path string, re *regexp.Regexp) string {
+func SCExtractMetadataINFO(path string, re *regexp.Regexp) string {
 	const l = 25
 	content, err := ioutil.ReadFile(path)
 	if err != nil {
