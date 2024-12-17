@@ -2,6 +2,7 @@ package utils
 
 import "encoding/json"
 
+
 type keyPack struct {
 	Key   string `json:"key"`
 	Email string `json:"email"`

@@ -178,7 +178,7 @@ func loadFunctions() {
 	Mapping["set"] = &types.Command{
 		Call:  runSet,
 		Usage: usageSet,
-		Desc:  "Set a ariable",
+		Desc:  "Set a variable",
 		Promp: nil,
 	}
 }

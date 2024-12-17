@@ -92,13 +92,10 @@ func LogMsg(logPath string, tp int, module string, message string) {
 		return
 	}
 
-	logMessage := fmt.Sprintf("type=%s module=%s message=%s",
-		ltype, module, message)
+	logMessage := fmt.Sprintf("type=%s module=%s message='%s'", ltype, module, strings.ReplaceAll(message, "'",`\'`))
 	nLog := log.New(f, "", log.LstdFlags)
 	nLog.Println(logMessage)
-	if err != nil {
-		panic(err.Error())
-	}
+
 	f.Close()
 }
 

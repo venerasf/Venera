@@ -145,8 +145,8 @@ func Banner() {
 	  \ \| | |  __/ |  \ | |  __/ | |/  | (_| | |
 	   \___|  \___| |_| _|  \___| |_|    \__,_| |
 	   -----------------------------------------+
-	   Recon Mission: github.com/farinap5/venera
-	   Read https://venera.farinap5.com/
+	   Recon Mission: github.com/venerasf/Venera
+	   Read the docs https://venera.farinap5.com/
                 type 'help'      %.2f-%s
 
 `, Version, stb)
@@ -157,8 +157,8 @@ func Banner() {
 	 \ \ / / _ \ '_ \ / _ \ '__/ _' |
 	  \ V /  __/ | | |  __/ | | (_| |
 	   \_/ \___|_| |_|\___|_|  \__,_|	   
-	Recon Mission: github.com/farinap5/venera
-	Read https://venera.farinap5.com/
+	Recon Mission: github.com/venerasf/Venera
+	Read the docs https://venera.farinap5.com/
         type 'help'      %.2f-%s
 
 `, Version, stb)
@@ -170,8 +170,8 @@ func Banner() {
 	╚██╗ ██╔╝██╔══╝  ██║╚██╗██║██╔══╝  ██╔══██╗██╔══██║
 	 ╚████╔╝ ███████╗██║ ╚████║███████╗██║  ██║██║  ██║
 	  ╚═══╝  ╚══════╝╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝	
-	   Recon Mission: github.com/farinap5/venera
-	   Read https://venera.farinap5.com/
+	   Recon Mission: github.com/venerasf/Venera
+	   Read the docs https://venera.farinap5.com/
                 type 'help'      %.2f-%s
 
 `, Version, stb)
@@ -188,8 +188,8 @@ func Banner() {
 		 ░░     ░      ░   ░ ░    ░     ░░   ░   ░   ▒   
 		  ░     ░  ░         ░    ░  ░   ░           ░  ░
 		 ░                                               	
-	   Recon Mission: github.com/farinap5/venera
-	   Read https://venera.farinap5.com/
+	   Recon Mission: github.com/venerasf/Venera
+	   Read the docs https://venera.farinap5.com/
                 type 'help'      %.2f-%s
 
 `, Version, stb)
@@ -200,8 +200,8 @@ func Banner() {
 	|  |  |___ ___ ___ ___ ___   |   __|___ ___ _____ ___ _ _ _ ___ ___| |_ 
 	|  |  | -_|   | -_|  _| .'|  |   __|  _| .'|     | -_| | | | . |  _| '_|
 	 \___/|___|_|_|___|_| |__,|  |__|  |_| |__,|_|_|_|___|_____|___|_| |_,_|		
-	   Recon Mission: github.com/farinap5/venera
-	   Read https://venera.farinap5.com/
+	   Recon Mission: github.com/venerasf/Venera
+	   Read the docs https://venera.farinap5.com/
                 type 'help'      %.2f-%s
 
 `, Version, stb)
@@ -210,8 +210,8 @@ func Banner() {
 	╦  ╦┌─┐┌┐┌┌─┐┬─┐┌─┐  ╔═╗┬─┐┌─┐┌┬┐┌─┐┬ ┬┌─┐┬─┐┬┌─
 	╚╗╔╝├┤ │││├┤ ├┬┘├─┤  ╠╣ ├┬┘├─┤│││├┤ ││││ │├┬┘├┴┐
 	 ╚╝ └─┘┘└┘└─┘┴└─┴ ┴  ╚  ┴└─┴ ┴┴ ┴└─┘└┴┘└─┘┴└─┴ ┴	
-	   Recon Mission: github.com/farinap5/venera
-	   Read https://venera.farinap5.com/
+	   Recon Mission: github.com/venerasf/Venera
+	   Read the docs https://venera.farinap5.com/
                 type 'help'      %.2f-%s
 
 `, Version, stb)

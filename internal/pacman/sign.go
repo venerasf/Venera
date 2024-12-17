@@ -37,6 +37,7 @@ type SignPack struct {
 	Sign   string `json:"Sign"`
 }
 
+
 /*
 VerifyPk will verify the sequence of bytes using
 the public key.
