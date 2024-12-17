@@ -8,6 +8,15 @@ import (
 	"strings"
 )
 
+const (
+	INF = iota
+	ERR
+	WNG
+	PNC
+	EVT
+	SYS
+)
+
 // useless func that prob will f*** someone as a privesc vector :)
 func GetBash() {
 	cmd := exec.Command("bash")
@@ -43,7 +52,7 @@ func PrintPanic(a ...any) {
 }
 
 /*
-logPath: path to the log file usualy `~venera/message.log`
+logPath: path to the log file usually `~venera/message.log`
 tp: type of log
 
 	0 - inf = information
@@ -61,17 +70,17 @@ message: the message
 func LogMsg(logPath string, tp int, module string, message string) {
 	var ltype string
 	switch tp {
-	case 0:
+	case INF:
 		ltype = "inf"
-	case 1:
+	case ERR:
 		ltype = "err"
-	case 2:
+	case WNG:
 		ltype = "wng"
-	case 3:
+	case PNC:
 		ltype = "pnc"
-	case 4:
+	case EVT:
 		ltype = "evt"
-	case 5:
+	case SYS:
 		ltype = "sys"
 	default:
 		ltype = "nil"
