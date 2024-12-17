@@ -1,6 +1,6 @@
 package wlua
 
-/* This structure wont be used anymore 
+/* This structure wont be used anymore
 type LuaProfile struct {
 	Prompt 		string
 	Script 		string   // script path
@@ -17,22 +17,22 @@ type LuaProfile struct {
 
 // Script metadata
 type METADATA struct {
-	AUTHOR 	[]string
+	AUTHOR  []string
 	VERSION string
-	TAGS 	[]string
-	INFO	string
+	TAGS    []string
+	INFO    string
 }
 
-/* Variables in script
-	TODO: use "REQUIRED" instead of "NEEDED".
- 	This change will affect all scripts done.
- */
+/*
+	 Variables in script
+		TODO: use "REQUIRED" instead of "NEEDED".
+	 	This change will affect all scripts done.
+*/
 type VarDef struct {
-	VALUE 		string
-	NEEDED 		string
-	DESCRIPT	string
+	VALUE    string
+	REQUIRED string
+	DESCRIPT string
 }
-
 
 type ScriptGlobals struct {
 	Globals map[string]string

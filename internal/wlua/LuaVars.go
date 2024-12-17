@@ -25,25 +25,24 @@ func LoadVars(L *lua.LState) int {
 // List variables
 func VarsList() {
 	t := tabby.New()
-	t.AddHeader("VARIABLE","DEFAULT","REQUIRED","DESCRIPTION")
-	for i,j := range(LoadVar) {
-		t.AddLine(i,j.VALUE,j.NEEDED,j.DESCRIPT)
+	t.AddHeader("VARIABLE", "DEFAULT", "REQUIRED", "DESCRIPTION")
+	for i, j := range LoadVar {
+		t.AddLine(i, j.VALUE, j.REQUIRED, j.DESCRIPT)
 	}
 	print("\n")
 	t.Print()
 	print("\n")
 }
 
-
-/* 
-	Set variales in manual use
+/*
+Set variales in manual use
 */
 func SetVarValue(L *lua.LState, key string, value string) {
 	key = strings.ToUpper(key)
 
 	ex := false
 	// Iterate all avaliable vars
-	for i, _ := range(LoadVar) {
+	for i, _ := range LoadVar {
 		if i == key {
 			ex = true // The var exists
 		}
@@ -58,14 +57,14 @@ func SetVarValue(L *lua.LState, key string, value string) {
 		L.SetField(lvalue1, "VALUE", newValue)
 
 		LoadVars(L) // Update var struct
-		utils.PrintSuccs(key," <- ",value)
+		utils.PrintSuccs(key, " <- ", value)
 		// println("[\u001B[1;32mOK\u001B[0;0m]",)
 	} else {
-		utils.PrintErr(key," <- ",value)
+		utils.PrintErr(key, " <- ", value)
 	}
 }
 
-// InstSet variables from globals 
+// InstSet variables from globals
 func SetFromGlobals(L *lua.LState, p *types.Profile) {
 	vars := new(map[string]VarDef)
 
@@ -73,7 +72,7 @@ func SetFromGlobals(L *lua.LState, p *types.Profile) {
 		panic(err)
 	}
 
-	for i := range(p.Globals) {
+	for i := range p.Globals {
 		//println("VARS."+i+".VALUE=\""+p.Globals[i]+"\"")
 		lvalue := L.GetGlobal("VARS")
 		lvalue1 := L.GetField(lvalue, i)
@@ -85,24 +84,22 @@ func SetFromGlobals(L *lua.LState, p *types.Profile) {
 	}
 }
 
-
 // Set vars from globals when running `use script/luascript.lua`
 func SetFromVarsScriptGlobals(L *lua.LState, p *types.Profile) {
-	for i := range(LoadVar) {
-		for j,y := range(p.Globals) {
+	for i := range LoadVar {
+		for j, y := range p.Globals {
 			if strings.ToUpper(j) == i {
-				SetVarValue(L,i,y)
+				SetVarValue(L, i, y)
 				break
 			}
 		}
 	}
 }
 
-
 // Get vars from scripts
 func GetVarsToChainTAGS(p *types.Profile) {
 	//fmt.Println(p.Scriptslist)
-	for _,f := range(p.Scriptslist) {
+	for _, f := range p.Scriptslist {
 		L := lua.NewState()
 		Sets(L)
 		L.DoFile(f)
@@ -112,7 +109,7 @@ func GetVarsToChainTAGS(p *types.Profile) {
 			panic(err)
 		}
 
-		for i,s := range(auxVar) {
+		for i, s := range auxVar {
 			if LoadVar[i].VALUE == "" {
 				//fmt.Println(i,LoadVar[i].VALUE)
 				LoadVar[i] = s
