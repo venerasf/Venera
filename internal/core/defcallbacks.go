@@ -166,12 +166,6 @@ func runImport(cmds []string, profile *types.Profile) int {
 	return 0
 }
 
-func runBash(cmds []string,profile *types.Profile) int {
-	// Starts a bash shell
-	utils.GetBash()
-	return 0
-}
-
 func runExit(cmds []string,profile *types.Profile) int {
 	// Exits the program
 	HandleExit()

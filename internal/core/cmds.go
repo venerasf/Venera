@@ -70,12 +70,6 @@ func loadFunctions() {
 		Promp: nil,
 	}
 
-	Mapping["bash"] = &types.Command{
-		Call:  runBash,
-		Usage: nil,
-		Desc:  "Spawns a shell.",
-		Promp: nil,
-	}
 
 	Mapping["import"] = &types.Command{
 		Call:  runImport,

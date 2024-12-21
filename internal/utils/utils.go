@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"os/exec"
 	"strings"
 )
 
@@ -17,14 +16,6 @@ const (
 	SYS
 )
 
-// useless func that prob will f*** someone as a privesc vector :)
-func GetBash() {
-	cmd := exec.Command("bash")
-	cmd.Stdin = os.Stdin
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	cmd.Run()
-}
 
 // Types of pretty printing
 func PrintSuccs(a ...any) {
