@@ -94,7 +94,7 @@ func search(repo, pattern string) {
 			}
 			fmt.Printf("Script: 	%s\n", pack.Target[i].Script)
 			fmt.Printf("Version:	%.2f\n", pack.Target[i].Version)
-			fmt.Printf("Decription:	%s\n", pack.Target[i].Description)
+			fmt.Printf("Description:%s\n", pack.Target[i].Description)
 			fmt.Printf("Tags:		")
 			for j := range pack.Target[i].Tags {
 				if j != 0 {
@@ -154,7 +154,7 @@ func sync(repo, vnrhome string) int {
 	}
 
 	for i := range pack.Target {
-		utils.PrintAlert("Intalling " + pack.Target[i].Script)
+		utils.PrintAlert("Installing " + pack.Target[i].Script)
 
 		DownloadScript(pack, vnrhome, i)
 	}
@@ -167,7 +167,7 @@ Script isn't verified by itself.
 
 Usefull when you configured a new package repo.
 */
-func justverifysign(repo string, signRepo string, database *db.DBDef) {
+func verifySign(repo string, signRepo string, database *db.DBDef) {
 	yamlBytes, err := DownloadData(repo)
 	if err != nil {
 		utils.PrintErr(err.Error())
@@ -207,21 +207,41 @@ pacman.VPMGetRemotePack(
 */
 
 func VPMGetRemotePack(repo string, vnrhome string, signRepo string, args []string, database db.DBDef, verify string, logfile string) int {
-	if len(args) > 2 && args[1] == "search" {
-		search(repo, args[2])
-	} else if len(args) > 2 && args[1] == "install" {
-		utils.LogMsg(logfile,0,"vmp","install from "+repo+" requested.")
-		installCommand(repo, args, vnrhome)
-	} else if len(args) > 1 && args[1] == "sync" {
+	if len(args) < 2 {
+		utils.PrintAlert("Type `help vpm`.")
+		return 1
+	}
+	
+	switch args[1] {
+	case "search":
+		if len(args) < 1 {
+			utils.PrintAlert("search needs more arguments.")
+		} else {
+			search(repo, args[2])
+			return 0
+		}
+
+	case "install":
+		if len(args) < 2 {
+			utils.PrintAlert("search needs more arguments.")
+		} else {
+			utils.LogMsg(logfile, utils.INF ,"vmp","install from "+repo+" requested.")
+			installCommand(repo, args, vnrhome)
+		}
+
+	case "sync":
 		utils.LogMsg(logfile,0,"vmp","sync with "+repo+" requested.")
 		n := sync(repo, vnrhome)
 		if n != 0 {
 			utils.LogMsg(logfile,1,"vmp","Sync error reported.")
 		}
-	} else if len(args) > 1 && args[1] == "verify" {
-		justverifysign(repo, signRepo, &database)
-	} else {
+	case "verify":
+		verifySign(repo, signRepo, &database)
+		return 0
+
+	default:
 		utils.PrintAlert("Type `help vpm`.")
 	}
-	return 0
+
+	return 1
 }

@@ -43,7 +43,7 @@ func PrintPanic(a ...any) {
 }
 
 /*
-logPath: path to the log file usually `~venera/message.log`
+logPath: path to the log file usually `~/.venera/message.log`
 tp: type of log
 
 	0 - inf = information
