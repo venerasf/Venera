@@ -11,44 +11,6 @@ import (
 	"venera/internal/utils"
 )
 
-func DownloadScript(pack Pack, vnrhome string, i int) int {
-	// download
-	data, err := DownloadData(pack.Target[i].Path)
-
-	// the signature block is explained during the sign.go file
-	// more references in https://venera.farinap5.com/6-venera-package-manager.html
-	sig := "\u001B[1;32mSigned\u001B[0;0m"
-	// bool
-	matchSignature := VerifySignatureScript(data, pack.Target[i].Hash)
-	if !matchSignature {
-		utils.PrintAlert("Signature Does Not Match!")
-		sig = "\u001B[1;31mSignature error!\u001B[0;0m"
-	}
-
-	if err != nil {
-		utils.PrintErr(err.Error())
-		return 3
-	} else {
-		r := installer(data, vnrhome, pack.Target[i].Script)
-		if r == 0 {
-			utils.PrintSuccs(pack.Target[i].Script + " installed. " + sig)
-			return 0
-		} else if r == 1 {
-			utils.PrintSuccs(
-				fmt.Sprintf("%s updated to %.2f. %s", pack.Target[i].Script, pack.Target[i].Version, sig),
-			)
-			return 1
-		} else if r == 2 {
-			utils.PrintAlert("No data script found.")
-			return 2
-		} else if r == 3 {
-			utils.PrintAlert("error.")
-			return 3
-		}
-	}
-
-	return 3
-}
 
 func validateTarget(pack Pack) int {
 	if len(pack.Target) == 0 || pack.Target == nil {
@@ -144,7 +106,7 @@ func installer(data []byte, vnrhome string, scriptPath string) int {
 	return returnInfo
 }
 
-func sync(repo, vnrhome string) int {
+func sync(dbc *db.DBDef, repo, vnrhome string) int {
 	utils.PrintSuccs("Requesting " + repo + "\n")
 	pack := getPack(repo)
 
@@ -156,7 +118,7 @@ func sync(repo, vnrhome string) int {
 	for i := range pack.Target {
 		utils.PrintAlert("Installing " + pack.Target[i].Script)
 
-		DownloadScript(pack, vnrhome, i)
+		DownloadScript(dbc, pack, vnrhome, i)
 	}
 	return 0
 }
@@ -179,12 +141,12 @@ func verifySign(repo string, signRepo string, database *db.DBDef) {
 	VerifySignaturePack(yamlBytes, signBytes, *database)
 }
 
-func installCommand(repo string, args []string, vnrhome string) int {
+func installCommand(dbc *db.DBDef, repo string, args []string, vnrhome string) int {
 	utils.PrintSuccs("Requesting " + repo + "\n")
 	pack := getPack(repo)
 	for i := range pack.Target {
 		if pack.Target[i].Script == args[2] {
-			DownloadScript(pack, vnrhome, i)
+			DownloadScript(dbc, pack, vnrhome, i)
 		}
 	}
 	return 0
@@ -214,7 +176,7 @@ func VPMGetRemotePack(repo string, vnrhome string, signRepo string, args []strin
 	
 	switch args[1] {
 	case "search":
-		if len(args) < 1 {
+		if len(args) < 3 {
 			utils.PrintAlert("search needs more arguments.")
 		} else {
 			search(repo, args[2])
@@ -222,19 +184,20 @@ func VPMGetRemotePack(repo string, vnrhome string, signRepo string, args []strin
 		}
 
 	case "install":
-		if len(args) < 2 {
+		if len(args) < 3 {
 			utils.PrintAlert("search needs more arguments.")
 		} else {
 			utils.LogMsg(logfile, utils.INF ,"vmp","install from "+repo+" requested.")
-			installCommand(repo, args, vnrhome)
+			installCommand(&database, repo, args, vnrhome)
 		}
 
 	case "sync":
 		utils.LogMsg(logfile,0,"vmp","sync with "+repo+" requested.")
-		n := sync(repo, vnrhome)
+		n := sync(&database, repo, vnrhome)
 		if n != 0 {
 			utils.LogMsg(logfile,1,"vmp","Sync error reported.")
 		}
+
 	case "verify":
 		verifySign(repo, signRepo, &database)
 		return 0

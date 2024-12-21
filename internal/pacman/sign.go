@@ -22,7 +22,6 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"encoding/pem"
-	"errors"
 	"fmt"
 	"io"
 	"strings"
@@ -57,16 +56,6 @@ func VerifyPk(r io.Reader, pemEncd []byte, bsign []byte) bool {
 	}
 	hash := h.Sum(nil)
 	return ecdsa.VerifyASN1(pk, hash, bsign)
-}
-
-func GetKeyByEmail(mail string, db *db.DBDef) ([]byte, error) {
-	var pkey string
-	var err error
-	db.DBConn.QueryRow("SELECT key FROM Pubkey WHERE Author = ?;", mail).Scan(&pkey)
-	if len(pkey) == 0 {
-		err = errors.New("No key for email: " + mail)
-	}
-	return []byte(pkey), err
 }
 
 func VerifySignaturePack(pack []byte, Signp []byte, db db.DBDef) bool {

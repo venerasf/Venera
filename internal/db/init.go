@@ -56,11 +56,30 @@ func (db *DBDef) dbCreateDs() {
 	} else {
 		sttm.Exec()
 	}
+
 	sttm, err = db.DBConn.Prepare(`
 	CREATE TABLE IF NOT EXISTS Pubkey (
 		gid		INTEGER PRIMARY KEY AUTOINCREMENT,
 		Author	TEXT UNIQUE,
 		Key 	TEXT
+	)
+	`)
+	if err != nil {
+		utils.PrintErr(err.Error())
+		utils.LogMsg("~/venera/message.log", 3, "core", err.Error())
+	} else {
+		sttm.Exec()
+	}
+
+	sttm, err = db.DBConn.Prepare(`
+	CREATE TABLE IF NOT EXISTS script (
+		sid		INTEGER PRIMARY KEY AUTOINCREMENT,
+		hash	VARCHAR(32) UNIQUE,
+		path 	TEXT UNIQUE,
+		tags	TEXT,
+		version REAL,
+		description TEXT,
+		date DATETIME
 	)
 	`)
 	if err != nil {
