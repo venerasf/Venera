@@ -116,8 +116,6 @@ func sync(dbc *db.DBDef, repo, vnrhome string) int {
 	}
 
 	for i := range pack.Target {
-		utils.PrintAlert("Installing " + pack.Target[i].Script)
-
 		DownloadScript(dbc, pack, vnrhome, i)
 	}
 	return 0

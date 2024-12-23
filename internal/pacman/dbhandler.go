@@ -38,7 +38,7 @@ func SelectScript(dbc *db.DBDef, t Target) (Target, error) {
 		SELECT 
 			hash, path, tags, version, description
 		FROM script WHERE path=?;
-		`, t.Path)
+		`, t.Script)
 
 	storeTarget := Target{}
 	var tags string
@@ -51,7 +51,6 @@ func SelectScript(dbc *db.DBDef, t Target) (Target, error) {
 	)
 
 	storeTarget.Tags = strings.Split(tags, ":")
-
 	return storeTarget, err
 }
 
