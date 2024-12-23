@@ -1,10 +1,12 @@
 package pacman
 
 import (
+	"database/sql"
 	"fmt"
 	"os"
 	"strings"
 
+	"github.com/cheynewallace/tabby"
 	"gopkg.in/yaml.v2"
 
 	"venera/internal/db"
@@ -36,8 +38,8 @@ func getPack(repo string) Pack {
 	return pack
 }
 
-func search(repo, pattern string) {
-	// Retrive the map package
+func search(dbc *db.DBDef ,repo, pattern string) {
+	// Retrieve the map package
 	pack := getPack(repo)
 	utils.PrintSuccs("Requesting " + repo + "\n")
 	if validateTarget(pack) != 0 {
@@ -47,27 +49,53 @@ func search(repo, pattern string) {
 	utils.PrintSuccs(fmt.Sprintf("%d scripts found.", len(pack.Target)))
 
 	c := 0
+	t := tabby.New()
+	t.AddHeader("SCRIPT","VERSION","DESCRIPTION","TAGS","STATUS")
 	for i := range pack.Target {
 		if strings.Contains(pack.Target[i].Description, pattern) ||
 			strings.Contains(pack.Target[i].Script, pattern) || pattern == "all" {
+
+			scriptStatus := "any"
+			localS, err := SelectScript(dbc, pack.Target[i])
+			if err == sql.ErrNoRows {
+				scriptStatus = "download"
+			} else if localS.Version < pack.Target[i].Version {
+				scriptStatus = "update"
+			} else if localS.Version >= pack.Target[i].Version {
+				scriptStatus = "\u001B[1;32mup to date\u001B[0;0m"
+			}
+
 			c++
+			desc := ""
+			if len(pack.Target[i].Description) > 30 {
+				desc = pack.Target[i].Description[:30]+"..."
+			} else {
+				desc = pack.Target[i].Description
+			}
+			t.AddLine(
+				pack.Target[i].Script,
+				pack.Target[i].Version,
+				desc,
+				strings.Join(pack.Target[i].Tags, ":"),
+				scriptStatus,
+			)
+
+			/*
 			if i > 0 {
 				print("-----------------------\n")
 			}
 			fmt.Printf("Script: 	%s\n", pack.Target[i].Script)
 			fmt.Printf("Version:	%.2f\n", pack.Target[i].Version)
 			fmt.Printf("Description:%s\n", pack.Target[i].Description)
-			fmt.Printf("Tags:		")
-			for j := range pack.Target[i].Tags {
-				if j != 0 {
-					print(", ")
-				}
-				print(pack.Target[i].Tags[j])
-			}
-			print("\n")
+			fmt.Printf("Tags:		%s\n", strings.Join(pack.Target[i].Tags, ":"))
+			fmt.Printf("Status:		%s\n", scriptStatus)
+			*/
 		}
 	}
-	utils.PrintSuccs(fmt.Sprintf("%d scripts.", c))
+	print("\n")
+	t.Print()
+	print("\n")
+	utils.PrintSuccs(fmt.Sprintf("%d scripts listed.", c))
 }
 
 func installer(data []byte, vnrhome string, scriptPath string) int {
@@ -177,7 +205,7 @@ func VPMGetRemotePack(repo string, vnrhome string, signRepo string, args []strin
 		if len(args) < 3 {
 			utils.PrintAlert("search needs more arguments.")
 		} else {
-			search(repo, args[2])
+			search(&database, repo, args[2])
 			return 0
 		}
 
