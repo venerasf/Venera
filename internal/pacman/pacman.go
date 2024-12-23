@@ -49,7 +49,7 @@ func search(repo, pattern string) {
 	c := 0
 	for i := range pack.Target {
 		if strings.Contains(pack.Target[i].Description, pattern) ||
-			strings.Contains(pack.Target[i].Script, pattern) {
+			strings.Contains(pack.Target[i].Script, pattern) || pattern == "all" {
 			c++
 			if i > 0 {
 				print("-----------------------\n")
