@@ -60,7 +60,7 @@ func search(dbc *db.DBDef ,repo, pattern string) {
 			if err == sql.ErrNoRows {
 				scriptStatus = "download"
 			} else if localS.Version < pack.Target[i].Version {
-				scriptStatus = "update"
+				scriptStatus = "\u001B[1;31mupdate\u001B[0;0m"
 			} else if localS.Version >= pack.Target[i].Version {
 				scriptStatus = "\u001B[1;32mup to date\u001B[0;0m"
 			}
@@ -153,7 +153,7 @@ func sync(dbc *db.DBDef, repo, vnrhome string) int {
 It is currently verifying the signature just from the main .yaml.
 Script isn't verified by itself.
 
-Usefull when you configured a new package repo.
+Useful when you configured a new package repo.
 */
 func verifySign(repo string, signRepo string, database *db.DBDef) {
 	yamlBytes, err := DownloadData(repo)

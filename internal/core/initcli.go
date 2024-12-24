@@ -25,6 +25,11 @@ type ProfAux struct {
 }
 
 
+func exitFunct(f *prompt.Buffer) {
+	HandleExit()
+	os.Exit(0)
+}
+
 func HandleExit() {
 	/*
 		it is necessary to deactivate the prompt in an 
@@ -43,12 +48,13 @@ func HandleExit() {
 	p.Execute() from cmds.go has all commands.
 */
 func InitCLI(p *types.Profile) {
-	SCLoadScripts(*p) // Load scripts from `stcript` root dir to memory.
+	SCLoadScripts(*p) // Load scripts from `script` root dir to memory.
 	Banner()
 	SCGetPath(*p)
 
 	paux := new(ProfAux)
 	paux.p = p
+
 
 	defer HandleExit()
 	prom := prompt.New(
@@ -58,7 +64,7 @@ func InitCLI(p *types.Profile) {
 		prompt.OptionLivePrefix(changeLivePrefix),
 		prompt.OptionCompletionOnDown(),
 		prompt.OptionMaxSuggestion(3),
-		//prompt.OptionAddKeyBind(prompt.KeyBind{})
+		prompt.OptionAddKeyBind(prompt.KeyBind{prompt.ControlQ, exitFunct}),
 	)
 	prom.Run()
 }
@@ -117,7 +123,7 @@ func (paux *ProfAux) completer(d prompt.Document) []prompt.Suggest {
 	// General options \\ No written commands
 	promptSuggestions := []prompt.Suggest {
 		{Text: "help",    	Description: "Show help menu"},
-		{Text: "bash",    	Description: "Spawn a command shell"},
+		//{Text: "bash",    	Description: "Spawn a command shell"},
 		{Text: "import",    Description: "Import a (edited) script"},
 		{Text: "export",    Description: "Export a script (to edit)"},
 		{Text: "globals",   Description: "Show global variables"},
