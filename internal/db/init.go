@@ -101,12 +101,7 @@ func (db *DBDef) dbCreateDs() {
 		utils.PrintErr(err.Error())
 		utils.LogMsg("~/venera/message.log", 3, "core", err.Error())
 	}
-	/*key := `-----BEGIN PUBLIC KEY-----
-	MIGbMBAGByqGSM49AgEGBSuBBAAjA4GGAAQADJX13tbFJYlQ0aWG6gHTZqJ6dLg3
-	/n/Z/aoUdROOrRfvKGNdgxw0IOH8EetWADU7zcZFd65+wMqV+x4iM2SsBBUAx6U2
-	vqaHn8ubrE+Z0GZtAAMR9Wusar4pjFS9G98XhILLPfzgZTCtY4BOpfenL+gqg/GT
-	euivf5/tEQVeHt9f+MQ=
-	-----END PUBLIC KEY-----`*/
+
 	sttm, err = db.DBConn.Prepare("INSERT INTO pubkey (Author,Key) VALUES (?,?);")
 	if err != nil {
 		utils.PrintErr(err.Error())

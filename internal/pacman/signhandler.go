@@ -24,10 +24,13 @@ import (
 	"encoding/pem"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"strings"
 
 	"venera/internal/db"
 	"venera/internal/utils"
+
+	"errors"
 )
 
 type SignPack struct {
@@ -119,3 +122,29 @@ func VerifySignatureScript(data []byte, hash string) bool {
 	}
 	return nil
 }*/
+
+
+func RegisterKeyFromFile(db *db.DBDef, file string) error {
+	data,err := ioutil.ReadFile(file)
+	if err != nil {
+		return err
+	}
+
+	kp, err := utils.GetKeyFromPack(data)
+	if err != nil {
+		return err
+	}
+	
+	// Test if there is the same email registered
+	_, err = GetKeyByEmail(kp.Email, db)
+	if err == nil {
+		return errors.New("key registered for given email")
+	}
+
+	err = RegisterKey(db, kp)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

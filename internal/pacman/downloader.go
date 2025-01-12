@@ -7,7 +7,6 @@ import (
 	"venera/internal/utils"
 )
 
-
 // the signature block is explained during the sign.go file
 // more references in https://venera.farinap5.com/6-venera-package-manager.html
 
@@ -18,7 +17,7 @@ func DownloadScript(dbc *db.DBDef, pack Pack, vnrhome string, i int) int {
 	// Verify if i have the script downloaded, if so, whats the version
 	storedS, err := SelectScript(dbc, pack.Target[i])
 
-	/* 
+	/*
 		If the script does not exist in the database, it will be installed
 		normally.
 	*/
@@ -34,7 +33,7 @@ func DownloadScript(dbc *db.DBDef, pack Pack, vnrhome string, i int) int {
 			utils.PrintAlert("Signature Does Not Match!")
 			sigStatus = "\u001B[1;31mSignature error!\u001B[0;0m"
 		}
-		InsertScript(dbc, pack.Target[i])
+		RegisterScript(dbc, pack.Target[i])
 		r := installer(data, vnrhome, pack.Target[i].Script)
 		if r == 3 {
 			utils.PrintAlert("error.")
@@ -45,16 +44,14 @@ func DownloadScript(dbc *db.DBDef, pack Pack, vnrhome string, i int) int {
 		}
 	}
 
-	s := pack.Target[i].Script 
+	s := pack.Target[i].Script
 	if pack.Target[i].Hash == storedS.Hash {
 		utils.PrintAlert(s + " already installed and up to date!")
 		return 0
 
-
 	} else if pack.Target[i].Version == storedS.Version {
 		utils.PrintAlert(s + " is up to date!")
 		return 0
-
 
 	} else if pack.Target[i].Version > storedS.Version {
 		// download

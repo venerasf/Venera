@@ -3,7 +3,7 @@ package utils
 import "encoding/json"
 
 
-type keyPack struct {
+type KeyPack struct {
 	Key   string `json:"key"`
 	Email string `json:"email"`
 	// Expr  string `json:"expr"`
@@ -12,11 +12,11 @@ type keyPack struct {
 /*
 	GetKeyFromPack receives the json and returns the keyPack (key and mail).
 */
-func GetKeyFromPack(data []byte) (keyPack, error) {
-	pack := new(keyPack)
+func GetKeyFromPack(data []byte) (KeyPack, error) {
+	pack := new(KeyPack)
 	err := json.Unmarshal(data, pack)
 	if err != nil {
-		return keyPack{},err
+		return KeyPack{},err
 	}
 	return *pack, nil
 }

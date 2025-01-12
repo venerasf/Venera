@@ -4,6 +4,7 @@ import (
 	"errors"
 	"strings"
 	"venera/internal/db"
+	"venera/internal/utils"
 )
 
 func GetKeyByEmail(mail string, db *db.DBDef) ([]byte, error) {
@@ -16,7 +17,27 @@ func GetKeyByEmail(mail string, db *db.DBDef) ([]byte, error) {
 	return []byte(pkey), err
 }
 
-func InsertScript(dbc *db.DBDef, t Target) {
+// Register new key
+func RegisterKey(dbc *db.DBDef, keypack utils.KeyPack) error {
+	sttm, err := dbc.DBConn.Prepare(`
+		INSERT INTO Pubkey 
+			(Author, Key)
+		VALUES
+			( ?, ?);
+	`)
+	if err != nil {
+		return err
+	}
+	_, err = sttm.Exec(keypack.Email, keypack.Key)
+
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// Register a new script
+func RegisterScript(dbc *db.DBDef, t Target) {
 	sttm, err := dbc.DBConn.Prepare(`
 		INSERT INTO script 
 			(hash, path, tags, version, description, date)
@@ -70,3 +91,4 @@ func UpdateScript(dbc *db.DBDef, t Target) {
 		panic(err.Error())
 	}
 }
+

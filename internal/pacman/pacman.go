@@ -203,7 +203,7 @@ func VPMGetRemotePack(repo string, vnrhome string, signRepo string, args []strin
 	switch args[1] {
 	case "search":
 		if len(args) < 3 {
-			utils.PrintAlert("search needs more arguments.")
+			utils.PrintAlert("vpm needs more arguments.")
 		} else {
 			search(&database, repo, args[2])
 			return 0
@@ -211,7 +211,7 @@ func VPMGetRemotePack(repo string, vnrhome string, signRepo string, args []strin
 
 	case "install":
 		if len(args) < 3 {
-			utils.PrintAlert("search needs more arguments.")
+			utils.PrintAlert("vpm needs more arguments.")
 		} else {
 			utils.LogMsg(logfile, utils.INF ,"vmp","install from "+repo+" requested.")
 			installCommand(&database, repo, args, vnrhome)
@@ -227,6 +227,21 @@ func VPMGetRemotePack(repo string, vnrhome string, signRepo string, args []strin
 	case "verify":
 		verifySign(repo, signRepo, &database)
 		return 0
+
+	case "key":
+		if len(args) < 4 {
+			utils.PrintAlert("vpm needs more arguments.")
+			return 1
+		}
+		if args[2] == "import" {
+			err := RegisterKeyFromFile(&database, args[3])
+			if err != nil {
+				utils.PrintAlert(err.Error())
+				return 1
+			}
+			utils.PrintSuccs("New key imported.")
+			utils.LogMsg(logfile, 0, "vmp", "imported key from file " + args[3])
+		}
 
 	default:
 		utils.PrintAlert("Type `help vpm`.")
