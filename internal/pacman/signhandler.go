@@ -31,6 +31,8 @@ import (
 	"venera/internal/utils"
 
 	"errors"
+
+	"github.com/cheynewallace/tabby"
 )
 
 type SignPack struct {
@@ -147,4 +149,48 @@ func RegisterKeyFromFile(db *db.DBDef, file string) error {
 	}
 
 	return nil
+}
+
+
+func ShowKeys(db *db.DBDef) {
+	data, err := GetRegisteredKeys(db)
+	if err != nil {
+		utils.PrintAlert(err.Error())
+		return
+	}
+
+	t := tabby.New()
+	t.AddHeader("Id", "Email", "Fingerprint")
+	for i := range data {
+		f, err := GenerateFingerprint(data[i].Key)
+		if err != nil {
+			utils.PrintAlert("err", data[i].Email, err.Error())
+			return
+		}
+		t.AddLine(data[i].Id, data[i].Email, f)
+	}
+	t.Print()
+}
+
+
+func GenerateFingerprint(pemKey string) (string, error) {
+	block, _ := pem.Decode([]byte(pemKey))
+	if block == nil {
+		return "", fmt.Errorf("failed to parse PEM block")
+	}
+
+	pubKey, err := x509.ParsePKIXPublicKey(block.Bytes)
+	if err != nil {
+		return "", err
+	}
+
+	derBytes, err := x509.MarshalPKIXPublicKey(pubKey)
+	if err != nil {
+		return "", err
+	}
+
+	md5Hash := md5.Sum(derBytes)
+	md5Fingerprint := hex.EncodeToString(md5Hash[:])
+
+	return md5Fingerprint, nil
 }

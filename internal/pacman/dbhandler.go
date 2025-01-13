@@ -92,3 +92,25 @@ func UpdateScript(dbc *db.DBDef, t Target) {
 	}
 }
 
+func GetRegisteredKeys(dbc *db.DBDef) ([]utils.KeyPack, error) {
+	rows, err := dbc.DBConn.Query(`
+		SELECT 
+			gid, Author, Key
+		FROM Pubkey;
+	`)
+	
+	if err != nil {
+		return nil,err
+	}
+
+	data := []utils.KeyPack{}
+	for rows.Next() {
+		var id int
+		var a,k string
+		err := rows.Scan(&id, &a, &k)
+		if err != nil {return nil,err}
+		data = append(data, utils.KeyPack{Id: id, Email: a, Key: k})
+	}
+
+	return data, nil
+}

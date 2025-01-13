@@ -229,11 +229,12 @@ func VPMGetRemotePack(repo string, vnrhome string, signRepo string, args []strin
 		return 0
 
 	case "key":
-		if len(args) < 4 {
+		if len(args) < 3 {
 			utils.PrintAlert("vpm needs more arguments.")
 			return 1
 		}
-		if args[2] == "import" {
+		
+		if len(args) < 4 && (args[2] == "i" || args[2] == "import") {
 			err := RegisterKeyFromFile(&database, args[3])
 			if err != nil {
 				utils.PrintAlert(err.Error())
@@ -241,6 +242,9 @@ func VPMGetRemotePack(repo string, vnrhome string, signRepo string, args []strin
 			}
 			utils.PrintSuccs("New key imported.")
 			utils.LogMsg(logfile, 0, "vmp", "imported key from file " + args[3])
+
+		} else if args[2] == "s" || args[2] == "show" {
+			ShowKeys(&database)
 		}
 
 	default:
