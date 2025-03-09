@@ -114,3 +114,13 @@ func GetRegisteredKeys(dbc *db.DBDef) ([]utils.KeyPack, error) {
 
 	return data, nil
 }
+
+func DelRegisteredKeys(dbc *db.DBDef, Email string) error {
+	sttm, err := dbc.DBConn.Prepare(`DELETE FROM Pubkey WHERE Author=?;`)
+
+	if err != nil {
+		return err
+	}
+	_, err = sttm.Exec(Email)
+	return err
+}

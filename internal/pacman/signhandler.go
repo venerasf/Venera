@@ -194,3 +194,17 @@ func GenerateFingerprint(pemKey string) (string, error) {
 
 	return md5Fingerprint, nil
 }
+
+
+func DeleteRegisKey(dbc *db.DBDef, Email string) error {
+	_, err := GetKeyByEmail(Email, dbc)
+	if err != nil {
+		return err
+	}
+
+	err = DelRegisteredKeys(dbc, Email)
+	if err != nil {
+		return err
+	}
+	return nil
+}

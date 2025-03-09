@@ -193,7 +193,6 @@ pacman.VPMGetRemotePack(
 )
 
 */
-
 func VPMGetRemotePack(repo string, vnrhome string, signRepo string, args []string, database db.DBDef, verify string, logfile string) int {
 	if len(args) < 2 {
 		utils.PrintAlert("Type `help vpm`.")
@@ -218,10 +217,11 @@ func VPMGetRemotePack(repo string, vnrhome string, signRepo string, args []strin
 		}
 
 	case "sync":
-		utils.LogMsg(logfile,0,"vmp","sync with "+repo+" requested.")
 		n := sync(&database, repo, vnrhome)
 		if n != 0 {
-			utils.LogMsg(logfile,1,"vmp","Sync error reported.")
+			utils.LogMsg(logfile,utils.ERR,"vmp","sync error reported for repo " + repo)
+		} else {
+			utils.LogMsg(logfile,utils.INF,"vmp","sync with " + repo + " requested")
 		}
 
 	case "verify":
@@ -233,7 +233,7 @@ func VPMGetRemotePack(repo string, vnrhome string, signRepo string, args []strin
 			utils.PrintAlert("vpm needs more arguments.")
 			return 1
 		}
-		
+
 		if len(args) < 4 && (args[2] == "i" || args[2] == "import") {
 			err := RegisterKeyFromFile(&database, args[3])
 			if err != nil {
@@ -243,8 +243,19 @@ func VPMGetRemotePack(repo string, vnrhome string, signRepo string, args []strin
 			utils.PrintSuccs("New key imported.")
 			utils.LogMsg(logfile, 0, "vmp", "imported key from file " + args[3])
 
+		} else if len(args) > 3 && args[2] == "del" {
+			err := DeleteRegisKey(&database, args[3])
+			if err != nil {
+				utils.PrintAlert(err.Error())
+				return 1
+			}
+			utils.PrintSuccs("Key deleted ", args[3])
+			utils.LogMsg(logfile, 0, "vmp", "Key " + args[3] + " deleted.")
+
 		} else if args[2] == "s" || args[2] == "show" {
 			ShowKeys(&database)
+		} else {
+			utils.PrintAlert("Type `help vpm`.")
 		}
 
 	default:
