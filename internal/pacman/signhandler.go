@@ -5,7 +5,7 @@
 	First we need to verify the package signature and assume that the script hashes are valid too.
 
 	For each downloaded script, we must match the hash digested with the downloaded bytes. The reference of the
-	script in the package has the atribute "hash" that holds the md5 computed during the package compilation.
+	script in the package has the attribute "hash" that holds the md5 computed during the package compilation.
 
 	https://venera.farinap5.com/6-venera-package-manager.html
 */
@@ -43,8 +43,8 @@ type SignPack struct {
 
 
 /*
-VerifyPk will verify the sequence of bytes using
-the public key.
+	VerifyPk will verify the sequence of bytes using
+	the public key.
 */
 func VerifyPk(r io.Reader, pemEncd []byte, bsign []byte) bool {
 	blk, _ := pem.Decode(pemEncd)

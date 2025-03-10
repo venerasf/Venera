@@ -5,8 +5,8 @@ import (
 
 	"github.com/c-bata/go-prompt"
 
-	"venera/internal/utils"
 	"venera/internal/types"
+	"venera/internal/utils"
 )
 
 var HelpSugg = []prompt.Suggest{}
@@ -24,7 +24,7 @@ func init() {
 	}
 }
 
-func (paux *ProfAux)Execute(cmd string) {
+func (paux *ProfAux) Execute(cmd string) {
 	cmd = strings.TrimSpace(cmd)
 	cmds := strings.Split(cmd, " ")
 	length := len(cmds)
@@ -50,8 +50,6 @@ func (paux *ProfAux)Execute(cmd string) {
 	}
 }
 
-
-
 /*
 Register the default commands
 
@@ -59,120 +57,119 @@ Register the default commands
 		Call 	func([]string, *Profile) int // Callback entrypoint
 		Usage 	func([]string) // help function callback
 		Desc 	string // hight level description.
-		Promp 	[][]string // Prompt help and auto-complete for subcmds
+		Prompt 	[][]string // Prompt help and auto-complete for subcmds
 	}
 */
 func loadFunctions() {
 	Mapping["help"] = &types.Command{
-		Call:  runHelp,
-		Usage: usageHelp,
-		Desc:  "Show help menu.",
-		Promp: nil,
+		Call:   runHelp,
+		Usage:  usageHelp,
+		Desc:   "Show help menu.",
+		Prompt: nil,
 	}
 
-
 	Mapping["import"] = &types.Command{
-		Call:  runImport,
-		Usage: nil,
-		Desc:  "Import a (edited) script.",
-		Promp: nil,
+		Call:   runImport,
+		Usage:  nil,
+		Desc:   "Import a (edited) script.",
+		Prompt: nil,
 	}
 
 	Mapping["export"] = &types.Command{
-		Call:  runExport,
-		Usage: nil,
-		Desc:  "Export a script.",
-		Promp: nil,
+		Call:   runExport,
+		Usage:  nil,
+		Desc:   "Export a script.",
+		Prompt: nil,
 	}
 
 	Mapping["globals"] = &types.Command{
-		Call:  runManageGlobals,
-		Usage: usageGlobal,
-		Desc:  "Manage global variables.",
-		Promp: nil,
+		Call:   runManageGlobals,
+		Usage:  usageGlobal,
+		Desc:   "Manage global variables.",
+		Prompt: nil,
 	}
 
 	Mapping["run"] = &types.Command{
-		Call:  runRunScript,
-		Usage: nil,
-		Desc:  "Execute the script.",
-		Promp: nil,
+		Call:   runRunScript,
+		Usage:  nil,
+		Desc:   "Execute the script.",
+		Prompt: nil,
 	}
 
 	Mapping["exit"] = &types.Command{
-		Call:  runExit,
-		Usage: nil,
-		Desc:  "Properly exit the tool.",
-		Promp: nil,
+		Call:   runExit,
+		Usage:  nil,
+		Desc:   "Properly exit the tool.",
+		Prompt: nil,
 	}
 
 	Mapping["reload"] = &types.Command{
-		Call:  runReload,
-		Usage: usageReload,
-		Desc:  "Reload (root|script).",
-		Promp: nil,
+		Call:   runReload,
+		Usage:  usageReload,
+		Desc:   "Reload (root|script).",
+		Prompt: nil,
 	}
 
 	Mapping["search"] = &types.Command{
-		Call:  runSearch,
-		Usage: usageSearch,
-		Desc:  "Search a script using patterns.",
-		Promp: nil,
+		Call:   runSearch,
+		Usage:  usageSearch,
+		Desc:   "Search a script using patterns.",
+		Prompt: nil,
 	}
 
 	Mapping["info"] = &types.Command{
-		Call:  runInfo,
-		Usage: nil,
-		Desc:  "Information regarding the loaded script.",
-		Promp: nil,
+		Call:   runInfo,
+		Usage:  nil,
+		Desc:   "Information regarding the loaded script.",
+		Prompt: nil,
 	}
 
 	Mapping["options"] = &types.Command{
-		Call:  runOptions,
-		Usage: nil,
-		Desc:  "Show configurable variables for loaded script.",
-		Promp: nil,
+		Call:   runOptions,
+		Usage:  nil,
+		Desc:   "Show configurable variables for loaded script.",
+		Prompt: nil,
 	}
 
 	Mapping["lua"] = &types.Command{
-		Call:  runLua,
-		Usage: nil,
-		Desc:  "Execute inline lua commands.",
-		Promp: nil,
+		Call:   runLua,
+		Usage:  nil,
+		Desc:   "Execute inline lua commands.",
+		Prompt: nil,
 	}
 
 	Mapping["back"] = &types.Command{
-		Call:  runBack,
-		Usage: nil,
-		Desc:  "Free the script.",
-		Promp: nil,
+		Call:   runBack,
+		Usage:  nil,
+		Desc:   "Free the script.",
+		Prompt: nil,
 	}
 
 	Mapping["use"] = &types.Command{
-		Call:  runUse,
-		Usage: usageUse,
-		Desc:  "Use a script.",
-		Promp: nil,
+		Call:   runUse,
+		Usage:  usageUse,
+		Desc:   "Use a script.",
+		Prompt: nil,
 	}
 
 	Mapping["banner"] = &types.Command{
-		Call:  runBanner,
-		Usage: nil,
-		Desc:  "Show banner.",
-		Promp: nil,
+		Call:   runBanner,
+		Usage:  nil,
+		Desc:   "Show banner.",
+		Prompt: nil,
 	}
 
 	Mapping["vpm"] = &types.Command{
-		Call:  runVPM,
-		Usage: usageVPM,
-		Desc:  "Use Venera package manager.",
-		Promp: nil,
+		Call:   runVPM,
+		Usage:  usageVPM,
+		Desc:   "Use Venera package manager.",
+		Prompt: nil,
 	}
 
 	Mapping["set"] = &types.Command{
-		Call:  runSet,
-		Usage: usageSet,
-		Desc:  "Set a variable",
-		Promp: nil,
+		Call:   runSet,
+		Usage:  usageSet,
+		Desc:   "Set a variable",
+		Prompt: nil,
 	}
 }

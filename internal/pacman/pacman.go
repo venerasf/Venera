@@ -234,7 +234,7 @@ func VPMGetRemotePack(repo string, vnrhome string, signRepo string, args []strin
 			return 1
 		}
 
-		if len(args) < 4 && (args[2] == "i" || args[2] == "import") {
+		if len(args) > 3 && args[2] == "add" {
 			err := RegisterKeyFromFile(&database, args[3])
 			if err != nil {
 				utils.PrintAlert(err.Error())
@@ -242,6 +242,7 @@ func VPMGetRemotePack(repo string, vnrhome string, signRepo string, args []strin
 			}
 			utils.PrintSuccs("New key imported.")
 			utils.LogMsg(logfile, 0, "vmp", "imported key from file " + args[3])
+
 
 		} else if len(args) > 3 && args[2] == "del" {
 			err := DeleteRegisKey(&database, args[3])
@@ -252,6 +253,7 @@ func VPMGetRemotePack(repo string, vnrhome string, signRepo string, args []strin
 			utils.PrintSuccs("Key deleted ", args[3])
 			utils.LogMsg(logfile, 0, "vmp", "Key " + args[3] + " deleted.")
 
+			
 		} else if args[2] == "s" || args[2] == "show" {
 			ShowKeys(&database)
 		} else {

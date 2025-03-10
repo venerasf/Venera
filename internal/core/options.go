@@ -120,8 +120,12 @@ func usageVPM(cmds []string) {
 	println("    `vpm search <pattern>` List matching substring.")
 	println("    `vpm install <script>` Install a script.")
 	println("       Usage:`vpm install /path/to/the/script.lua`")
-	println("    `vpm sync` Sincronize with remote repository.")
+	println("    `vpm sync` Synchronize with remote repository.")
 	println("    `vpm verify` Verify the signature of the configured remote repository.")
+	println("    `vpm key` Manage keys.")
+	println("      `vpm key show` Show keys.")
+	println("      `vpm key del <email>` Delete key by email.")
+	println("      `vpm key add </path/to/key>` Add key from file.")
 	print("\n")
 }
 

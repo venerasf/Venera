@@ -98,15 +98,16 @@ func (paux *ProfAux) completer(d prompt.Document) []prompt.Suggest {
 		case "globals":
 			return prompt.FilterHasPrefix([]prompt.Suggest{
 				{Text: "set", Description: "Set global variable kv"},
-				{Text: "rm",   Description: "Remove global variable"},
+				{Text: "rm",  Description: "Remove global variable"},
 			}, inputs[1], true)
 
 		case "vpm":
 			return prompt.FilterHasPrefix([]prompt.Suggest{
 				{Text: "search", 	Description: "Search for scripts with a pattern"},
 				{Text: "install",	Description: "Install a script"},
-				{Text: "sync",		Description: "Sincronize with remote repository"},
+				{Text: "sync",		Description: "Synchronize with remote repository"},
 				{Text: "verify",	Description: "Verify package signature"},
+				{Text: "key",		Description: "Manage keys"},
 			}, inputs[1], true)
 
 		case "reload":
@@ -117,6 +118,17 @@ func (paux *ProfAux) completer(d prompt.Document) []prompt.Suggest {
 		
 		case "help":
 			return prompt.FilterHasPrefix(HelpSugg, inputs[1], true)
+		}
+	}
+
+	if (length == 3) {
+		switch inputs[1] {
+		case "key":
+			return prompt.FilterHasPrefix([]prompt.Suggest{
+				{Text: "show",		Description: "Show keys"},
+				{Text: "del",		Description: "Delete key"},
+				{Text: "add",		Description: "Add key from file"},
+			}, inputs[2], true)
 		}
 	}
 
@@ -167,3 +179,15 @@ func (paux *ProfAux) completer(d prompt.Document) []prompt.Suggest {
 			}, d.GetWordBeforeCursor(),true)
 	*/
 }
+
+/*
+
+{"cmds":[{
+	"name":"network",
+	"description":"Do network scan",
+	"subcmd":[
+		{"name": "ping", "description":"Do ping", "subcmd":null},
+		{"name": "scan", "description":"Do network scan", "subcmd":[{"name": "tcp", "description":"choose tcp scan", "subcmd":null}]}
+	]}
+}]}
+*/
