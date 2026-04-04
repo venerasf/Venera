@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -15,7 +16,6 @@ const (
 	EVT
 	SYS
 )
-
 
 // Types of pretty printing
 func PrintSuccs(a ...any) {
@@ -78,16 +78,15 @@ func LogMsg(logPath string, tp int, module string, message string) {
 	}
 
 	// since it is not used all the time, lets open for each use
-	f, err := os.OpenFile(logPath, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	f, err := os.OpenFile(logPath, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0640)
 	if err != nil {
 		return
 	}
+	defer f.Close()
 
-	logMessage := fmt.Sprintf("type=%s module=%s message='%s'", ltype, module, strings.ReplaceAll(message, "'",`\'`))
+	logMessage := fmt.Sprintf("type=%s module=%s message='%s'", ltype, module, strings.ReplaceAll(message, "'", `\'`))
 	nLog := log.New(f, "", log.LstdFlags)
 	nLog.Println(logMessage)
-
-	f.Close()
 }
 
 /*
@@ -107,4 +106,54 @@ to cms/wp_user_enum
 */
 func HideLuaExtension(scrptName string) string {
 	return strings.TrimSuffix(scrptName, ".lua")
+}
+
+/*
+ValidatePath checks if a path is safe and within allowed directory.
+Prevents directory traversal attacks.
+Returns the cleaned absolute path or error if path is unsafe.
+*/
+func ValidatePath(path string, allowedDir string) (string, error) {
+	// Clean the paths to resolve . and ..
+	cleanPath := filepath.Clean(path)
+	cleanAllowedDir := filepath.Clean(allowedDir)
+	
+	// Convert to absolute paths
+	absPath, err := filepath.Abs(cleanPath)
+	if err != nil {
+		return "", fmt.Errorf("invalid path: %w", err)
+	}
+	
+	absAllowedDir, err := filepath.Abs(cleanAllowedDir)
+	if err != nil {
+		return "", fmt.Errorf("invalid allowed directory: %w", err)
+	}
+	
+	// Check if the path starts with the allowed directory
+	if !strings.HasPrefix(absPath, absAllowedDir) {
+		return "", fmt.Errorf("path traversal detected: %s is outside allowed directory %s", path, allowedDir)
+	}
+	
+	// Additional check for path separators
+	if strings.Contains(path, "..") {
+		return "", fmt.Errorf("path contains directory traversal sequence: %s", path)
+	}
+	
+	return absPath, nil
+}
+
+/*
+SafeJoinPath safely joins a base directory with a relative path.
+Prevents directory traversal by validating the result is within base.
+*/
+func SafeJoinPath(base string, elem string) (string, error) {
+	// Clean both paths
+	cleanBase := filepath.Clean(base)
+	cleanElem := filepath.Clean(elem)
+	
+	// Join them
+	joined := filepath.Join(cleanBase, cleanElem)
+	
+	// Validate the result
+	return ValidatePath(joined, cleanBase)
 }

@@ -5,7 +5,7 @@
 	First we need to verify the package signature and assume that the script hashes are valid too.
 
 	For each downloaded script, we must match the hash digested with the downloaded bytes. The reference of the
-	script in the package has the attribute "hash" that holds the md5 computed during the package compilation.
+	script in the package has the attribute "hash" that holds the SHA-256 hash computed during the package compilation.
 
 	https://venera.farinap5.com/6-venera-package-manager.html
 */
@@ -15,7 +15,6 @@ package pacman
 import (
 	"bytes"
 	"crypto/ecdsa"
-	"crypto/md5"
 	"crypto/sha256"
 	"crypto/x509"
 	"encoding/base64"
@@ -101,11 +100,11 @@ func VerifySignaturePack(pack []byte, Signp []byte, db db.DBDef) bool {
 }
 
 func VerifySignatureScript(data []byte, hash string) bool {
-	m := md5.New()
-	m.Write(data)
-	h := m.Sum(nil)
+	h := sha256.New()
+	h.Write(data)
+	computed := h.Sum(nil)
 
-	if hex.EncodeToString(h) == hash {
+	if hex.EncodeToString(computed) == hash {
 		return true
 	} else {
 		return false
@@ -189,10 +188,11 @@ func GenerateFingerprint(pemKey string) (string, error) {
 		return "", err
 	}
 
-	md5Hash := md5.Sum(derBytes)
-	md5Fingerprint := hex.EncodeToString(md5Hash[:])
+	// Use SHA-256 for fingerprints instead of MD5
+	sha256Hash := sha256.Sum256(derBytes)
+	sha256Fingerprint := hex.EncodeToString(sha256Hash[:])
 
-	return md5Fingerprint, nil
+	return sha256Fingerprint, nil
 }
 
 

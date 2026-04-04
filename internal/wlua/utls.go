@@ -85,13 +85,53 @@ func LogMsg(L *lua.LState) int {
 
 //##################################################
 // Open file and get content
+// Restricted to only read files within the Venera scripts directory
 func Open(L *lua.LState) int {
-	p := L.ToString(1)
-	cont, err := ioutil.ReadFile(p)
-	if err != nil {
-		L.Push(lua.LString(err.Error()))
+	requestedPath := L.ToString(1)
+	
+	// Get the allowed scripts directory from globals
+	scriptsDir := LuaProf.Globals["root"]
+	if scriptsDir == "" {
+		L.Push(lua.LString("Error: scripts directory not configured"))
 		return 1
 	}
+	
+	// Validate that the requested path is within the scripts directory
+	safePath, err := utils.ValidatePath(requestedPath, scriptsDir)
+	if err != nil {
+		// If validation fails, try joining with scripts directory
+		safePath, err = utils.SafeJoinPath(scriptsDir, requestedPath)
+		if err != nil {
+			L.Push(lua.LString("Error: access denied - " + err.Error()))
+			return 1
+		}
+	}
+	
+	// Additional check: ensure it's a regular file, not a directory or special file
+	fileInfo, err := os.Stat(safePath)
+	if err != nil {
+		L.Push(lua.LString("Error: " + err.Error()))
+		return 1
+	}
+	
+	if !fileInfo.Mode().IsRegular() {
+		L.Push(lua.LString("Error: not a regular file"))
+		return 1
+	}
+	
+	// Check file size to prevent reading extremely large files
+	const maxFileSize = 10 * 1024 * 1024 // 10 MB limit
+	if fileInfo.Size() > maxFileSize {
+		L.Push(lua.LString(fmt.Sprintf("Error: file too large (max %d bytes)", maxFileSize)))
+		return 1
+	}
+	
+	cont, err := ioutil.ReadFile(safePath)
+	if err != nil {
+		L.Push(lua.LString("Error: " + err.Error()))
+		return 1
+	}
+	
 	L.Push(lua.LString(string(cont)))
 	return 1
 }

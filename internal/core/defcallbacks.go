@@ -4,10 +4,9 @@ import (
 	"os"
 	"strings"
 	"venera/internal/pacman"
+	"venera/internal/types"
 	"venera/internal/utils"
 	"venera/internal/wlua"
-	"venera/internal/types"
-
 	//"github.com/c-bata/go-prompt"
 )
 
@@ -21,7 +20,7 @@ func runUse(cmds []string, profile *types.Profile) int {
 		if len(cmds) < 2 {
 			utils.PrintErr("Invalid arguments.")
 		} else {
-			if (cmds[1] == "tags" || cmds[1] == "tag" || cmds[1] == "t") {
+			if cmds[1] == "tags" || cmds[1] == "tag" || cmds[1] == "t" {
 				utils.PrintSuccs("Using tag context")
 				if len(cmds) < 3 {
 					utils.PrintErr("Invalid Arguments.")
@@ -39,7 +38,7 @@ func runUse(cmds []string, profile *types.Profile) int {
 }
 
 // Exit from a script
-func runOptions(cmds []string,profile *types.Profile) int {
+func runOptions(cmds []string, profile *types.Profile) int {
 	if profile.SSet || profile.Chain {
 		wlua.VarsList()
 	} else {
@@ -49,7 +48,7 @@ func runOptions(cmds []string,profile *types.Profile) int {
 }
 
 // Exit from a script
-func runBack(cmds []string,profile *types.Profile) int {
+func runBack(cmds []string, profile *types.Profile) int {
 	if profile.SSet || profile.Chain {
 		FreeScript(profile)
 	} else {
@@ -58,13 +57,13 @@ func runBack(cmds []string,profile *types.Profile) int {
 	return 0
 }
 
-func runInfo(cmds []string,profile *types.Profile) int {
+func runInfo(cmds []string, profile *types.Profile) int {
 	if profile.SSet || profile.Chain {
 		// Displays information
 		if profile.Chain {
 			SCInfoForChaining(*profile)
 		} else {
-			wlua.MetaShow()	
+			wlua.MetaShow()
 		}
 	} else {
 		utils.PrintErr("Must have script setted.")
@@ -72,13 +71,13 @@ func runInfo(cmds []string,profile *types.Profile) int {
 	return 0
 }
 
-func runSearch(cmds []string,profile *types.Profile) int {
+func runSearch(cmds []string, profile *types.Profile) int {
 	// Searches a script
 	SCListScripts(*profile, cmds)
 	return 0
 }
 
-func runRunScript(cmds []string,profile *types.Profile) int {
+func runRunScript(cmds []string, profile *types.Profile) int {
 	if profile.SSet || profile.Chain {
 		// Runs the script
 		if profile.Chain {
@@ -92,11 +91,13 @@ func runRunScript(cmds []string,profile *types.Profile) int {
 	return 0
 }
 
-func runSet(cmds []string,profile *types.Profile) int {
+func runSet(cmds []string, profile *types.Profile) int {
 	if profile.SSet || profile.Chain {
 		// Sets a variable for the script
 		if len(cmds) < 3 {
 			utils.PrintErr("Invalid arguments.")
+		} else if profile.State == nil {
+			utils.PrintErr("Script state not initialized.")
 		} else {
 			wlua.SetVarValue(profile.State, cmds[1], strings.Join(cmds[2:], " "))
 		}
@@ -132,21 +133,21 @@ func runHelp(cmds []string, p *types.Profile) int {
 	return 0
 }
 
-func runVPM(cmds []string,profile *types.Profile) int {
+func runVPM(cmds []string, profile *types.Profile) int {
 	// TODO: Must not be executed with scrpt setted
 	// TODO: Validate return code
 	return pacman.VPMGetRemotePack(
 		profile.Globals["repo"],
 		profile.Globals["root"],
 		profile.Globals["sign"],
-		cmds, 
+		cmds,
 		*profile.Database,
 		profile.Globals["vpmvs"],
 		profile.Globals["logfile"],
 	)
 }
 
-func runExport(cmds []string,profile *types.Profile) int {
+func runExport(cmds []string, profile *types.Profile) int {
 	// Exports a script
 	if len(cmds) != 3 {
 		utils.PrintErr("Invalid arguments.")
@@ -166,19 +167,21 @@ func runImport(cmds []string, profile *types.Profile) int {
 	return 0
 }
 
-func runExit(cmds []string,profile *types.Profile) int {
+func runExit(cmds []string, profile *types.Profile) int {
 	// Exits the program
 	HandleExit()
 	os.Exit(0)
 	return 0 // wont run
 }
 
-func runLua(cmds []string,profile *types.Profile) int {
+func runLua(cmds []string, profile *types.Profile) int {
 	if profile.SSet || profile.Chain {
 		length := len(cmds)
 		// Executes lua code
 		if length < 2 {
 			utils.PrintErr("Invalid arguments.")
+		} else if profile.State == nil {
+			utils.PrintErr("Script state not initialized.")
 		} else {
 			wlua.LuaExecString(profile.State, strings.Join(cmds[1:], " "))
 		}
@@ -188,7 +191,7 @@ func runLua(cmds []string,profile *types.Profile) int {
 	return 0
 }
 
-func runReload(cmds []string,profile *types.Profile) int {
+func runReload(cmds []string, profile *types.Profile) int {
 	if len(cmds) != 2 {
 		utils.PrintErr("Invalid args.")
 		return 1
@@ -196,7 +199,7 @@ func runReload(cmds []string,profile *types.Profile) int {
 
 	if cmds[1] == "script" || cmds[1] == "s" {
 		// Reloads the selected script
-		if profile.SSet { 
+		if profile.SSet {
 			ReloadScript(profile)
 		} else {
 			utils.PrintErr("Not a valid command out from script.")
@@ -207,10 +210,19 @@ func runReload(cmds []string,profile *types.Profile) int {
 	return 0
 }
 
-
 // Load script
 func useScript(p *types.Profile, cmds []string) {
-	p.Script = cmds[1]                     // Set script as passed over cmd
+	// Validate script path is within allowed directory
+	scriptsDir := p.Globals["root"]
+	scriptPath := cmds[1]
+
+	safePath, err := utils.ValidatePath(scriptPath, scriptsDir)
+	if err != nil {
+		utils.PrintErr("Invalid script path: " + err.Error())
+		return
+	}
+
+	p.Script = safePath // Set validated script path
 	//profile := *p                          // Take off pointer
 	//pl := wlua.LuaProfile(profile)         // Convert Profile to LuaProfile
 	p.State, p.SSet = wlua.LuaInitUniq(p) // Init script
@@ -220,7 +232,7 @@ func useScript(p *types.Profile, cmds []string) {
 	}
 
 	// hide the root path and extension when prompting the script path
-	promptedPath := utils.HideBasePath(p.Globals["root"], cmds[1])
+	promptedPath := utils.HideBasePath(p.Globals["root"], safePath)
 	promptedPath = utils.HideLuaExtension(promptedPath)
 
 	p.Prompt = "(" + promptedPath + ")>> " // save new prompt
@@ -230,10 +242,12 @@ func useScript(p *types.Profile, cmds []string) {
 	LivePrefixState.IsEnable = true
 }
 
-
-
 func runScript(p *types.Profile) {
 	if p.SSet {
+		if p.State == nil {
+			utils.PrintErr("Script state not initialized.")
+			return
+		}
 		wlua.LuaRunUniq(p.State)
 	} else {
 		println("No Script")
@@ -251,7 +265,12 @@ func FreeScript(p *types.Profile) {
 	p.SSet = false
 	p.Chain = false
 	p.Script = ""
-	p.State.Close()
+	
+	if p.State != nil {
+		p.State.Close()
+		p.State = nil
+	}
+	
 	wlua.LuaFreeScript()
 	p.Prompt = "[*]>> "
 	LivePrefixState.LivePrefix = p.Prompt
@@ -264,7 +283,10 @@ func ReloadScript(p *types.Profile) {
 
 	utils.PrintSuccs("Freeing memory.")
 	// Free script
-	p.State.Close()
+	if p.State != nil {
+		p.State.Close()
+		p.State = nil
+	}
 	p.SSet = false
 	p.Script = ""
 
@@ -275,7 +297,7 @@ func ReloadScript(p *types.Profile) {
 
 	// load script
 	utils.PrintSuccs("Loading " + aux)
-	p.Script = aux                         // Set script as passed over cmd
+	p.Script = aux // Set script as passed over cmd
 	//profile := *p                          // Take off pointer
 	//pl := wlua.LuaProfile(profile)         // Convert Profile to LuaProfile
 	p.State, p.SSet = wlua.LuaInitUniq(p) // Init script
@@ -288,7 +310,6 @@ func ReloadScript(p *types.Profile) {
 	LivePrefixState.LivePrefix = p.Prompt
 	LivePrefixState.IsEnable = true
 }
-
 
 func useScriptTAG(p *types.Profile, cmds []string) {
 	var scriptslist []string

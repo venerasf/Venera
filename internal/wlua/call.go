@@ -1,6 +1,7 @@
 package wlua
 
 import (
+	"venera/internal/utils"
 	"github.com/yuin/gluamapper"
 	lua "github.com/yuin/gopher-lua"
 )
@@ -22,7 +23,9 @@ func Calls(l *lua.LState) int {
 	}
 
 	if err := gluamapper.Map(l.GetGlobal("Vars").(*lua.LTable), &newFileVars); err != nil {
-		panic(err)
+		utils.PrintErr("Failed to map variables for chained script call: " + err.Error())
+		newFile.Close()
+		return 0
 	}
 
 

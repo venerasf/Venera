@@ -37,7 +37,7 @@ func RegisterKey(dbc *db.DBDef, keypack utils.KeyPack) error {
 }
 
 // Register a new script
-func RegisterScript(dbc *db.DBDef, t Target) {
+func RegisterScript(dbc *db.DBDef, t Target) error {
 	sttm, err := dbc.DBConn.Prepare(`
 		INSERT INTO script 
 			(hash, path, tags, version, description, date)
@@ -45,13 +45,17 @@ func RegisterScript(dbc *db.DBDef, t Target) {
 			( ?, ?, ?, ?, ?, datetime());
 		`)
 	if err != nil {
-		panic(err.Error())
+		utils.PrintErr("Failed to prepare script registration: " + err.Error())
+		return err
 	}
+	defer sttm.Close()
+	
 	_, err = sttm.Exec(t.Hash, t.Script, strings.Join(t.Tags, ":"), t.Version, t.Description)
-
 	if err != nil {
-		panic(err.Error())
+		utils.PrintErr("Failed to register script: " + err.Error())
+		return err
 	}
+	return nil
 }
 
 func SelectScript(dbc *db.DBDef, t Target) (Target, error) {
@@ -75,21 +79,25 @@ func SelectScript(dbc *db.DBDef, t Target) (Target, error) {
 	return storeTarget, err
 }
 
-func UpdateScript(dbc *db.DBDef, t Target) {
+func UpdateScript(dbc *db.DBDef, t Target) error {
 	sttm, err := dbc.DBConn.Prepare(`
 	UPDATE script SET
-		hash=? path=? tags=? version=? description=? date=datetime())
-	VALUES
+		hash=?, path=?, tags=?, version=?, description=?, date=datetime()
+	WHERE path=?
 	`)
 
 	if err != nil {
-		panic(err.Error())
+		utils.PrintErr("Failed to prepare script update: " + err.Error())
+		return err
 	}
-	_, err = sttm.Exec(t.Hash, t.Script, strings.Join(t.Tags, ":"), t.Version, t.Description)
-
+	defer sttm.Close()
+	
+	_, err = sttm.Exec(t.Hash, t.Script, strings.Join(t.Tags, ":"), t.Version, t.Description, t.Script)
 	if err != nil {
-		panic(err.Error())
+		utils.PrintErr("Failed to update script: " + err.Error())
+		return err
 	}
+	return nil
 }
 
 func GetRegisteredKeys(dbc *db.DBDef) ([]utils.KeyPack, error) {

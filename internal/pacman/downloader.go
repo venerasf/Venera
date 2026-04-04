@@ -33,7 +33,10 @@ func DownloadScript(dbc *db.DBDef, pack Pack, vnrhome string, i int) int {
 			utils.PrintAlert("Signature Does Not Match!")
 			sigStatus = "\u001B[1;31mSignature error!\u001B[0;0m"
 		}
-		RegisterScript(dbc, pack.Target[i])
+		if err := RegisterScript(dbc, pack.Target[i]); err != nil {
+			utils.PrintErr("Failed to register script in database")
+			return 3
+		}
 		r := installer(data, vnrhome, pack.Target[i].Script)
 		if r == 3 {
 			utils.PrintAlert("error.")
@@ -66,7 +69,10 @@ func DownloadScript(dbc *db.DBDef, pack Pack, vnrhome string, i int) int {
 			sigStatus = "\u001B[1;31mSignature error!\u001B[0;0m"
 		}
 
-		UpdateScript(dbc, pack.Target[i])
+		if err := UpdateScript(dbc, pack.Target[i]); err != nil {
+			utils.PrintErr("Failed to update script in database")
+			return 3
+		}
 		r := installer(data, vnrhome, pack.Target[i].Script)
 		if r == 3 {
 			utils.PrintAlert("error.")

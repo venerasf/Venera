@@ -54,7 +54,11 @@ func (db *DBDef) dbCreateDs() {
 		utils.PrintErr(err.Error())
 		utils.LogMsg("~/venera/message.log", 3, "core", err.Error())
 	} else {
-		sttm.Exec()
+		if _, err := sttm.Exec(); err != nil {
+			utils.PrintErr("Failed to create global table: " + err.Error())
+			utils.LogMsg("~/venera/message.log", 3, "core", err.Error())
+		}
+		sttm.Close()
 	}
 
 	sttm, err = db.DBConn.Prepare(`
@@ -68,7 +72,11 @@ func (db *DBDef) dbCreateDs() {
 		utils.PrintErr(err.Error())
 		utils.LogMsg("~/venera/message.log", 3, "core", err.Error())
 	} else {
-		sttm.Exec()
+		if _, err := sttm.Exec(); err != nil {
+			utils.PrintErr("Failed to create Pubkey table: " + err.Error())
+			utils.LogMsg("~/venera/message.log", 3, "core", err.Error())
+		}
+		sttm.Close()
 	}
 
 	sttm, err = db.DBConn.Prepare(`
@@ -86,7 +94,11 @@ func (db *DBDef) dbCreateDs() {
 		utils.PrintErr(err.Error())
 		utils.LogMsg("~/venera/message.log", 3, "core", err.Error())
 	} else {
-		sttm.Exec()
+		if _, err := sttm.Exec(); err != nil {
+			utils.PrintErr("Failed to create script table: " + err.Error())
+			utils.LogMsg("~/venera/message.log", 3, "core", err.Error())
+		}
+		sttm.Close()
 	}
 
 	// default root key must be changed and dynamic
@@ -107,7 +119,11 @@ func (db *DBDef) dbCreateDs() {
 		utils.PrintErr(err.Error())
 		utils.LogMsg("~/venera/message.log", 3, "core", err.Error())
 	} else {
-		sttm.Exec(keyPack.Email, keyPack.Key)
+		if _, err := sttm.Exec(keyPack.Email, keyPack.Key); err != nil {
+			// Key might already exist, log but don't fail
+			utils.LogMsg("~/venera/message.log", 1, "core", "Key insert: "+err.Error())
+		}
+		sttm.Close()
 	}
 }
 
@@ -115,7 +131,7 @@ func (db *DBDef) DBStoreGlobal(key string, value string) {
 	// validate if key exists
 	var v string = ""
 	row := db.DBConn.QueryRow("SELECT value FROM global WHERE key = ?;", key)
-	row.Scan(&v)
+	row.Scan(&v)  // Ignore error - empty result is expected if key doesn't exist
 
 	if v != "" {
 		// if key exists we update it
@@ -123,8 +139,14 @@ func (db *DBDef) DBStoreGlobal(key string, value string) {
 		if err != nil {
 			utils.LogMsg("~/venera/message.log", 3, "core", err.Error())
 			utils.PrintErr(err.Error())
+			return
 		}
-		sttm.Exec(value, key)
+		defer sttm.Close()
+		
+		if _, err := sttm.Exec(value, key); err != nil {
+			utils.LogMsg("~/venera/message.log", 3, "core", err.Error())
+			utils.PrintErr("Failed to update global: " + err.Error())
+		}
 	} else {
 		// if not set assing the velue
 		sttm, err := db.DBConn.Prepare(`
@@ -133,8 +155,14 @@ func (db *DBDef) DBStoreGlobal(key string, value string) {
 		if err != nil {
 			utils.LogMsg("~/venera/message.log", 3, "core", err.Error())
 			utils.PrintErr(err.Error())
+			return
 		}
-		sttm.Exec(key, value)
+		defer sttm.Close()
+		
+		if _, err := sttm.Exec(key, value); err != nil {
+			utils.LogMsg("~/venera/message.log", 3, "core", err.Error())
+			utils.PrintErr("Failed to insert global: " + err.Error())
+		}
 	}
 }
 
@@ -147,21 +175,40 @@ func (db *DBDef) DBLoadIntoGlobals() map[string]string {
 	row, err := db.DBConn.Query("SELECT key, value FROM global;")
 	if err != nil {
 		utils.LogMsg("~/venera/message.log", 3, "core", err.Error())
-		panic(err.Error())
+		utils.PrintErr("Failed to load globals from database: " + err.Error())
+		return g  // Return empty map instead of panicking
 	}
+	defer row.Close()
+	
 	for row.Next() {
 		var k, v string
-		row.Scan(&k, &v)
+		if err := row.Scan(&k, &v); err != nil {
+			utils.LogMsg("~/venera/message.log", 1, "core", "Error scanning row: "+err.Error())
+			continue  // Skip this row and continue
+		}
 		g[k] = v
 	}
+	
+	// Check for errors during iteration
+	if err := row.Err(); err != nil {
+		utils.LogMsg("~/venera/message.log", 1, "core", "Error iterating rows: "+err.Error())
+	}
+	
 	return g
 }
 
-func (db *DBDef) DBRemoveGlobals(key string) {
+func (db *DBDef) DBRemoveGlobals(key string) error {
 	sttm, err := db.DBConn.Prepare("DELETE FROM global WHERE key = ?;")
 	if err != nil {
 		utils.LogMsg("~/venera/message.log", 3, "core", err.Error())
-		panic(err.Error())
+		return err
 	}
-	sttm.Exec(key)
+	defer sttm.Close()
+	
+	_, err = sttm.Exec(key)
+	if err != nil {
+		utils.LogMsg("~/venera/message.log", 3, "core", err.Error())
+		return err
+	}
+	return nil
 }

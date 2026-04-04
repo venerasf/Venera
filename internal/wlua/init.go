@@ -4,7 +4,7 @@ import (
 	"venera/internal/types"
 
 	libs "github.com/venerasf/go-lua-libs"
-	"github.com/yuin/gopher-lua"
+	lua "github.com/yuin/gopher-lua"
 )
 
 // TODO: Create a sctruct and mas to methods or as var, i don't like globals
@@ -65,6 +65,7 @@ func LuaInitUniq(p *types.Profile) (*lua.LState, bool) {
 	err := l.DoFile(p.Script)
 	if err != nil {
 		println(err.Error())
+		l.Close()
 		return nil, false
 	}
 	l.DoString("Init()")

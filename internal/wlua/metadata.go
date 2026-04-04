@@ -5,6 +5,7 @@ package wlua
 
 import (
 	"fmt"
+	"venera/internal/utils"
 	"github.com/yuin/gluamapper"
 	lua "github.com/yuin/gopher-lua"
 )
@@ -12,7 +13,8 @@ import (
 // Load metadata
 func Meta(L *lua.LState) int {
 	if err := gluamapper.Map(L.GetGlobal("METADATA").(*lua.LTable), &Metad); err != nil {
-		panic(err)
+		utils.PrintErr("Failed to load script metadata: " + err.Error())
+		return 0
 	}
 	return 1
 }

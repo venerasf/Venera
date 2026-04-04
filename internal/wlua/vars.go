@@ -16,7 +16,8 @@ import (
 // Load vars
 func LoadVars(L *lua.LState) int {
 	if err := gluamapper.Map(L.GetGlobal("VARS").(*lua.LTable), &LoadVar); err != nil {
-		panic(err)
+		utils.PrintErr("Failed to load script variables: " + err.Error())
+		return 0
 	}
 	//print
 	return 1
@@ -69,7 +70,8 @@ func SetFromGlobals(L *lua.LState, p *types.Profile) {
 	vars := new(map[string]VarDef)
 
 	if err := gluamapper.Map(L.GetGlobal("VARS").(*lua.LTable), &vars); err != nil {
-		panic(err)
+		utils.PrintErr("Failed to load variables from globals: " + err.Error())
+		return
 	}
 
 	for i := range p.Globals {
@@ -106,7 +108,9 @@ func GetVarsToChainTAGS(p *types.Profile) {
 
 		auxVar := make(map[string]VarDef)
 		if err := gluamapper.Map(L.GetGlobal("VARS").(*lua.LTable), &auxVar); err != nil {
-			panic(err)
+			utils.PrintErr("Failed to load variables from script " + f + ": " + err.Error())
+			L.Close()
+			continue
 		}
 
 		for i, s := range auxVar {

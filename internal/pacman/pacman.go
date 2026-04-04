@@ -13,7 +13,6 @@ import (
 	"venera/internal/utils"
 )
 
-
 func validateTarget(pack Pack) int {
 	if len(pack.Target) == 0 || pack.Target == nil {
 		return 2
@@ -38,7 +37,7 @@ func getPack(repo string) Pack {
 	return pack
 }
 
-func search(dbc *db.DBDef ,repo, pattern string) {
+func search(dbc *db.DBDef, repo, pattern string) {
 	// Retrieve the map package
 	pack := getPack(repo)
 	utils.PrintSuccs("Requesting " + repo + "\n")
@@ -50,7 +49,7 @@ func search(dbc *db.DBDef ,repo, pattern string) {
 
 	c := 0
 	t := tabby.New()
-	t.AddHeader("SCRIPT","VERSION","DESCRIPTION","TAGS","STATUS")
+	t.AddHeader("SCRIPT", "VERSION", "DESCRIPTION", "TAGS", "STATUS")
 	for i := range pack.Target {
 		if strings.Contains(pack.Target[i].Description, pattern) ||
 			strings.Contains(pack.Target[i].Script, pattern) || pattern == "all" {
@@ -68,7 +67,7 @@ func search(dbc *db.DBDef ,repo, pattern string) {
 			c++
 			desc := ""
 			if len(pack.Target[i].Description) > 30 {
-				desc = pack.Target[i].Description[:30]+"..."
+				desc = pack.Target[i].Description[:30] + "..."
 			} else {
 				desc = pack.Target[i].Description
 			}
@@ -81,14 +80,14 @@ func search(dbc *db.DBDef ,repo, pattern string) {
 			)
 
 			/*
-			if i > 0 {
-				print("-----------------------\n")
-			}
-			fmt.Printf("Script: 	%s\n", pack.Target[i].Script)
-			fmt.Printf("Version:	%.2f\n", pack.Target[i].Version)
-			fmt.Printf("Description:%s\n", pack.Target[i].Description)
-			fmt.Printf("Tags:		%s\n", strings.Join(pack.Target[i].Tags, ":"))
-			fmt.Printf("Status:		%s\n", scriptStatus)
+				if i > 0 {
+					print("-----------------------\n")
+				}
+				fmt.Printf("Script: 	%s\n", pack.Target[i].Script)
+				fmt.Printf("Version:	%.2f\n", pack.Target[i].Version)
+				fmt.Printf("Description:%s\n", pack.Target[i].Description)
+				fmt.Printf("Tags:		%s\n", strings.Join(pack.Target[i].Tags, ":"))
+				fmt.Printf("Status:		%s\n", scriptStatus)
 			*/
 		}
 	}
@@ -127,9 +126,13 @@ func installer(data []byte, vnrhome string, scriptPath string) int {
 		utils.PrintErr(err.Error())
 		return 3
 	}
+	defer file.Close()
 
-	file.Write(data)
-	file.Close()
+	_, err = file.Write(data)
+	if err != nil {
+		utils.PrintErr(err.Error())
+		return 3
+	}
 
 	return returnInfo
 }
@@ -183,6 +186,7 @@ VPMGetRemotePack is the entrypoint for using Venera Package Manager
 
 The following exemplifies the way to call it.
 pacman.VPMGetRemotePack(
+
 	profile.Globals["repo"],  	http://r.venera.farinap5.com/package.yaml
 	profile.Globals["root"],  	root where to place scripts
 	profile.Globals["sign"],  	http://r.venera.farinap5.com/package.sgn
@@ -190,15 +194,15 @@ pacman.VPMGetRemotePack(
 	*profile.Database,        	Database interface
 	profile.Globals["vpmvs"], 	If verification is on or off
 	profile.Globals["logfile"],	Log path
-)
 
+)
 */
 func VPMGetRemotePack(repo string, vnrhome string, signRepo string, args []string, database db.DBDef, verify string, logfile string) int {
 	if len(args) < 2 {
 		utils.PrintAlert("Type `help vpm`.")
 		return 1
 	}
-	
+
 	switch args[1] {
 	case "search":
 		if len(args) < 3 {
@@ -212,16 +216,16 @@ func VPMGetRemotePack(repo string, vnrhome string, signRepo string, args []strin
 		if len(args) < 3 {
 			utils.PrintAlert("vpm needs more arguments.")
 		} else {
-			utils.LogMsg(logfile, utils.INF ,"vmp","install from "+repo+" requested.")
+			utils.LogMsg(logfile, utils.INF, "vmp", "install from "+repo+" requested.")
 			installCommand(&database, repo, args, vnrhome)
 		}
 
 	case "sync":
 		n := sync(&database, repo, vnrhome)
 		if n != 0 {
-			utils.LogMsg(logfile,utils.ERR,"vmp","sync error reported for repo " + repo)
+			utils.LogMsg(logfile, utils.ERR, "vmp", "sync error reported for repo "+repo)
 		} else {
-			utils.LogMsg(logfile,utils.INF,"vmp","sync with " + repo + " requested")
+			utils.LogMsg(logfile, utils.INF, "vmp", "sync with "+repo+" requested")
 		}
 
 	case "verify":
@@ -241,8 +245,7 @@ func VPMGetRemotePack(repo string, vnrhome string, signRepo string, args []strin
 				return 1
 			}
 			utils.PrintSuccs("New key imported.")
-			utils.LogMsg(logfile, 0, "vmp", "imported key from file " + args[3])
-
+			utils.LogMsg(logfile, 0, "vmp", "imported key from file "+args[3])
 
 		} else if len(args) > 3 && args[2] == "del" {
 			err := DeleteRegisKey(&database, args[3])
@@ -251,9 +254,8 @@ func VPMGetRemotePack(repo string, vnrhome string, signRepo string, args []strin
 				return 1
 			}
 			utils.PrintSuccs("Key deleted ", args[3])
-			utils.LogMsg(logfile, 0, "vmp", "Key " + args[3] + " deleted.")
+			utils.LogMsg(logfile, 0, "vmp", "Key "+args[3]+" deleted.")
 
-			
 		} else if args[2] == "s" || args[2] == "show" {
 			ShowKeys(&database)
 		} else {
