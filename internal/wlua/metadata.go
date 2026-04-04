@@ -1,11 +1,12 @@
 /*
-	This file define functions o handle metadata of a in use script
+This file define functions o handle metadata of a in use script
 */
 package wlua
 
 import (
 	"fmt"
 	"venera/internal/utils"
+
 	"github.com/yuin/gluamapper"
 	lua "github.com/yuin/gopher-lua"
 )
@@ -29,14 +30,14 @@ func MetaShow() {
 }
 
 func MetaListAuthors() {
-	for i := range(Metad.AUTHOR) {
-		fmt.Printf("%d) %s\n",i+1,Metad.AUTHOR[i])
+	for i := range Metad.AUTHOR {
+		fmt.Printf("%d) %s\n", i+1, Metad.AUTHOR[i])
 	}
 }
 
 func MetaListCats() {
-	for i := range(Metad.TAGS) {
-		fmt.Printf("%d) %s\n",i+1,Metad.TAGS[i])
+	for i := range Metad.TAGS {
+		fmt.Printf("%d) %s\n", i+1, Metad.TAGS[i])
 	}
 }
 
@@ -56,10 +57,16 @@ func ScriptGetTags(path string) []string {
 		return []string{"nil(f)"}
 	}
 	//println(path)
-	x := aux.GetGlobal("METADATA").(*lua.LTable)
+
+	// Safe type assertion with check
+	metadata := aux.GetGlobal("METADATA")
+	x, ok := metadata.(*lua.LTable)
+	if !ok {
+		return []string{"nil(t)"}
+	}
+
 	if err = gluamapper.Map(x, &newMeta); err != nil {
 		return []string{"nil(m)"}
 	}
 	return newMeta.TAGS
 }
-

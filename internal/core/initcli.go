@@ -82,77 +82,27 @@ func changeLivePrefix() (string, bool) {
 
 // Load suggestions
 func (paux *ProfAux) completer(d prompt.Document) []prompt.Suggest {
-	//inputs := strings.Split(d.CurrentLine(), " ")
 	inputs := strings.Split(d.TextBeforeCursor(), " ")
 	length := len(inputs)
 
-	// Specific options \\ Commands written
+	// Specific options - commands with 2 tokens
 	if length == 2 {
-		switch inputs[0] {
-		case "use":
-			if ScriptSuggestions != nil {
-				return prompt.FilterHasPrefix(*ScriptSuggestions, inputs[1], true)
-			}
-			return []prompt.Suggest{}
-
-		case "search":
-			return prompt.FilterHasPrefix([]prompt.Suggest{
-				{Text: "match", Description: "Match string"},
-				{Text: "tag", Description: "Search tags"},
-			}, inputs[1], true)
-
-		case "export":
-			if ScriptSuggestions != nil {
-				return prompt.FilterHasPrefix(*ScriptSuggestions, inputs[1], true)
-			}
-			return []prompt.Suggest{}
-
-		case "globals":
-			return prompt.FilterHasPrefix([]prompt.Suggest{
-				{Text: "set", Description: "Set global variable kv"},
-				{Text: "rm", Description: "Remove global variable"},
-			}, inputs[1], true)
-
-		case "vpm":
-			return prompt.FilterHasPrefix([]prompt.Suggest{
-				{Text: "search", Description: "Search for scripts with a pattern"},
-				{Text: "install", Description: "Install a script"},
-				{Text: "sync", Description: "Synchronize with remote repository"},
-				{Text: "verify", Description: "Verify package signature"},
-				{Text: "key", Description: "Manage keys"},
-			}, inputs[1], true)
-
-		case "reload":
-			return prompt.FilterHasPrefix([]prompt.Suggest{
-				{Text: "root", Description: "Reload root directory"},
-				{Text: "script", Description: "Reload script in memory"},
-			}, inputs[1], true)
-
-		case "help":
-			return prompt.FilterHasPrefix(HelpSugg, inputs[1], true)
-		}
+		return paux.completeSecondArg(inputs)
 	}
 
-	// VPM subcommands
+	// VPM subcommands - commands with 3 tokens
 	if length == 3 {
-		switch inputs[1] {
-		case "key":
-			return prompt.FilterHasPrefix([]prompt.Suggest{
-				{Text: "show", Description: "Show keys"},
-				{Text: "del", Description: "Delete key"},
-				{Text: "add", Description: "Add key from file"},
-			}, inputs[2], true)
-		case "search":
-			return prompt.FilterHasPrefix([]prompt.Suggest{
-				{Text: "all", Description: "Return all packages"},
-			}, inputs[2], true)
-		}
+		return paux.completeThirdArg(inputs)
 	}
 
-	// General options \\ No written commands
+	// General options - first argument completion
+	return paux.completeFirstArg(inputs)
+}
+
+// completeFirstArg returns suggestions for the first argument
+func (paux *ProfAux) completeFirstArg(inputs []string) []prompt.Suggest {
 	promptSuggestions := []prompt.Suggest{
 		{Text: "help", Description: "Show help menu"},
-		//{Text: "bash",    	Description: "Spawn a command shell"},
 		{Text: "import", Description: "Import a (edited) script"},
 		{Text: "export", Description: "Export a script (to edit)"},
 		{Text: "globals", Description: "Show global variables"},
@@ -161,7 +111,7 @@ func (paux *ProfAux) completer(d prompt.Document) []prompt.Suggest {
 		{Text: "exit", Description: "Exit from the prompt"},
 	}
 
-	if paux.p.SSet { // Options only valid when there is a selected script.
+	if paux.p.SSet { // Options only valid when there is a selected script
 		promptSuggestions = append(promptSuggestions,
 			prompt.Suggest{Text: "set", Description: "Set value for a var"},
 			prompt.Suggest{Text: "run", Description: "Run a script/module"},
@@ -170,7 +120,7 @@ func (paux *ProfAux) completer(d prompt.Document) []prompt.Suggest {
 			prompt.Suggest{Text: "lua", Description: "Run Lua code in running mod"},
 			prompt.Suggest{Text: "info", Description: "Info/metadata about script/module"},
 		)
-	} else { // Options only valid when there is no selected script.
+	} else { // Options only valid when there is no selected script
 		promptSuggestions = append(promptSuggestions,
 			prompt.Suggest{Text: "search", Description: "Search script/module"},
 			prompt.Suggest{Text: "use", Description: "Load a script/module"},
@@ -178,23 +128,68 @@ func (paux *ProfAux) completer(d prompt.Document) []prompt.Suggest {
 	}
 
 	return prompt.FilterHasPrefix(promptSuggestions, inputs[0], true)
-	/*
-		return prompt.FilterContains(
-			[]prompt.Suggest{
-				// General options
-				{Text: "help", 	Description: "Show help menu"},
-				{Text: "use", 	Description: "Load a script/module"},
-				{Text: "bash", 	Description: "Spawn shell"},
+}
 
-				// Inside script/module options
-				{Text:"back", 		Description:"Exit module/script"},
-				{Text:"set",		Description:"Set value for a ver"},
-				{Text: "options", 	Description: "Show variables of script/module"},
-				{Text: "info", 		Description: "Info/metadata about script/module"},
-				{Text: "run", 		Description: "Run a script/module"},
-				{Text: "lua", 		Description: "Run Lua code in running mod"},
-			}, d.GetWordBeforeCursor(),true)
-	*/
+// completeSecondArg returns suggestions for second arguments based on the command
+func (paux *ProfAux) completeSecondArg(inputs []string) []prompt.Suggest {
+	switch inputs[0] {
+	case "use", "export":
+		if ScriptSuggestions != nil {
+			return prompt.FilterHasPrefix(*ScriptSuggestions, inputs[1], true)
+		}
+		return []prompt.Suggest{}
+
+	case "search":
+		return prompt.FilterHasPrefix([]prompt.Suggest{
+			{Text: "match", Description: "Match string"},
+			{Text: "tag", Description: "Search tags"},
+		}, inputs[1], true)
+
+	case "globals":
+		return prompt.FilterHasPrefix([]prompt.Suggest{
+			{Text: "set", Description: "Set global variable kv"},
+			{Text: "rm", Description: "Remove global variable"},
+		}, inputs[1], true)
+
+	case "vpm":
+		return prompt.FilterHasPrefix([]prompt.Suggest{
+			{Text: "search", Description: "Search for scripts with a pattern"},
+			{Text: "install", Description: "Install a script"},
+			{Text: "sync", Description: "Synchronize with remote repository"},
+			{Text: "verify", Description: "Verify package signature"},
+			{Text: "key", Description: "Manage keys"},
+		}, inputs[1], true)
+
+	case "reload":
+		return prompt.FilterHasPrefix([]prompt.Suggest{
+			{Text: "root", Description: "Reload root directory"},
+			{Text: "script", Description: "Reload script in memory"},
+		}, inputs[1], true)
+
+	case "help":
+		return prompt.FilterHasPrefix(HelpSugg, inputs[1], true)
+	}
+
+	return []prompt.Suggest{}
+}
+
+// completeThirdArg returns suggestions for third arguments (VPM subcommands)
+func (paux *ProfAux) completeThirdArg(inputs []string) []prompt.Suggest {
+	switch inputs[1] {
+	case "key":
+		return prompt.FilterHasPrefix([]prompt.Suggest{
+			{Text: "show", Description: "Show keys"},
+			{Text: "del", Description: "Delete key"},
+			{Text: "add", Description: "Add key from file"},
+		}, inputs[2], true)
+
+	case "search":
+		return prompt.FilterHasPrefix([]prompt.Suggest{
+			{Text: "all", Description: "Return all packages"},
+		}, inputs[2], true)
+	}
+
+	return []prompt.Suggest{}
 }
 
 /*

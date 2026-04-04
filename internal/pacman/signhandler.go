@@ -40,10 +40,9 @@ type SignPack struct {
 	Sign   string `json:"Sign"`
 }
 
-
 /*
-	VerifyPk will verify the sequence of bytes using
-	the public key.
+VerifyPk will verify the sequence of bytes using
+the public key.
 */
 func VerifyPk(r io.Reader, pemEncd []byte, bsign []byte) bool {
 	blk, _ := pem.Decode(pemEncd)
@@ -51,12 +50,21 @@ func VerifyPk(r io.Reader, pemEncd []byte, bsign []byte) bool {
 	publicKey, err := x509.ParsePKIXPublicKey(x509Encd) // generic key
 	if err != nil {
 		println(err.Error())
+		return false
 	}
-	pk := publicKey.(*ecdsa.PublicKey)
+
+	// Safe type assertion with check
+	pk, ok := publicKey.(*ecdsa.PublicKey)
+	if !ok {
+		println("Error: public key is not ECDSA type")
+		return false
+	}
+
 	h := sha256.New()
 	_, err = io.Copy(h, r)
 	if err != nil {
 		fmt.Println(err.Error())
+		return false
 	}
 	hash := h.Sum(nil)
 	return ecdsa.VerifyASN1(pk, hash, bsign)
@@ -124,9 +132,8 @@ func VerifySignatureScript(data []byte, hash string) bool {
 	return nil
 }*/
 
-
 func RegisterKeyFromFile(db *db.DBDef, file string) error {
-	data,err := ioutil.ReadFile(file)
+	data, err := ioutil.ReadFile(file)
 	if err != nil {
 		return err
 	}
@@ -135,7 +142,7 @@ func RegisterKeyFromFile(db *db.DBDef, file string) error {
 	if err != nil {
 		return err
 	}
-	
+
 	// Test if there is the same email registered
 	_, err = GetKeyByEmail(kp.Email, db)
 	if err == nil {
@@ -149,7 +156,6 @@ func RegisterKeyFromFile(db *db.DBDef, file string) error {
 
 	return nil
 }
-
 
 func ShowKeys(db *db.DBDef) {
 	data, err := GetRegisteredKeys(db)
@@ -170,7 +176,6 @@ func ShowKeys(db *db.DBDef) {
 	}
 	t.Print()
 }
-
 
 func GenerateFingerprint(pemKey string) (string, error) {
 	block, _ := pem.Decode([]byte(pemKey))
@@ -194,7 +199,6 @@ func GenerateFingerprint(pemKey string) (string, error) {
 
 	return sha256Fingerprint, nil
 }
-
 
 func DeleteRegisKey(dbc *db.DBDef, Email string) error {
 	_, err := GetKeyByEmail(Email, dbc)

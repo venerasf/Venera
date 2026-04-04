@@ -9,6 +9,7 @@ import (
 	"github.com/cheynewallace/tabby"
 	"gopkg.in/yaml.v2"
 
+	"venera/internal/constants"
 	"venera/internal/db"
 	"venera/internal/utils"
 )
@@ -115,7 +116,7 @@ func installer(data []byte, vnrhome string, scriptPath string) int {
 	if strings.Split(path, "")[0] != "/" {
 		path = "/" + path
 	}
-	err = os.MkdirAll(vnrhome+path, 0700)
+	err = os.MkdirAll(vnrhome+path, constants.ScriptDirPermissions)
 	if err != nil {
 		utils.PrintErr(err.Error())
 		return 3

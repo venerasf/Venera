@@ -2,6 +2,8 @@ package db
 
 import (
 	"os"
+	"path/filepath"
+	"venera/internal/constants"
 	"venera/internal/utils"
 )
 
@@ -9,14 +11,16 @@ func createVeneraDir(homeDir string) error {
 	println("It seems like your first time running it!")
 	println("After all finished setup process, please type `vpm sync` to synchronize packages.")
 	utils.PrintSuccs("Setting up ~/.venera")
-	return os.Mkdir(homeDir+"/.venera", 0750)
+	veneraPath := filepath.Join(homeDir, constants.VeneraDirName)
+	return os.Mkdir(veneraPath, constants.VeneraDirPermissions)
 }
 
 /*
 TestVeneraDir will test the directory where venera will store everything
 */
 func TestVeneraDir(homeDir string) error {
-	_, folderExist := os.Stat(homeDir + "/.venera")
+	veneraPath := filepath.Join(homeDir, constants.VeneraDirName)
+	_, folderExist := os.Stat(veneraPath)
 	/*
 		Many problems can occur but for now this unique will be validated.
 	*/

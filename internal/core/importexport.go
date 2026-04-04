@@ -4,15 +4,13 @@
 package core
 
 import (
-	"io/ioutil"
-	"os"
 	"path/filepath"
 	"venera/internal/types"
 	"venera/internal/utils"
 )
 
 // Import script from somewhere to inside scripts file
-func SCImportScript(p types.Profile,pathFrom string, pathTo string) {
+func SCImportScript(p types.Profile, pathFrom string, pathTo string) {
 	// Validate that pathTo doesn't contain directory traversal
 	myscriptsDir := filepath.Clean(p.Globals["myscripts"])
 	safePath, err := utils.SafeJoinPath(myscriptsDir, pathTo)
@@ -20,34 +18,15 @@ func SCImportScript(p types.Profile,pathFrom string, pathTo string) {
 		utils.PrintErr("Invalid destination path: " + err.Error())
 		return
 	}
-	
-	cont, err := ioutil.ReadFile(pathFrom)
-	if err != nil {
-		utils.PrintErr(err.Error())
-		return
-	}
-	
-	// Create directory if needed
-	dir := filepath.Dir(safePath)
-	if err := os.MkdirAll(dir, 0750); err != nil {
-		utils.PrintErr("Failed to create directory: " + err.Error())
-		return
-	}
-	
-	file, err :=  os.Create(safePath)
-	if err != nil {
-		utils.PrintErr(err.Error())
-		return
-	}
-	defer file.Close()
 
-	_, err = file.Write(cont)
+	// Copy file to safe destination
+	finalPath, err := utils.CopyFile(pathFrom, safePath, 0750, 0640)
 	if err != nil {
 		utils.PrintErr(err.Error())
 		return
 	}
-	
-	utils.PrintSuccs("Script imported to: " + safePath)
+
+	utils.PrintSuccs("Script imported to: " + finalPath)
 }
 
 // export a script
@@ -59,13 +38,7 @@ func SCExportScript(p types.Profile, pathFrom string, pathTo string) {
 		utils.PrintErr("Invalid source path: " + err.Error())
 		return
 	}
-	
-	cont, err := ioutil.ReadFile(safePathFrom)
-	if err != nil {
-		utils.PrintErr(err.Error())
-		return
-	}
-	
+
 	// For export, we allow writing to user-specified location
 	// but we still clean the path and validate it's absolute
 	cleanPathTo := filepath.Clean(pathTo)
@@ -77,19 +50,13 @@ func SCExportScript(p types.Profile, pathFrom string, pathTo string) {
 			return
 		}
 	}
-	
-	fileTo, err :=  os.Create(cleanPathTo)
-	if err != nil {
-		utils.PrintErr(err.Error())
-		return
-	}
-	defer fileTo.Close()
 
-	_, err = fileTo.Write(cont)
+	// Copy file to export destination
+	finalPath, err := utils.CopyFile(safePathFrom, cleanPathTo, 0750, 0640)
 	if err != nil {
 		utils.PrintErr(err.Error())
 		return
 	}
-	
-	utils.PrintSuccs("Script exported to: " + cleanPathTo)
+
+	utils.PrintSuccs("Script exported to: " + finalPath)
 }

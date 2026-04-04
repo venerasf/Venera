@@ -117,28 +117,28 @@ func ValidatePath(path string, allowedDir string) (string, error) {
 	// Clean the paths to resolve . and ..
 	cleanPath := filepath.Clean(path)
 	cleanAllowedDir := filepath.Clean(allowedDir)
-	
+
 	// Convert to absolute paths
 	absPath, err := filepath.Abs(cleanPath)
 	if err != nil {
 		return "", fmt.Errorf("invalid path: %w", err)
 	}
-	
+
 	absAllowedDir, err := filepath.Abs(cleanAllowedDir)
 	if err != nil {
 		return "", fmt.Errorf("invalid allowed directory: %w", err)
 	}
-	
+
 	// Check if the path starts with the allowed directory
 	if !strings.HasPrefix(absPath, absAllowedDir) {
 		return "", fmt.Errorf("path traversal detected: %s is outside allowed directory %s", path, allowedDir)
 	}
-	
+
 	// Additional check for path separators
 	if strings.Contains(path, "..") {
 		return "", fmt.Errorf("path contains directory traversal sequence: %s", path)
 	}
-	
+
 	return absPath, nil
 }
 
@@ -150,10 +150,39 @@ func SafeJoinPath(base string, elem string) (string, error) {
 	// Clean both paths
 	cleanBase := filepath.Clean(base)
 	cleanElem := filepath.Clean(elem)
-	
+
 	// Join them
 	joined := filepath.Join(cleanBase, cleanElem)
-	
+
 	// Validate the result
 	return ValidatePath(joined, cleanBase)
+}
+
+/*
+CopyFile copies a file from src to dst.
+Creates the destination directory if needed.
+Returns the cleaned destination path and any error.
+*/
+func CopyFile(src, dst string, dirPerm, filePerm os.FileMode) (string, error) {
+	// Read source file
+	content, err := os.ReadFile(src)
+	if err != nil {
+		return "", fmt.Errorf("failed to read source file: %w", err)
+	}
+
+	// Clean destination path
+	cleanDst := filepath.Clean(dst)
+
+	// Create destination directory if needed
+	dir := filepath.Dir(cleanDst)
+	if err := os.MkdirAll(dir, dirPerm); err != nil {
+		return "", fmt.Errorf("failed to create directory: %w", err)
+	}
+
+	// Write to destination
+	if err := os.WriteFile(cleanDst, content, filePerm); err != nil {
+		return "", fmt.Errorf("failed to write destination file: %w", err)
+	}
+
+	return cleanDst, nil
 }

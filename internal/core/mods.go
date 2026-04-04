@@ -12,9 +12,10 @@ import (
 	"regexp"
 	"sort"
 	"strings"
-	"venera/internal/wlua"
-	"venera/internal/utils"
+	"venera/internal/constants"
 	"venera/internal/types"
+	"venera/internal/utils"
+	"venera/internal/wlua"
 
 	"github.com/c-bata/go-prompt"
 	"github.com/cheynewallace/tabby"
@@ -22,7 +23,7 @@ import (
 
 var ScriptSuggestions *[]prompt.Suggest // script list with descriptions
 var SCTAG []types.ScriptTAGInfo         // script list with tags and infos,
-										// it will be in memory for later use.
+// it will be in memory for later use.
 
 // Load all paths, get metadata INFO and tags
 // TODO: The regex can be better
@@ -63,111 +64,99 @@ func SCGetPath(p types.Profile) []string {
 // Use for search functions
 // TODO: Use `strings.ToLower()` to match strings without case sensitive
 func SCListScripts(p types.Profile, key []string) {
-	pathList := SCGetPath(p)
-	t := tabby.New()
-
 	if len(key) == 1 {
-		// TODO: Put a limit
-		t.AddHeader("COUNT", "PATH", "DESCRIPTION", "TAGS")
-		aux := SCTAG
-		for i := range pathList {
-			t.AddLine(i+1, aux[i].Path, aux[i].Info, JoinTgs(aux[i].Tag))
-		}
-		print("\n")
-		t.Print()
-		print("\n")
-
+		printAllScripts()
 	} else if (key[1] == "all" || key[1] == "a") && len(key) >= 2 {
-		t.AddHeader("COUNT", "PATH", "DESCRIPTION", "TAGS")
-		aux := SCTAG
-		for i := range aux {
-			t.AddLine(i+1, aux[i].Path, aux[i].Info, JoinTgs(aux[i].Tag))
-		}
-		print("\n")
-		t.Print()
-		print("\n")
-
-		// List match just path
+		printAllScripts()
 	} else if (key[1] == "match:path" || key[1] == "m:path" || key[1] == "m:p" || key[1] == "match:p") && len(key) >= 3 {
-		t.AddHeader("COUNT", "PATH", "DESCRIPTION", "TAGS")
-		aux := SCTAG
-		for i := range aux {
-			if strings.Contains(strings.ToLower(aux[i].Path), strings.ToLower(key[2])) {
-				t.AddLine(i+1, aux[i].Path, aux[i].Info, JoinTgs(aux[i].Tag))
-			}
-		}
-		print("\n")
-		t.Print()
-		print("\n")
-
-		// List match description
+		printMatchingScripts(func(sc types.ScriptTAGInfo) bool {
+			return strings.Contains(strings.ToLower(sc.Path), strings.ToLower(key[2]))
+		})
 	} else if (key[1] == "match:description" || key[1] == "m:description" || key[1] == "m:d" || key[1] == "match:d") && len(key) >= 3 {
-		t.AddHeader("COUNT", "PATH", "DESCRIPTION", "TAGS")
-		aux := SCTAG
-		for i := range aux {
-			if strings.Contains(aux[i].Info, key[2]) {
-				t.AddLine(i+1, aux[i].Path, aux[i].Info, JoinTgs(aux[i].Tag))
-			}
-		}
-		print("\n")
-		t.Print()
-		print("\n")
-
-		// Match anything, path and description
+		printMatchingScripts(func(sc types.ScriptTAGInfo) bool {
+			return strings.Contains(sc.Info, key[2])
+		})
 	} else if (key[1] == "match" || key[1] == "m") && len(key) >= 3 {
-		t.AddHeader("COUNT", "PATH", "DESCRIPTION", "TAGS")
-		aux := SCTAG
-		for i := range aux {
-			if strings.Contains(aux[i].Path, key[2]) || strings.Contains(aux[i].Info, key[2]) {
-				t.AddLine(i+1, aux[i].Path, aux[i].Info, JoinTgs(aux[i].Tag))
-			}
-		}
-		print("\n")
-		t.Print()
-		print("\n")
-
+		printMatchingScripts(func(sc types.ScriptTAGInfo) bool {
+			return strings.Contains(sc.Path, key[2]) || strings.Contains(sc.Info, key[2])
+		})
 	} else if (key[1] == "tag" || key[1] == "t") && len(key) == 2 {
 		print("\n")
 		fmt.Println("AVAILABLE TAGS:\n", TagsJoinALL())
 		print("\n")
 	} else if (key[1] == "tag" || key[1] == "t") && len(key) >= 3 {
-		t.AddHeader("COUNT", "PATH", "INFO", "TAG")
-		aux := SCTAG
-		for x, tag := range aux {
-			for i := range tag.Tag {
-				for _, j := range key[2:] {
-					if strings.Contains(strings.ToLower(tag.Tag[i]), strings.ToLower(j)) {
-						tags := strings.Join(tag.Tag, ", ")
-						if len(tags) < 20 {
-							t.AddLine(x+1, tag.Path, tag.Info, tags)
-						} else {
-							t.AddLine(x+1, tag.Path, tag.Info, tags[:20]+"...")
-						}
-						break
+		printMatchingTags(key[2:])
+	} else {
+		printScriptSuggestions()
+	}
+}
+
+// printAllScripts displays all scripts in a table
+func printAllScripts() {
+	t := tabby.New()
+	t.AddHeader("COUNT", "PATH", "DESCRIPTION", "TAGS")
+	for i, sc := range SCTAG {
+		t.AddLine(i+1, sc.Path, sc.Info, JoinTgs(sc.Tag))
+	}
+	print("\n")
+	t.Print()
+	print("\n")
+}
+
+// printMatchingScripts displays scripts matching a filter function
+func printMatchingScripts(matchFunc func(types.ScriptTAGInfo) bool) {
+	t := tabby.New()
+	t.AddHeader("COUNT", "PATH", "DESCRIPTION", "TAGS")
+	for i, sc := range SCTAG {
+		if matchFunc(sc) {
+			t.AddLine(i+1, sc.Path, sc.Info, JoinTgs(sc.Tag))
+		}
+	}
+	print("\n")
+	t.Print()
+	print("\n")
+}
+
+// printMatchingTags displays scripts matching specific tags
+func printMatchingTags(searchTags []string) {
+	t := tabby.New()
+	t.AddHeader("COUNT", "PATH", "INFO", "TAG")
+	for x, tag := range SCTAG {
+		for i := range tag.Tag {
+			for _, j := range searchTags {
+				if strings.Contains(strings.ToLower(tag.Tag[i]), strings.ToLower(j)) {
+					tags := strings.Join(tag.Tag, ", ")
+					if len(tags) < 20 {
+						t.AddLine(x+1, tag.Path, tag.Info, tags)
+					} else {
+						t.AddLine(x+1, tag.Path, tag.Info, tags[:20]+"...")
 					}
+					break
 				}
 			}
 		}
-		print("\n")
-		t.Print()
-		print("\n")
-
-	} else {
-		// TODO: Put a limit
-		t.AddHeader("COUNT", "PATH", "DESCRIPTION")
-		aux := *ScriptSuggestions
-		for i := range aux {
-			t.AddLine(i+1, aux[i].Text, aux[i].Description)
-		}
-		print("\n")
-		t.Print()
-		print("\n")
 	}
+	print("\n")
+	t.Print()
+	print("\n")
+}
+
+// printScriptSuggestions displays script suggestions in a table
+func printScriptSuggestions() {
+	t := tabby.New()
+	t.AddHeader("COUNT", "PATH", "DESCRIPTION")
+	if ScriptSuggestions != nil {
+		for i, suggestion := range *ScriptSuggestions {
+			t.AddLine(i+1, suggestion.Text, suggestion.Description)
+		}
+	}
+	print("\n")
+	t.Print()
+	print("\n")
 }
 
 // // Extract INFO from script based on the regex passed (in SCLoadScripts())
 func SCExtractMetadataINFO(path string, re *regexp.Regexp) string {
-	const l = 25
 	content, err := ioutil.ReadFile(path)
 	if err != nil {
 		return "Nil info..."
@@ -176,8 +165,8 @@ func SCExtractMetadataINFO(path string, re *regexp.Regexp) string {
 	if len(match) < 7 {
 		return "Nil info..."
 	}
-	if len(match[7]) >= l-1 {
-		return match[7][:l] + "..."
+	if len(match[7]) >= constants.MaxInfoDisplayLength-1 {
+		return match[7][:constants.MaxInfoDisplayLength] + "..."
 	} else {
 		return match[7]
 	}
@@ -185,10 +174,9 @@ func SCExtractMetadataINFO(path string, re *regexp.Regexp) string {
 
 // Create a string with ths in fixed length
 func JoinTgs(t []string) string {
-	const l = 25
 	aux := strings.Join(t, ",")
-	if len(aux) >= l-1 {
-		return aux[:l]
+	if len(aux) >= constants.MaxInfoDisplayLength-1 {
+		return aux[:constants.MaxInfoDisplayLength]
 	} else {
 		return aux
 	}
@@ -213,14 +201,13 @@ func TagsJoinALL() string {
 	return strings.Join(list, ",")
 }
 
-
 func SCInfoForChaining(p types.Profile) {
 	m := make(map[string]bool)
 	utils.PrintSuccs("Listing loaded scripts.")
-	for i := range(p.Scriptslist) {
+	for i := range p.Scriptslist {
 		if !m[p.Scriptslist[i]] {
 			m[p.Scriptslist[i]] = true
-			fmt.Println("- "+p.Scriptslist[i])
+			fmt.Println("- " + p.Scriptslist[i])
 		}
 	}
 }
