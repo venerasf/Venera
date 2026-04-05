@@ -3,6 +3,7 @@ package core
 import (
 	"os"
 	"os/exec"
+	"sort"
 	"strings"
 	"venera/internal/types"
 
@@ -175,6 +176,10 @@ func (paux *ProfAux) completeSecondArg(inputs []string) []prompt.Suggest {
 
 // completeThirdArg returns suggestions for third arguments (VPM subcommands)
 func (paux *ProfAux) completeThirdArg(inputs []string) []prompt.Suggest {
+	if inputs[0] == "globals" && (inputs[1] == "set" || inputs[1] == "rm") {
+		return prompt.FilterHasPrefix(paux.globalKeySuggestions(), inputs[2], true)
+	}
+
 	switch inputs[1] {
 	case "key":
 		return prompt.FilterHasPrefix([]prompt.Suggest{
@@ -190,6 +195,28 @@ func (paux *ProfAux) completeThirdArg(inputs []string) []prompt.Suggest {
 	}
 
 	return []prompt.Suggest{}
+}
+
+func (paux *ProfAux) globalKeySuggestions() []prompt.Suggest {
+	if paux.p == nil || paux.p.Globals == nil {
+		return []prompt.Suggest{}
+	}
+
+	keys := make([]string, 0, len(paux.p.Globals))
+	for key := range paux.p.Globals {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+
+	suggestions := make([]prompt.Suggest, 0, len(keys))
+	for _, key := range keys {
+		suggestions = append(suggestions, prompt.Suggest{
+			Text:        key,
+			Description: "Global variable",
+		})
+	}
+
+	return suggestions
 }
 
 /*
