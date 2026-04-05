@@ -115,5 +115,7 @@ func LuaFreeScript() {
 	//LuaProf.State.Close()
 	//p.SSet = false
 	//p.Script = ""
-	LuaProf.State = nil
+	if LuaProf != nil {
+		LuaProf.State = nil
+	}
 }

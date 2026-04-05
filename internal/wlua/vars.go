@@ -13,9 +13,45 @@ import (
 	lua "github.com/yuin/gopher-lua"
 )
 
+func getVarsTable(L *lua.LState) (*lua.LTable, bool) {
+	vars := L.GetGlobal("VARS")
+	varsTable, ok := vars.(*lua.LTable)
+	if !ok {
+		utils.PrintErr("Failed to load variables: script VARS table is missing")
+		return nil, false
+	}
+
+	return varsTable, true
+}
+
+func getScriptVarTable(varsTable *lua.LTable, key string) (*lua.LTable, bool) {
+	varKey := key
+	value := varsTable.RawGetString(varKey)
+	if _, ok := value.(*lua.LTable); !ok {
+		varsTable.ForEach(func(k lua.LValue, _ lua.LValue) {
+			if strings.EqualFold(k.String(), key) {
+				varKey = k.String()
+			}
+		})
+		value = varsTable.RawGetString(varKey)
+	}
+
+	varTable, ok := value.(*lua.LTable)
+	if !ok {
+		return nil, false
+	}
+
+	return varTable, true
+}
+
 // Load vars
 func LoadVars(L *lua.LState) int {
-	if err := gluamapper.Map(L.GetGlobal("VARS").(*lua.LTable), &LoadVar); err != nil {
+	varsTable, ok := getVarsTable(L)
+	if !ok {
+		return 0
+	}
+
+	if err := gluamapper.Map(varsTable, &LoadVar); err != nil {
 		utils.PrintErr("Failed to load script variables: " + err.Error())
 		return 0
 	}
@@ -51,9 +87,17 @@ func SetVarValue(L *lua.LState, key string, value string) {
 
 	if ex {
 		//L.DoString(fmt.Sprintf(`VARS.%s.VALUE="%s"`, key, value))
+		varsTable, ok := getVarsTable(L)
+		if !ok {
+			return
+		}
 
-		lvalue := L.GetGlobal("VARS")
-		lvalue1 := L.GetField(lvalue, key)
+		lvalue1, ok := getScriptVarTable(varsTable, key)
+		if !ok {
+			utils.PrintErr("Variable not found in script: " + key)
+			return
+		}
+
 		newValue := lua.LString(value)
 		L.SetField(lvalue1, "VALUE", newValue)
 
@@ -67,17 +111,27 @@ func SetVarValue(L *lua.LState, key string, value string) {
 
 // InstSet variables from globals
 func SetFromGlobals(L *lua.LState, p *types.Profile) {
-	vars := new(map[string]VarDef)
-
-	if err := gluamapper.Map(L.GetGlobal("VARS").(*lua.LTable), &vars); err != nil {
-		utils.PrintErr("Failed to load variables from globals: " + err.Error())
+	varsTable, ok := getVarsTable(L)
+	if !ok {
 		return
 	}
 
+	varsByUpper := make(map[string]string)
+	varsTable.ForEach(func(k lua.LValue, _ lua.LValue) {
+		varsByUpper[strings.ToUpper(k.String())] = k.String()
+	})
+
 	for i := range p.Globals {
-		//println("VARS."+i+".VALUE=\""+p.Globals[i]+"\"")
-		lvalue := L.GetGlobal("VARS")
-		lvalue1 := L.GetField(lvalue, i)
+		varKey, exists := varsByUpper[strings.ToUpper(i)]
+		if !exists {
+			continue
+		}
+
+		lvalue1 := varsTable.RawGetString(varKey)
+		if _, ok := lvalue1.(*lua.LTable); !ok {
+			continue
+		}
+
 		newValue := lua.LString(p.Globals[i])
 		L.SetField(lvalue1, "VALUE", newValue)
 
@@ -104,10 +158,21 @@ func GetVarsToChainTAGS(p *types.Profile) {
 	for _, f := range p.Scriptslist {
 		L := lua.NewState()
 		Sets(L)
-		L.DoFile(f)
+		err := L.DoFile(f)
+		if err != nil {
+			utils.PrintErr("Failed to load script " + f + ": " + err.Error())
+			L.Close()
+			continue
+		}
+
+		varsTable, ok := getVarsTable(L)
+		if !ok {
+			L.Close()
+			continue
+		}
 
 		auxVar := make(map[string]VarDef)
-		if err := gluamapper.Map(L.GetGlobal("VARS").(*lua.LTable), &auxVar); err != nil {
+		if err := gluamapper.Map(varsTable, &auxVar); err != nil {
 			utils.PrintErr("Failed to load variables from script " + f + ": " + err.Error())
 			L.Close()
 			continue
